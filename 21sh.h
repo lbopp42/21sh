@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/19 10:29:20 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/19 14:36:05 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/21 14:05:00 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,19 @@
 
 # include "libft.h"
 # include <stdio.h>
+enum Operator
+{
+	SEMICOLON = 0,
+	PIPE,
+	LESS,
+	DLESS,
+	GREAT,
+	DGREAT,
+	INPUT,
+	OUTPUT,
+	WORD,
+	BLANK
+};
 
 typedef struct	s_token
 {
