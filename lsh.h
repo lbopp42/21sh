@@ -1,30 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   21sh.h                                             :+:      :+:    :+:   */
+/*   lsh.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/03/19 10:29:20 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/21 15:02:37 by lbopp            ###   ########.fr       */
+/*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
+/*   Updated: 2017/03/23 13:21:26 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LSH_H
 # define LSH_H
 
-# include "libft.h"
-# include <stdio.h>
-enum Operator
-{
+char	*g_line;
+
+#include "libft.h"
+#include <stdio.h>
+
+enum {
 	SEMICOLON = 0,
 	PIPE,
 	LESS,
-	DLESS,
 	GREAT,
+	DLESS,
 	DGREAT,
-	INPUT,
 	OUTPUT,
+	INPUT,
 	WORD,
 	BLANK
 };
@@ -35,6 +37,5 @@ typedef struct	s_token
 	char			*content;
 	struct s_token	*next;
 }				t_token;
-char	*g_line;
 
 #endif
