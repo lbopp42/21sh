@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:02:58 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/24 11:02:25 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/24 15:33:31 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,18 @@ int		isblank(int *i)
 	if (ft_isspace(g_line[*i]))
 		return (BLANK);
 	return (WORD);
+}
+
+int		isquote(int *i)
+{
+	if (g_line[*i] == '"')
+		return (DQUOTE);
+	else if (g_line[*i] == '\'')
+		return (QUOTE);
+	else if (g_line[*i] == '`')
+		return (BQUOTE);
+	else
+		return (WORD);
 }
 
 int		isop(int *i)
@@ -46,7 +58,7 @@ int		isop(int *i)
 
 int		find_type(int *i)
 {
-	static int	(*f[3])(int*) = {&isblank, &isop, 0};
+	static int	(*f[4])(int*) = {&isblank, &isop, &isquote, 0};
 	int			id;
 	int			ret;
 
@@ -58,24 +70,88 @@ int		find_type(int *i)
 	return (ret);
 }
 
-void	get_token(void)
+void	state_management(t_state **state_lst, int type)
 {
-	int	i;
-	int	ret;
+	t_state	*tmp;
+
+	if (!*state_lst)
+	{
+		if (!(*state_lst = (t_state*)ft_memalloc(sizeof(t_state))))
+			return ;
+		(*state_lst)->state = -1;
+		(*state_lst)->next = NULL;
+	}
+	else
+	{
+		tmp = *state_lst;
+		while (tmp->next != NULL)
+			tmp = tmp->next;
+		if (tmp->type == ret)
+		{
+			free(tmp);
+			tmp = NULL;
+		}
+		else
+		{
+			if (!(tmp->next = (t_state*)ft_memalloc(sizeof(t_state))))
+				return ;
+			tmp->next->state = type;
+			tmp->next->next = NULL;
+		}
+	}
+}
+
+void	token_management(t_token **tok_lst, int type, t_state *state_lst, int i)
+{
+	char	*tmp;
+	t_state	*tmp_tok;
+
+	tmp = NULL;
+	tmp = ft_strsub((const char*)g_line, i, 1);
+	if (!*tok_lst)
+	{
+		if (!(*tok_lst = (t_token*)ft_memalloc(sizeof(t_token))))
+			return ;
+		(*tok_lst)->content = ft_strdup(tmp);
+		(*tok_lst)->type = type;
+		(*tok_lst)->next = NULL;
+	}
+	else
+	{
+		tmp_tok = *tok_lst;
+		while (tmp_tok->next)
+			tmp_tok = tmp_tok->next;
+		if (!(tmp_tok->next = (t_token*)ft_memalloc(sizeof(t_token))))
+			return ;
+		tmp_tok->next->content = ft_strdup(tmp);
+	}
+}
+
+void	get_token(t_token **tok_lst)
+{
+	int		i;
+	int		ret;
+	t_state	*state_lst;
 
 	i = 0;
+	state_lst = NULL;
 	while (g_line[i])
 	{
 		ret = find_type(&i);
-		printf("%c = %d\n", g_line[i], ret);
+		if (ret == QUOTE || ret == DQUOTE || ret == BQUOTE)
+			state_management(&state_lst, ret);
+		token_management(tok_lst, ret, state_lst, i);
 		i++;
 	}
 }
 
 int		main(void)
 {
+	t_token	*tok_lst;
+
 	g_line = NULL;
+	tok_lst = NULL;
 	get_next_line(0, &g_line);
-	get_token();
+	get_token(&tok_lst);
 	return (1);
 }
