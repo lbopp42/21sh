@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:02:58 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/24 16:47:30 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/26 16:42:31 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,10 @@ int		find_type(int *i)
 void	state_management(t_state **state_lst, int type)
 {
 	t_state	*tmp;
+	t_state	*first;
 
+	first = NULL;
+	tmp = *state_lst;
 	if (!*state_lst)
 	{
 		if (!(*state_lst = (t_state*)ft_memalloc(sizeof(t_state))))
@@ -83,13 +86,23 @@ void	state_management(t_state **state_lst, int type)
 	}
 	else
 	{
-		tmp = *state_lst;
-		while (tmp->next != NULL)
+		if ((*state_lst)->state == type && !(*state_lst)->next)
+		{
+			free(*state_lst);
+			*state_lst = NULL;
+			return ;
+		}
+		while (tmp->next)
+		{
+			first = tmp;
 			tmp = tmp->next;
+		}
 		if (tmp->state == type)
 		{
 			free(tmp);
 			tmp = NULL;
+			if (first && first->next)
+				first->next = NULL;
 		}
 		else
 		{
@@ -115,17 +128,16 @@ void	print_lst(t_token *tok_lst)
 	}
 }
 
-void	token_management(t_token **tok_lst, int type, t_state *state_lst, int i)
+void	token_management(t_token **tok_lst, int type, t_state *state_lst, int *i)
 {
 	char		*tmp;
 	t_token		*tmp_tok;
 	const char	*token[9] = {";", "|", "<", ">", "<<", ">>", ">&", "<&", NULL};
 
-	/*while (state_lst && state_lst->next)
-		state_lst = state_lst->next;*/
-	(void)state_lst;
+	while (state_lst && state_lst->next)
+		state_lst = state_lst->next;
 	tmp = NULL;
-	tmp = ft_strsub((const char*)g_line, i, 1);
+	tmp = ft_strsub((const char*)g_line, *i, 1);
 	if (!*tok_lst)
 	{
 		if (!(*tok_lst = (t_token*)ft_memalloc(sizeof(t_token))))
@@ -139,8 +151,9 @@ void	token_management(t_token **tok_lst, int type, t_state *state_lst, int i)
 		tmp_tok = *tok_lst;
 		while (tmp_tok->next)
 			tmp_tok = tmp_tok->next;
-		if (tmp_tok->type == type)// || (state_lst && state_lst->state >= QUOTE
-				 //&& state_lst->state <= BQUOTE))
+		if ((tmp_tok->type == type || state_lst) && g_line[*i] != '`' &&
+				g_line[*i] != '\'' && g_line[*i] != '\"' &&
+				ft_strcmp(tmp_tok->content, "\""))
 			tmp_tok->content = ft_stradd(tmp_tok->content, tmp);
 		else
 		{
@@ -150,9 +163,12 @@ void	token_management(t_token **tok_lst, int type, t_state *state_lst, int i)
 				tmp_tok->next->content = ft_strdup(token[type]);
 			else
 				tmp_tok->next->content = ft_strdup(tmp);
-			if (state_lst && state_lst->state != -1)
+			/*if (state_lst)
+			{
 				tmp_tok->next->type = state_lst->state;
-			else
+				printf("[%c]\n", g_line[*i]);
+			}
+			else*/
 				tmp_tok->next->type = type;
 			tmp_tok->next->next = NULL;
 		}
@@ -172,7 +188,7 @@ void	get_token(t_token **tok_lst)
 		ret = find_type(&i);
 		if (ret == QUOTE || ret == DQUOTE || ret == BQUOTE)
 			state_management(&state_lst, ret);
-		token_management(tok_lst, ret, state_lst, i);
+		token_management(tok_lst, ret, state_lst, &i);
 		i++;
 	}
 }
