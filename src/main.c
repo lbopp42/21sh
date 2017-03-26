@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:02:58 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/26 16:42:31 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/26 17:43:18 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,22 +153,21 @@ void	token_management(t_token **tok_lst, int type, t_state *state_lst, int *i)
 			tmp_tok = tmp_tok->next;
 		if ((tmp_tok->type == type || state_lst) && g_line[*i] != '`' &&
 				g_line[*i] != '\'' && g_line[*i] != '\"' &&
-				ft_strcmp(tmp_tok->content, "\""))
+				ft_strcmp(tmp_tok->content, "\"") && ft_strcmp(tmp_tok->content, "`")
+					&& ft_strcmp(tmp_tok->content, "\'"))
 			tmp_tok->content = ft_stradd(tmp_tok->content, tmp);
 		else
 		{
+			printf("[%c]\n", g_line[*i]);
 			if (!(tmp_tok->next = (t_token*)ft_memalloc(sizeof(t_token))))
 				return ;
 			if (type >= 0 && type <= 7)
 				tmp_tok->next->content = ft_strdup(token[type]);
 			else
 				tmp_tok->next->content = ft_strdup(tmp);
-			/*if (state_lst)
-			{
+			if (state_lst)
 				tmp_tok->next->type = state_lst->state;
-				printf("[%c]\n", g_line[*i]);
-			}
-			else*/
+			else
 				tmp_tok->next->type = type;
 			tmp_tok->next->next = NULL;
 		}
