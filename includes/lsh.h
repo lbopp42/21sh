@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/26 16:32:54 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/27 12:35:57 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,5 +51,8 @@ typedef struct	s_token
 	char			*content;
 	struct s_token	*next;
 }				t_token;
+
+void	print_lst(t_token *tok_lst);
+void	get_token(t_token **tok_lst);
 
 #endif
