@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/27 14:23:29 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/27 15:43:14 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,14 +69,11 @@ int	main(void)
 		{DQUOTE, "\""},
 		{0, NULL}	
 	};
-	/*t_tok_test	tok_array5[] = {
+	t_tok_test	tok_array5[] = {
 		{WORD, "echo"},
 		{BLANK, " "},
 		{DQUOTE, "\""},
-		{DQUOTE, "ls"},
-		{DQUOTE, " "},
-		{DQUOTE, ";"},
-		{DQUOTE, " "},
+		{DQUOTE, "ls ; "},
 		{BQUOTE, "`"},
 		{BQUOTE, "cat"},
 		{DQUOTE, "`"},
@@ -85,7 +82,57 @@ int	main(void)
 		{DQUOTE, "test2"},
 		{DQUOTE, "\""},
 		{0, NULL}	
-	};*/
+	};
+	t_tok_test	tok_array6[] = {
+		{WORD, "mkdir"},
+		{BLANK, " "},
+		{WORD, "test"},
+		{BLANK, " "},
+		{SEMICOLON, ";"},
+		{BLANK, " "},
+		{WORD, "cd"},
+		{BLANK, " "},
+		{WORD, "test"},
+		{BLANK, " "},
+		{SEMICOLON, ";"},
+		{BLANK, " "},
+		{WORD, "ls"},
+		{BLANK, " "},
+		{WORD, "-a"},
+		{BLANK, " "},
+		{SEMICOLON, ";"},
+		{BLANK, " "},
+		{WORD, "ls"},
+		{BLANK, " "},
+		{PIPE, "|"},
+		{BLANK, " "},
+		{WORD, "cat"},
+		{BLANK, " "},
+		{PIPE, "|"},
+		{BLANK, " "},
+		{WORD, "wc"},
+		{BLANK, " "},
+		{WORD, "-c"},
+		{BLANK, " "},
+		{GREAT, ">"},
+		{BLANK, " "},
+		{WORD, "fifi"},
+		{BLANK, " "},
+		{SEMICOLON, ";"},
+		{BLANK, " "},
+		{WORD, "cat"},
+		{BLANK, " "},
+		{WORD, "fifi"},
+		{0, NULL}	
+	};
+	t_tok_test	tok_array7[] = {
+		{WORD, "ls"},
+		{BLANK, " "},
+		{SEMICOLON, ";"},
+		{BLANK, " "},
+		{WORD, "cat"},
+		{0, NULL}
+	};
 
 	printf("\033[36m=========  Testing lsh  =========\n\n\033[0m");
 	printf("[ls]");
@@ -186,21 +233,17 @@ int	main(void)
 		printf("\033[32m\tOK\n\033[0m");
 
 	/*		TEST 5		*/
-	printf("TEST\n");
 	printf("[echo \"ls ; `cat`\"\"test2\"]");
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
 	free(g_line);
 	g_line = NULL;
-	printf("TEST2\n");
 	g_line = ft_strdup("echo \"ls ; `cat`\"\"test2\"");
 	get_token(&tok_lst);
 	i = 0;
 	tmp = tok_lst;
-	printf("TEST3\n");
-	print_lst(tok_lst);
-	/*while (tok_array5[i].content)
+	while (tok_array5[i].content)
 	{
 		if (tok_array5[i].type != tmp->type)
 			errortype++;
@@ -212,7 +255,57 @@ int	main(void)
 	if (errortype || errortoken)
 		printf("   \033[31mErrortype = %d and Errortoken = %d\n\033[0m", errortype, errortoken);
 	else
-		printf("\033[32m\tOK\n\033[0m");*/
+		printf("\033[32m\tOK\n\033[0m");
+
+	/*		TEST 6		*/
+	printf("[mkdir test ; cd test ; ls -a ; ls | cat | wc -c > fifi ; cat fifi]");
+	errortype = 0;
+	errortoken = 0;
+	tok_lst = NULL;
+	free(g_line);
+	g_line = NULL;
+	g_line = ft_strdup("mkdir test ; cd test ; ls -a ; ls | cat | wc -c > fifi ; cat fifi");
+	get_token(&tok_lst);
+	i = 0;
+	tmp = tok_lst;
+	while (tok_array6[i].content)
+	{
+		if (tok_array6[i].type != tmp->type)
+			errortype++;
+		if (ft_strcmp(tok_array6[i].content, tmp->content))
+			errortoken++;
+		i++;
+		tmp = tmp->next;
+	}
+	if (errortype || errortoken)
+		printf("   \033[31mErrortype = %d and Errortoken = %d\n\033[0m", errortype, errortoken);
+	else
+		printf("\033[32m\tOK\n\033[0m");
+
+	/*		TEST 7		*/
+	printf("[ls       ;         cat]");
+	errortype = 0;
+	errortoken = 0;
+	tok_lst = NULL;
+	free(g_line);
+	g_line = NULL;
+	g_line = ft_strdup("ls       ;         cat");
+	get_token(&tok_lst);
+	i = 0;
+	tmp = tok_lst;
+	while (tok_array7[i].content)
+	{
+		if (tok_array7[i].type != tmp->type)
+			errortype++;
+		if (ft_strcmp(tok_array7[i].content, tmp->content))
+			errortoken++;
+		i++;
+		tmp = tmp->next;
+	}
+	if (errortype || errortoken)
+		printf("   \033[31mErrortype = %d and Errortoken = %d\n\033[0m", errortype, errortoken);
+	else
+		printf("\033[32m\tOK\n\033[0m");
 
 	/*		End of Test		*/
 	printf("\n\033[36m=================================\n\033[0m");
