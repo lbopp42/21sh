@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/27 16:05:22 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/28 10:16:48 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ int	main(void)
 	int			i;
 	int			errortype;
 	int			errortoken;
+	t_state		*state_lst;
 	t_tok_test	tok_array1[] = {{WORD, "ls"}, {0, NULL}};
 	t_tok_test	tok_array2[] = {
 		{WORD, "ls"},
@@ -133,14 +134,22 @@ int	main(void)
 		{WORD, "cat"},
 		{0, NULL}
 	};
+	t_tok_test	tok_array8[] = {
+		{DQUOTE, "\""},
+		{QUOTE, "'"},
+		{DQUOTE, "\""},
+		{QUOTE, "'"},
+		{0, NULL}
+	};
 
+	state_lst = NULL;
 	printf("\n\033[36m=========  Testing lexer of lsh  =========\n\n\033[0m");
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
 	g_line = NULL;
 	g_line = ft_strdup("ls");
-	get_token(&tok_lst);
+	get_token(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array1[i].content)
@@ -152,20 +161,21 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken)
-		printf("\033[31m[FAIL]   \033[0m");
+	if (errortype || errortoken || state_lst)
+		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
 	printf("[%s]\n", g_line);
 
 	/*			TEST 2		*/
+	state_lst = NULL;
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("ls | cat ; test >> lol");
-	get_token(&tok_lst);
+	get_token(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array2[i].content)
@@ -177,20 +187,21 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken)
-		printf("\033[31m[FAIL]   \033[0m");
+	if (errortype || errortoken || state_lst)
+		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
 	printf("[%s]\n", g_line);
 
 	/*		TEST 3		*/
+	state_lst = NULL;
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("ls| cat ;test>>lol");
-	get_token(&tok_lst);
+	get_token(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array3[i].content)
@@ -202,20 +213,21 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken)
-		printf("\033[31m[FAIL]   \033[0m");
+	if (errortype || errortoken || state_lst)
+		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
 	printf("[%s]\n", g_line);
 
 	/*		TEST 4		*/
+	state_lst = NULL;
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("echo \"test\"\"test2\"");
-	get_token(&tok_lst);
+	get_token(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array4[i].content)
@@ -227,20 +239,21 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken)
-		printf("\033[31m[FAIL]   \033[0m");
+	if (errortype || errortoken || state_lst)
+		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
 	printf("[%s]\n", g_line);
 
 	/*		TEST 5		*/
+	state_lst = NULL;
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("echo \"ls ; `cat`\"\"test2\"");
-	get_token(&tok_lst);
+	get_token(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array5[i].content)
@@ -252,20 +265,21 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken)
-		printf("\033[31m[FAIL]   \033[0m");
+	if (errortype || errortoken || state_lst)
+		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
 	printf("[%s]\n", g_line);
 
 	/*		TEST 6		*/
+	state_lst = NULL;
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("mkdir test ; cd test ; ls -a ; ls | cat | wc -c > fifi ; cat fifi");
-	get_token(&tok_lst);
+	get_token(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array6[i].content)
@@ -277,20 +291,21 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken)
-		printf("\033[31m[FAIL]   \033[0m");
+	if (errortype || errortoken || state_lst)
+		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
 	printf("[%s]\n", g_line);
 
 	/*		TEST 7		*/
+	state_lst = NULL;
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("ls       ;         cat");
-	get_token(&tok_lst);
+	get_token(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array7[i].content)
@@ -302,8 +317,34 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken)
-		printf("\033[31m[FAIL]   \033[0m");
+	if (errortype || errortoken || state_lst)
+		printf("\033[31m[FAIL] \033[0m");
+	else
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
+
+	/*		TEST 8		*/
+	state_lst = NULL;
+	errortype = 0;
+	errortoken = 0;
+	tok_lst = NULL;
+	free(g_line);
+	g_line = NULL;
+	g_line = ft_strdup("\"'\"'");
+	get_token(&tok_lst, &state_lst);
+	i = 0;
+	tmp = tok_lst;
+	while (tok_array8[i].content)
+	{
+		if (tok_array8[i].type != tmp->type)
+			errortype++;
+		if (ft_strcmp(tok_array8[i].content, tmp->content))
+			errortoken++;
+		i++;
+		tmp = tmp->next;
+	}
+	if (errortype || errortoken || !state_lst)
+		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
 	printf("[%s]\n", g_line);

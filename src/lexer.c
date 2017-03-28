@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:24:43 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/28 09:44:05 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/28 10:07:26 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,20 +179,18 @@ void	token_management(t_token **tok_lst, int type, t_state *state_lst, int *i)
 	}
 }
 
-void	get_token(t_token **tok_lst)
+void	get_token(t_token **tok_lst, t_state **state_lst)
 {
 	int		i;
 	int		ret;
-	t_state	*state_lst;
 
 	i = 0;
-	state_lst = NULL;
 	while (g_line[i])
 	{
 		ret = find_type(&i);
 		if (ret == QUOTE || ret == DQUOTE || ret == BQUOTE)
-			state_management(&state_lst, ret);
-		token_management(tok_lst, ret, state_lst, &i);
+			state_management(state_lst, ret);
+		token_management(tok_lst, ret, *state_lst, &i);
 		i++;
 	}
 }
