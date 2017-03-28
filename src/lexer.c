@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:24:43 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/27 13:01:44 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/28 09:44:05 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,6 +143,9 @@ void	token_management(t_token **tok_lst, int type, t_state *state_lst, int *i)
 		if (!(*tok_lst = (t_token*)ft_memalloc(sizeof(t_token))))
 			return ;
 		(*tok_lst)->content = ft_strdup(tmp);
+		if (type == BLANK)
+			while (g_line[*i + 1] && ft_isspace(g_line[*i + 1]))
+				*i += 1;
 		(*tok_lst)->type = type;
 		(*tok_lst)->next = NULL;
 	}
@@ -170,6 +173,9 @@ void	token_management(t_token **tok_lst, int type, t_state *state_lst, int *i)
 				tmp_tok->next->type = type;
 			tmp_tok->next->next = NULL;
 		}
+		if (type == BLANK)
+			while (g_line[*i + 1] && ft_isspace(g_line[*i + 1]))
+				*i += 1;
 	}
 }
 

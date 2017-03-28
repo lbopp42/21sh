@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/03/27 13:10:52 by lbopp            ###   ########.fr        #
+#    Updated: 2017/03/27 16:07:04 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,20 +29,20 @@ RM = rm -f
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	@echo "\033[32m=== Compilation of libft\t\t\tDONE"
 	@make -C libft
+	@echo "\033[32m=== Compilation of libft\t[DONE]\033[0m"
 	$(CLANG) $(CFLAGS) -o $(NAME) $(OBJ) -I includes -I libft/includes -lft -L libft -ltermcap
-	@echo "\033[32m=== Compilation\t[DONE]"
+	@echo "\033[32m=== Compilation\t[DONE]\033[0m"
 
 %.o: %.c
 	@echo "\033[36m=Compilation of $^"
 	$(CLANG) $(CFLAGS) -c $^ -o $@ -I includes -I libft/includes
 
 test:
-	@echo "\033[32m=== Compilation of libft\t\t\tDONE"
 	@make -C libft
-	$(CLANG) $(CFLAGS) -o 21sh $(SRC_TEST) -I includes -I libft/includes -lft -L libft
-	@echo "\033[32m=== Compilation\t[DONE]"
+	@echo "\033[32m=== Compilation of libft\t[DONE]\033[0m"
+	@$(CLANG) $(CFLAGS) -o 21sh $(SRC_TEST) -I includes -I libft/includes -lft -L libft
+	@echo "\033[32m=== Compilation\t[DONE]\033[0m" && ./21sh
 
 clean:
 	@make -C libft clean

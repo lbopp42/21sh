@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/27 15:43:14 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/27 16:05:22 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,8 +134,7 @@ int	main(void)
 		{0, NULL}
 	};
 
-	printf("\033[36m=========  Testing lsh  =========\n\n\033[0m");
-	printf("[ls]");
+	printf("\n\033[36m=========  Testing lexer of lsh  =========\n\n\033[0m");
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
@@ -154,11 +153,12 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (errortype || errortoken)
-		printf("   \033[31mErrortype = %d and Errortoken = %d\n\033[0m", errortype, errortoken);
+		printf("\033[31m[FAIL]   \033[0m");
 	else
-		printf("\033[32m\tOK\n\033[0m");
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
+
 	/*			TEST 2		*/
-	printf("[ls | cat ; test >> lol]");
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
@@ -178,12 +178,12 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (errortype || errortoken)
-		printf("   \033[31mErrortype = %d and Errortoken = %d\n\033[0m", errortype, errortoken);
+		printf("\033[31m[FAIL]   \033[0m");
 	else
-		printf("\033[32m\tOK\n\033[0m");
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
 
 	/*		TEST 3		*/
-	printf("[ls| cat ;test>>lol]");
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
@@ -203,12 +203,12 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (errortype || errortoken)
-		printf("   \033[31mErrortype = %d and Errortoken = %d\n\033[0m", errortype, errortoken);
+		printf("\033[31m[FAIL]   \033[0m");
 	else
-		printf("\033[32m\tOK\n\033[0m");
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
 
 	/*		TEST 4		*/
-	printf("[echo \"test\"\"test2\"]");
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
@@ -228,12 +228,12 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (errortype || errortoken)
-		printf("   \033[31mErrortype = %d and Errortoken = %d\n\033[0m", errortype, errortoken);
+		printf("\033[31m[FAIL]   \033[0m");
 	else
-		printf("\033[32m\tOK\n\033[0m");
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
 
 	/*		TEST 5		*/
-	printf("[echo \"ls ; `cat`\"\"test2\"]");
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
@@ -253,12 +253,12 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (errortype || errortoken)
-		printf("   \033[31mErrortype = %d and Errortoken = %d\n\033[0m", errortype, errortoken);
+		printf("\033[31m[FAIL]   \033[0m");
 	else
-		printf("\033[32m\tOK\n\033[0m");
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
 
 	/*		TEST 6		*/
-	printf("[mkdir test ; cd test ; ls -a ; ls | cat | wc -c > fifi ; cat fifi]");
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
@@ -278,12 +278,12 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (errortype || errortoken)
-		printf("   \033[31mErrortype = %d and Errortoken = %d\n\033[0m", errortype, errortoken);
+		printf("\033[31m[FAIL]   \033[0m");
 	else
-		printf("\033[32m\tOK\n\033[0m");
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
 
 	/*		TEST 7		*/
-	printf("[ls       ;         cat]");
 	errortype = 0;
 	errortoken = 0;
 	tok_lst = NULL;
@@ -303,11 +303,12 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (errortype || errortoken)
-		printf("   \033[31mErrortype = %d and Errortoken = %d\n\033[0m", errortype, errortoken);
+		printf("\033[31m[FAIL]   \033[0m");
 	else
-		printf("\033[32m\tOK\n\033[0m");
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
 
 	/*		End of Test		*/
-	printf("\n\033[36m=================================\n\033[0m");
+	printf("\n\033[36m===========================================\n\033[0m");
 	return (0);
 }
