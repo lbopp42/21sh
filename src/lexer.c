@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:24:43 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/28 10:07:26 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/31 15:34:03 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ void	state_management(t_state **state_lst, int type)
 			if (first && first->next)
 				first->next = NULL;
 		}
-		else
+		else if (tmp->state != QUOTE)
 		{
 			if (!(tmp->next = (t_state*)ft_memalloc(sizeof(t_state))))
 				return ;

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/30 10:11:57 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/31 15:39:42 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,8 +137,8 @@ int	main(void)
 	t_tok_test	tok_array8[] = {
 		{DQUOTE, "\""},
 		{QUOTE, "'"},
-		{DQUOTE, "\""},
-		{QUOTE, "'"},
+		{QUOTE, "\""},
+		{DQUOTE, "'"},
 		{0, NULL}
 	};
 	t_tok_test	tok_array9[] = {
