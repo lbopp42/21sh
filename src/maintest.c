@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/28 10:16:48 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/03/30 10:11:57 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,9 @@ int	main(void)
 		{QUOTE, "'"},
 		{DQUOTE, "\""},
 		{QUOTE, "'"},
+		{0, NULL}
+	};
+	t_tok_test	tok_array9[] = {
 		{0, NULL}
 	};
 
@@ -344,6 +347,32 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (errortype || errortoken || !state_lst)
+		printf("\033[31m[FAIL] \033[0m");
+	else
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
+
+	/*		TEST 9		*/
+	state_lst = NULL;
+	errortype = 0;
+	errortoken = 0;
+	tok_lst = NULL;
+	free(g_line);
+	g_line = NULL;
+	g_line = ft_strdup("");
+	get_token(&tok_lst, &state_lst);
+	i = 0;
+	tmp = tok_lst;
+	while (tok_array9[i].content)
+	{
+		if (tok_array9[i].type != tmp->type)
+			errortype++;
+		if (ft_strcmp(tok_array9[i].content, tmp->content))
+			errortoken++;
+		i++;
+		tmp = tmp->next;
+	}
+	if (tok_lst || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
