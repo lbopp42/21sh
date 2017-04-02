@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/31 15:42:36 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/02 14:44:11 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,26 +33,18 @@ int	main(void)
 	t_tok_test	tok_array1[] = {{WORD, "ls"}, {0, NULL}};
 	t_tok_test	tok_array2[] = {
 		{WORD, "ls"},
-		{BLANK, " "},
 		{PIPE, "|"},
-		{BLANK, " "},
 		{WORD, "cat"},
-		{BLANK, " "},
 		{SEMICOLON, ";"},
-		{BLANK, " "},
 		{WORD, "test"},
-		{BLANK, " "},
 		{DGREAT, ">>"},
-		{BLANK, " "},
 		{WORD, "lol"},
 		{0, NULL}
 	};
 	t_tok_test	tok_array3[] = {
 		{WORD, "ls"},
 		{PIPE, "|"},
-		{BLANK, " "},
 		{WORD, "cat"},
-		{BLANK, " "},
 		{SEMICOLON, ";"},
 		{WORD, "test"},
 		{DGREAT, ">>"},
@@ -61,87 +53,51 @@ int	main(void)
 	};
 	t_tok_test	tok_array4[] = {
 		{WORD, "echo"},
-		{BLANK, " "},
-		{DQUOTE, "\""},
-		{DQUOTE, "test"},
-		{DQUOTE, "\""},
-		{DQUOTE, "\""},
-		{DQUOTE, "test2"},
-		{DQUOTE, "\""},
+		{DQUOTE, "testtest2"},
 		{0, NULL}	
 	};
 	t_tok_test	tok_array5[] = {
 		{WORD, "echo"},
-		{BLANK, " "},
-		{DQUOTE, "\""},
-		{DQUOTE, "ls ; "},
-		{BQUOTE, "`"},
-		{BQUOTE, "cat"},
-		{DQUOTE, "`"},
-		{DQUOTE, "\""},
-		{DQUOTE, "\""},
-		{DQUOTE, "test2"},
-		{DQUOTE, "\""},
+		{DQUOTE, "ls ; `cat`test2"},
 		{0, NULL}	
 	};
 	t_tok_test	tok_array6[] = {
 		{WORD, "mkdir"},
-		{BLANK, " "},
 		{WORD, "test"},
-		{BLANK, " "},
 		{SEMICOLON, ";"},
-		{BLANK, " "},
 		{WORD, "cd"},
-		{BLANK, " "},
 		{WORD, "test"},
-		{BLANK, " "},
 		{SEMICOLON, ";"},
-		{BLANK, " "},
 		{WORD, "ls"},
-		{BLANK, " "},
 		{WORD, "-a"},
-		{BLANK, " "},
 		{SEMICOLON, ";"},
-		{BLANK, " "},
 		{WORD, "ls"},
-		{BLANK, " "},
 		{PIPE, "|"},
-		{BLANK, " "},
 		{WORD, "cat"},
-		{BLANK, " "},
 		{PIPE, "|"},
-		{BLANK, " "},
 		{WORD, "wc"},
-		{BLANK, " "},
 		{WORD, "-c"},
-		{BLANK, " "},
 		{GREAT, ">"},
-		{BLANK, " "},
 		{WORD, "fifi"},
-		{BLANK, " "},
 		{SEMICOLON, ";"},
-		{BLANK, " "},
 		{WORD, "cat"},
-		{BLANK, " "},
 		{WORD, "fifi"},
 		{0, NULL}	
 	};
 	t_tok_test	tok_array7[] = {
 		{WORD, "ls"},
-		{BLANK, " "},
 		{SEMICOLON, ";"},
-		{BLANK, " "},
 		{WORD, "cat"},
 		{0, NULL}
 	};
 	t_tok_test	tok_array8[] = {
-		{DQUOTE, "\""},
-		{QUOTE, "'"},
-		{QUOTE, "\""},
-		{DQUOTE, "'"},
 		{0, NULL}
 	};
 	t_tok_test	tok_array9[] = {
+		{0, NULL}
+	};
+	t_tok_test	tok_array10[] = {
+		{DQUOTE, "ls"},
 		{0, NULL}
 	};
 
@@ -152,7 +108,7 @@ int	main(void)
 	tok_lst = NULL;
 	g_line = NULL;
 	g_line = ft_strdup("ls");
-	get_token(&tok_lst, &state_lst);
+	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array1[i].content)
@@ -178,7 +134,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("ls | cat ; test >> lol");
-	get_token(&tok_lst, &state_lst);
+	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array2[i].content)
@@ -204,7 +160,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("ls| cat ;test>>lol");
-	get_token(&tok_lst, &state_lst);
+	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array3[i].content)
@@ -230,10 +186,10 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("echo \"test\"\"test2\"");
-	get_token(&tok_lst, &state_lst);
+	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
-	while (tok_array4[i].content)
+	while (tok_array4[i].content && tmp)
 	{
 		if (tok_array4[i].type != tmp->type)
 			errortype++;
@@ -256,10 +212,10 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("echo \"ls ; `cat`\"\"test2\"");
-	get_token(&tok_lst, &state_lst);
+	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
-	while (tok_array5[i].content)
+	while (tok_array5[i].content && tmp)
 	{
 		if (tok_array5[i].type != tmp->type)
 			errortype++;
@@ -282,10 +238,10 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("mkdir test ; cd test ; ls -a ; ls | cat | wc -c > fifi ; cat fifi");
-	get_token(&tok_lst, &state_lst);
+	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
-	while (tok_array6[i].content)
+	while (tok_array6[i].content && tmp)
 	{
 		if (tok_array6[i].type != tmp->type)
 			errortype++;
@@ -308,7 +264,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("ls       ;         cat");
-	get_token(&tok_lst, &state_lst);
+	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array7[i].content)
@@ -334,7 +290,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("\"'\"'");
-	get_token(&tok_lst, &state_lst);
+	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array8[i].content)
@@ -360,7 +316,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("");
-	get_token(&tok_lst, &state_lst);
+	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array9[i].content)
@@ -373,6 +329,32 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (tok_lst || errortype || errortoken || state_lst)
+		printf("\033[31m[FAIL] \033[0m");
+	else
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
+
+	/*		TEST 9		*/
+	state_lst = NULL;
+	errortype = 0;
+	errortoken = 0;
+	tok_lst = NULL;
+	free(g_line);
+	g_line = NULL;
+	g_line = ft_strdup("\"ls\"");
+	fill_tok_lst(&tok_lst, &state_lst);
+	i = 0;
+	tmp = tok_lst;
+	while (tok_array10[i].content)
+	{
+		if (tok_array10[i].type != tmp->type)
+			errortype++;
+		if (ft_strcmp(tok_array10[i].content, tmp->content))
+			errortoken++;
+		i++;
+		tmp = tmp->next;
+	}
+	if (errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");

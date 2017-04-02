@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/02 11:18:01 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/02 14:37:28 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,10 @@ enum {
 	DGREAT,
 	OUTPUT,
 	INPUT,
+	WORD,
 	QUOTE,
 	DQUOTE,
 	BQUOTE,
-	WORD,
 };
 
 typedef struct	s_state
@@ -38,12 +38,6 @@ typedef struct	s_state
 	int				state;
 	struct s_state	*next;
 }				t_state;
-typedef struct	s_stat_array
-{
-	int	current_state;
-	int	ret_funct;
-	int	next_state;
-}				t_stat_array;
 typedef struct	s_token
 {
 	int				type;

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/31 12:24:52 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/02 12:07:18 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/02 14:55:25 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 void	print_lst(t_token *tok_lst)
 {
 	t_token	*tmp;
-	/*char	*test[] = {"SEMICOLON", "PIPE", "LESS", "DLESS", "GREAT", "DGREAT",
-	  "INPUT", "OUTPUT", "WORD", "BLANK"};*/
+	const char	*test[] = {"SEMICOLON", "PIPE", "LESS", "DLESS", "GREAT", "DGREAT",
+		"INPUT", "OUTPUT", "WORD", "QUOTE", "DQUOTE", "BQUOTE"};
 
 	tmp = tok_lst;
 	while (tmp)
 	{
-		printf("TOKEN = [%s] and TYPE = %d\n", tmp->content, tmp->type);
+		printf("TOKEN = [%s] and TYPE = %s\n", tmp->content, test[tmp->type]);
 		tmp = tmp->next;
 	}
 }
@@ -141,10 +141,12 @@ void	state_management(t_state **state_lst, int *i)
 			pop_state(state_lst);
 	}
 	else
+	{
 		if (get_last_state(*state_lst)->state == isquote(i))
 			pop_state(state_lst);
 		else
 			push_state(state_lst, isquote(i));
+	}
 }
 
 t_token	*get_last_token(t_token *tok_lst)
@@ -157,44 +159,63 @@ t_token	*get_last_token(t_token *tok_lst)
 	return (last);
 }
 
-void	token_management(t_token **tok_lst, t_state *st_lst, int *i, int type)
+void	create_tok_lst(t_token **tok_lst, t_state *st_lst, char *ins, int type)
 {
 	const char	*token[9] = {";", "|", "<", ">", "<<", ">>", ">&", "<&", NULL};
-	char		insert[2];
-	t_token		*last_tok;
-	static int	new = 0;
 
-	if (ft_isspace(g_line[*i]))
-		new = 1;
-	insert[0] = g_line[*i];
-	insert[1] = '\0';
-	if (!*tok_lst && !ft_isspace(insert[0]))
+	if ((ft_isspace(ins[0]) && !st_lst))
+		return ;
+	else
 	{
 		if (!(*tok_lst = (t_token *)ft_memalloc(sizeof(t_token))))
 			return ;
 		if (type >= 0 && type <= 7)
 			(*tok_lst)->content = ft_strdup(token[type]);
 		else
-			(*tok_lst)->content = ft_strdup(insert);
+			(*tok_lst)->content = ft_strdup(ins);
 		(*tok_lst)->type = type;
 		(*tok_lst)->next = NULL;
 	}
-	else if (!ft_isspace(insert[0]))
+}
+
+void	add_next_token(t_token **last_tok, char *ins, int type)
+{
+	const char	*token[9] = {";", "|", "<", ">", "<<", ">>", ">&", "<&", NULL};
+
+	if (!((*last_tok)->next = (t_token *)ft_memalloc(sizeof(t_token))))
+		return ;
+	if (type >= 0 && type <= 7)
+		(*last_tok)->next->content = ft_strdup(token[type]);
+	else
+		(*last_tok)->next->content = ft_strdup(ins);
+	(*last_tok)->next->type = type;
+}
+
+void	token_management(t_token **tok_lst, t_state *st_lst, int *i, int type)
+{
+	char		insert[2];
+	t_token		*last_tok;
+	static int	new = 0;
+
+	if (ft_isspace(g_line[*i]) && !st_lst)
+		new = 1;
+	insert[0] = g_line[*i];
+	insert[1] = '\0';
+	if (!*tok_lst && !ft_isspace(insert[0]))
+		create_tok_lst(tok_lst, st_lst, insert, type);
+	else
 	{
 		last_tok = get_last_token(*tok_lst);
-		if ((last_tok->type == type || st_lst) && !new)
-			last_tok->content = ft_stradd(last_tok->content, insert);
+		if ((ft_isspace(g_line[*i]) && !st_lst))
+			return ;
 		else
 		{
-			if (!(last_tok->next = (t_token *)ft_memalloc(sizeof(t_token))))
-				return ;
-			if (type >= 0 && type <= 7)
-				last_tok->next->content = ft_strdup(token[type]);
+			if ((last_tok->type == type || st_lst) && !new)
+				last_tok->content = ft_stradd(last_tok->content, insert);
 			else
-				last_tok->next->content = ft_strdup(insert);
-			last_tok->next->type = type;
+				add_next_token(&last_tok, insert, type);
+			new = 0;
 		}
-		new = 0;
 	}
 }
 
@@ -222,8 +243,7 @@ void	treat_char(int *i, t_token **tok_lst, t_state **state_lst)
 		type = find_type(i);
 	else
 		type = get_last_state(*state_lst)->state;
-	//printf("ON PASSE\n");
-	if (isquote(i) == WORD)
+	if (isquote(i) == WORD || (*state_lst && (*state_lst)->state != isquote(i)))
 		token_management(tok_lst, *state_lst, i, type);
 }
 
