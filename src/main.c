@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/03/28 11:07:18 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/02 10:08:48 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,15 @@ int		main(void)
 	state_lst = NULL;
 	tok_lst = NULL;
 	get_next_line(0, &g_line);
-	get_token(&tok_lst, &state_lst);
+	fill_tok_lst(&tok_lst, &state_lst);
 	if (state_lst)
+	{
 		ft_putendl("Lexical problem !");
-	print_lst(tok_lst);
+		while (state_lst)
+		{
+			printf("State = %d\n", state_lst->state);
+			state_lst = state_lst->next;
+		}
+	}
 	return (1);
 }

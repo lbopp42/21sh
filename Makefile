@@ -6,17 +6,17 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/03/27 16:07:04 by lbopp            ###   ########.fr        #
+#    Updated: 2017/04/02 10:27:15 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = 21sh
-CFLAGS = -Wall -Werror -Wextra
+CFLAGS = -Wall -Werror -Wextra -g
 LIBFT = libft/
 CLANG = clang
-SRC_NAME = lexer.c\
+SRC_NAME = lexer2.c\
 		   main.c
-SRC_TEST = src/lexer.c\
+SRC_TEST = src/lexer2.c\
 		   src/maintest.c
 SRC_PATH = src
 SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
