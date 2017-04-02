@@ -1,26 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_last_state.c                                   :+:      :+:    :+:   */
+/*   find_type.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/04/02 16:34:23 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/02 16:36:09 by lbopp            ###   ########.fr       */
+/*   Created: 2017/04/02 16:40:21 by lbopp             #+#    #+#             */
+/*   Updated: 2017/04/02 17:01:36 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
 
-t_state	*get_last_state(t_state *state_lst)
-{
-	t_state	*last;
+/*
+**	Function used to identify the type :
+**	All type of quote and operator
+*/
 
-	last = NULL;
-	while (state_lst)
-	{
-		last = state_lst;
-		state_lst = state_lst->next;
-	}
-	return (last);
+int		find_type(int *i)
+{
+	static int	(*f[4])(int*) = {&isop, &isquote, 0};
+	int			id;
+	int			ret;
+
+	id = 0;
+	ret = WORD;
+	while ((*f[id]))
+		if ((ret = (*f[id++])(i)) != WORD)
+			return (ret);
+	return (ret);
 }

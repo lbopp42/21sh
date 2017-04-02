@@ -6,11 +6,20 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/02 16:22:53 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/02 16:27:25 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/02 17:43:52 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
+
+/*
+**	Function to create the token list:
+**	If current char is a space and we have state, we do nothing.
+**	Else
+**		If the current char is an operator we create a token for it
+**		Else we create a token and add the current char
+**		type is type send by the last function
+*/
 
 static void	create_tok_lst(t_token **t_lst, t_state *s_lst, char *ins, int type)
 {
@@ -31,6 +40,14 @@ static void	create_tok_lst(t_token **t_lst, t_state *s_lst, char *ins, int type)
 	}
 }
 
+/*
+**	Function to add a new token to the list:
+**	We malloc the next address of last token
+**	If the current token is an operator we put it in the token
+**	Else we create a token with the current char
+**	The type is the type send by the last function
+*/
+
 static void	add_next_token(t_token **last_tok, char *ins, int type)
 {
 	const char	*token[9] = {";", "|", "<", ">", "<<", ">>", ">&", "<&", NULL};
@@ -43,6 +60,21 @@ static void	add_next_token(t_token **last_tok, char *ins, int type)
 		(*last_tok)->next->content = ft_strdup(ins);
 	(*last_tok)->next->type = type;
 }
+
+/*
+**	This function manage all the token list:
+**	If we have a space and no state, we set a variable to don't forgot it
+**	We add the current char in a tmp named insert
+**	If we haven't token list and current char isn't a space we create it
+**	Else we get the last token,
+**	If current char is a space and we are not in a state we stop it now
+**	Else
+**		If the current token type have the same type as type send by last
+**		function and new = 0 or we are in a state and new = 0
+**			We add the current char to the current token
+**		Else we create a new token to the end of the token list
+**		And new = 0
+*/
 
 void		token_management(t_token **t_lst, t_state *s_lst, int *i, int type)
 {

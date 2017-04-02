@@ -6,11 +6,24 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/02 16:37:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/02 16:40:12 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/02 17:11:38 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
+
+/*
+**	This function return WORD if it don't recognize an operator
+**	Operator managed:
+**	SEMICOLON = ;
+**	PIPE = |
+**	LESS = <
+**	GREAT = >
+**	DLESS = <<
+**	DGREAT = >>
+**	OUTPUT = >&
+**	INPUT = <&
+*/
 
 int		isop(int *i)
 {

@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/04/02 16:43:47 by lbopp            ###   ########.fr        #
+#    Updated: 2017/04/02 16:59:08 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,29 +14,33 @@ NAME = 21sh
 CFLAGS = -Wall -Werror -Wextra -g
 LIBFT = libft/
 CLANG = clang
-SRC_NAME = find_type.c\
-		   isop.c\
-		   isquote.c\
-		   get_last_state.c\
-		   get_last_token.c\
-		   lexer.c\
-		   main.c\
-		   print_debug.c\
-		   state_management.c\
-		   token_management.c
-SRC_TEST = src/find_type.c\
-		   src/isop.c\
-		   src/isquote.c\
-		   src/get_last_state.c\
-		   src/get_last_token.c\
-		   src/lexer.c\
+LEXER_SRC = find_type.c\
+			isop.c\
+			isquote.c\
+			get_last_state.c\
+			get_last_token.c\
+			lexer.c\
+			print_debug.c\
+			state_management.c\
+			token_management.c
+
+SRC_NAME = main.c
+SRC_TEST = src/lexer/find_type.c\
+		   src/lexer/isop.c\
+		   src/lexer/isquote.c\
+		   src/lexer/get_last_state.c\
+		   src/lexer/get_last_token.c\
+		   src/lexer/lexer.c\
 		   src/maintest.c\
-		   src/print_debug.c\
-		   src/state_management.c\
-		   src/token_management.c
+		   src/lexer/print_debug.c\
+		   src/lexer/state_management.c\
+		   src/lexer/token_management.c
 SRC_PATH = src
+LEXER_PATH = src/lexer
 SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
-OBJ = $(SRC:.c=.o)
+LEXER = $(addprefix $(LEXER_PATH)/,$(LEXER_SRC))
+OBJ = $(SRC:.c=.o)\
+	$(LEXER:.c=.o)
 OBJ_TEST = $(SRC_TEST:.c=.o)
 RM = rm -f
 
