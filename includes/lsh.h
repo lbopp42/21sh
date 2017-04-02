@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/02 14:37:28 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/02 16:43:55 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,15 @@ typedef struct	s_token
 }				t_token;
 
 void	print_lst(t_token *tok_lst);
+void	print_state_lst(t_state *state_lst);
+
+int		isop(int *i);
+int		isquote(int *i);
 void	fill_tok_lst(t_token **tok_lst, t_state **state_lst);
+int		find_type(int *i);
+t_state	*get_last_state(t_state *state_lst);
+t_token	*get_last_token(t_token *tok_lst);
+void	state_management(t_state **state_lst, int *i);
+void	token_management(t_token **t_lst, t_state *s_lst, int *i, int type);
 
 #endif

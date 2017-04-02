@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/04/02 10:27:15 by lbopp            ###   ########.fr        #
+#    Updated: 2017/04/02 16:43:47 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,10 +14,26 @@ NAME = 21sh
 CFLAGS = -Wall -Werror -Wextra -g
 LIBFT = libft/
 CLANG = clang
-SRC_NAME = lexer2.c\
-		   main.c
-SRC_TEST = src/lexer2.c\
-		   src/maintest.c
+SRC_NAME = find_type.c\
+		   isop.c\
+		   isquote.c\
+		   get_last_state.c\
+		   get_last_token.c\
+		   lexer.c\
+		   main.c\
+		   print_debug.c\
+		   state_management.c\
+		   token_management.c
+SRC_TEST = src/find_type.c\
+		   src/isop.c\
+		   src/isquote.c\
+		   src/get_last_state.c\
+		   src/get_last_token.c\
+		   src/lexer.c\
+		   src/maintest.c\
+		   src/print_debug.c\
+		   src/state_management.c\
+		   src/token_management.c
 SRC_PATH = src
 SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
 OBJ = $(SRC:.c=.o)
