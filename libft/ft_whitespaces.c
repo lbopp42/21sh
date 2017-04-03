@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/07 12:23:02 by lbopp             #+#    #+#             */
-/*   Updated: 2017/02/07 12:31:32 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/03 14:13:51 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,12 +82,10 @@ static	char	**ft_letter(char const *s, char **array)
 
 char			**ft_whitespaces(char const *s)
 {
-	int		i;
 	int		word;
 	char	**array;
 	char	*new;
 
-	i = 0;
 	word = 0;
 	if (!(s))
 		return (NULL);
