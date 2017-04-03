@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/02 16:22:53 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/03 15:14:34 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/03 15:54:21 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ void		token_management(t_token **t_lst, t_state *s_lst, int *i, int type)
 	else
 	{
 		last_tok = get_last_token(*t_lst);
-		if ((ft_isspace(g_line[*i]) && !s_lst))
+		if ((ft_isspace(g_line[*i]) && !s_lst) || !last_tok)
 			return ;
 		else
 		{
