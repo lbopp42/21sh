@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/07 11:26:56 by lbopp             #+#    #+#             */
-/*   Updated: 2017/01/20 12:54:22 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/03 13:38:39 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,9 @@ char			*ft_strtrim(char const *s)
 	char	*news;
 	int		i;
 	int		start;
-	int		j;
 	int		size;
 
 	i = 0;
-	j = 0;
 	if (!s)
 		return (0);
 	while (s[i] && ft_isspace(s[i]))
