@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/11 11:02:32 by lbopp             #+#    #+#             */
-/*   Updated: 2017/02/03 11:18:03 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/03 14:11:38 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,9 @@ char			*ft_strtrimchar(char *s, char c)
 	char	*news;
 	int		i;
 	int		start;
-	int		j;
 	int		size;
 
 	i = 0;
-	j = 0;
 	start = 0;
 	size = 0;
 	if (!s)
