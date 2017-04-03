@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/02 16:42:38 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/02 16:42:50 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/03 15:04:10 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	print_lst(t_token *tok_lst)
 {
 	t_token	*tmp;
 	const char	*test[] = {"SEMICOLON", "PIPE", "LESS", "DLESS", "GREAT", "DGREAT",
-		"INPUT", "OUTPUT", "WORD", "QUOTE", "DQUOTE", "BQUOTE"};
+		"INPUT", "OUTPUT", "QUOTE", "DQUOTE", "BQUOTE", "WORD"};
 
 	tmp = tok_lst;
 	while (tmp)

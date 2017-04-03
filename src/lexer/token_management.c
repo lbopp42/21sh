@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/02 16:22:53 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/02 17:43:52 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/03 15:14:34 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ void		token_management(t_token **t_lst, t_state *s_lst, int *i, int type)
 	t_token		*last_tok;
 	static int	new = 0;
 
-	if (ft_isspace(g_line[*i]) && !s_lst)
+	if ((ft_isspace(g_line[*i]) || (type >= 0 && type <= 7)) &&  !s_lst)
 		new = 1;
 	insert[0] = g_line[*i];
 	insert[1] = '\0';
