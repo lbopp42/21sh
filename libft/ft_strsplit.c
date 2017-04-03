@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/12 15:27:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/02/06 10:57:37 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/03 13:59:25 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,12 +82,10 @@ static	char	**ft_letter(char const *s, char c, char **array)
 
 char			**ft_strsplit(char *s, char c)
 {
-	int		i;
 	int		word;
 	char	**array;
 	char	*new;
 
-	i = 0;
 	word = 0;
 	if (!(s))
 		return (NULL);
