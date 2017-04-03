@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/02 14:44:11 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/03 16:37:20 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ int	main(void)
 	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
-	while (tok_array1[i].content)
+	while (tok_array1[i].content && tmp)
 	{
 		if (tok_array1[i].type != tmp->type)
 			errortype++;
@@ -120,7 +120,7 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken || state_lst)
+	if (tok_array1[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
@@ -137,7 +137,7 @@ int	main(void)
 	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
-	while (tok_array2[i].content)
+	while (tok_array2[i].content && tmp)
 	{
 		if (tok_array2[i].type != tmp->type)
 			errortype++;
@@ -146,7 +146,7 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken || state_lst)
+	if (tok_array2[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
@@ -163,7 +163,7 @@ int	main(void)
 	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
-	while (tok_array3[i].content)
+	while (tok_array3[i].content && tmp)
 	{
 		if (tok_array3[i].type != tmp->type)
 			errortype++;
@@ -172,7 +172,7 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken || state_lst)
+	if (tok_array3[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
@@ -198,7 +198,7 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken || state_lst)
+	if (tok_array4[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
@@ -224,7 +224,7 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken || state_lst)
+	if (tok_array5[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
@@ -250,7 +250,7 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken || state_lst)
+	if (tok_array6[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
@@ -267,7 +267,7 @@ int	main(void)
 	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
-	while (tok_array7[i].content)
+	while (tok_array7[i].content && tmp)
 	{
 		if (tok_array7[i].type != tmp->type)
 			errortype++;
@@ -276,7 +276,7 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken || state_lst)
+	if (tok_array7[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
@@ -293,7 +293,7 @@ int	main(void)
 	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
-	while (tok_array8[i].content)
+	while (tok_array8[i].content && tmp)
 	{
 		if (tok_array8[i].type != tmp->type)
 			errortype++;
@@ -319,7 +319,7 @@ int	main(void)
 	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
-	while (tok_array9[i].content)
+	while (tok_array9[i].content && tmp)
 	{
 		if (tok_array9[i].type != tmp->type)
 			errortype++;
@@ -328,7 +328,7 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (tok_lst || errortype || errortoken || state_lst)
+	if (tok_array9[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
@@ -345,7 +345,7 @@ int	main(void)
 	fill_tok_lst(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
-	while (tok_array10[i].content)
+	while (tok_array10[i].content && tmp)
 	{
 		if (tok_array10[i].type != tmp->type)
 			errortype++;
@@ -354,7 +354,7 @@ int	main(void)
 		i++;
 		tmp = tmp->next;
 	}
-	if (errortype || errortoken || state_lst)
+	if (tok_array10[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
