@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/21 10:43:07 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/21 17:02:04 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,14 @@ enum {
 	GREAT,
 	DLESS,
 	DGREAT,
-	OUTPUT,
-	INPUT,
+	GREATAND,
+	LESSAND,
 	QUOTE,
 	DQUOTE,
 	BQUOTE,
 	WORD,
-	NEWLINE
+	NEWLINE,
+	IO_NUMBER,
 };
 
 typedef struct	s_state
