@@ -6,9 +6,11 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/20 13:45:55 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/20 17:24:10 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/21 10:43:04 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "lsh.h"
 
 int	isio_file(tokenx)
 {
@@ -65,63 +67,73 @@ int	iscommand(tokenx)
 	return (0);
 }
 
-int	ispipe_sequence(tokenx)
+int	ispipe_sequence(t_token *tok_lst, int nb_tok, int *pos)
 {
 	static int i = 0;
 
 	i++;
-	if (ispipe_sequence(tokenx) && tokenx + 1 == '|' && ((tokenx + 2 == '\n' && iscommand(tokenx + 3) || iscommand(tokenx + 2)) && i < 4))
+	if ((nb_tok - *pos - 4 * i - i - 1) >= 0 && ispipe_sequence(tok_lst) &&
+			tok_lst->next->type == PIPE && ((tok_lst->next->next->type == NEWLINE &&
+					iscommand(tok_list->next->next->next, pos) || iscommand(tok_lst->next->next, pos))))
 		return (1);
-	else if (iscommand(tokenx))
+	else if (iscommand(tok_lst, pos))
 		return (1);
 	return (0);
 }
 
-int	isand_or(tokenx)
+int	isand_or(t_token *tok_lst, int nb_tok, int *pos)
 {
 	static int i = 0;
 
 	i++;
-	if (isand_or(tokenx) && tokenx + 1 == "&&" && ((tokenx + 2 == '\n' && ispipe_sequence(tokenx + 3)) || ispipe_sequence(tokenx + 2)) && i < 4)
+	/*if ((nb_tok - *pos - 4 * i - i - 1) >= 0 && isand_or(tok_lst) && tokenx + 1 == "&&" && ((tokenx + 2 == '\n' && ispipe_sequence(tokenx + 3)) || ispipe_sequence(tokenx + 2)))
 		return (1);
-	else if (isand_or(tokenx) && tokenx + 1 == "||" && ((tokenx + 2 == '\n' && ispipe_sequence(tokenx + 3)) || ispipe_sequence(tokenx + 2)) && i < 4)
+	else if ((nb_tok - *pos - 4 * i - i - 1) >= 0 && isand_or(tokenx) && tokenx + 1 == "||" && ((tokenx + 2 == '\n' && ispipe_sequence(tokenx + 3)) || ispipe_sequence(tokenx + 2)))
 		return (1);
-	else if (ispipe_sequence(tokenx))
+	else */if (ispipe_sequence(tok_lst, nb_tok, pos))
 		return (1);
 	return (0);
 }
 
-int	islist(tokenx)
+int	islist(t_token *tok_lst, int nb_tok, int *pos)
 {
 	static int i = 0;
 
 	i++;
-	if (islist(tokenx) && isseparator_op(tokenx + 1) && isand_or(tokenx + 2) && i < 3)
+	if ((nb_tok - *pos - 3 * i - i - 1) >= 0 && islist(tok_lst, nb_tok, *pos) &&
+			isseparator_op(tok_lst->next, pos) && isand_or(token_lst->next->next, nb_tok, pos))
 		return (1);
-	else if (isand_or(tokenx))
-		return (1);
-	return (0);
-}
-
-int	isseparator_op(tokenx)
-{
-	if (tokenx == ';')
-		return (1);
-	else if (tokenx == '&')
+	else if (isand_or(token_lst->next->next, nb_tok, pos))
 		return (1);
 	return (0);
 }
 
-int	iscomplete_command(void)
+int	isseparator_op(t_token *tok_lst, int *pos)
 {
-	if (islist(tokenx))
+	if (tok_lst->type == SEMICOLON)
 		return (1);
-	else if (islist(tokenx) && isseparator_op(tokenx + 1))
+	/*else if (tok_lst == '&')
+		return (1);*/
+	return (0);
+}
+
+int	iscomplete_command(t_token *tok_lst, int nb_tok)
+{
+	int	pos;
+
+	pos = 0;
+	if (islist(tok_lst, nb_tok, &pos))
+		return (1);
+	else if (islist(tok_lst, nb_tok, &pos) && isseparator_op(tok_lst->next, nb_tok, &pos))
 		return (1);
 	return (0);
 }
 
 int main(void)
 {
-	
+	int		nb_token;
+	t_token	*tok_lst = {};
+
+	nb_token = 10;
+	iscomplete_command(tok_lst, nb_token);
 }
