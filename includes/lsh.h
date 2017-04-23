@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/21 17:02:04 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/23 16:33:16 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct	s_state
 }				t_state;
 typedef struct	s_token
 {
+	int				i;
 	int				type;
 	char			*content;
 	struct s_token	*next;
