@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/24 12:10:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/24 13:59:28 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/24 14:42:32 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ int	isio_file(t_token *tok_lst, int nb_tok, int *max)
 	}
 	else if (tok_lst->type == GREAT && tok_lst->next->type == WORD)
 	{
+		printf("ON SORT ICI HIHI, i = %d\n", tok_lst->next->i);
 		if (tok_lst->next->i > *max)
 			*max = tok_lst->next->i;
 			return (1);
@@ -57,6 +58,7 @@ int	isio_redirect(t_token *tok_lst, int nb_tok, int *max)
 {
 	if (nb_tok - tok_lst->i >= 2 && isio_file(tok_lst, nb_tok, max))
 	{
+		printf("OU ICI\n");
 		if (tok_lst->i > *max)
 			*max = tok_lst->i;
 			return (1);
@@ -64,6 +66,7 @@ int	isio_redirect(t_token *tok_lst, int nb_tok, int *max)
 	else if (tok_lst->type == IO_NUMBER && tok_lst->next &&
 			isio_file(tok_lst->next, nb_tok, max))
 	{
+		printf("OU LA\n");
 		if (tok_lst->i > *max)
 			*max = tok_lst->i;
 			return (1);
@@ -71,6 +74,7 @@ int	isio_redirect(t_token *tok_lst, int nb_tok, int *max)
 	else if (tok_lst->type == DLESS && tok_lst->next &&
 			tok_lst->next->type == WORD)
 	{
+		printf("ICI voila\n");
 		if (tok_lst->i > *max)
 			*max = tok_lst->i;
 			return (1);
@@ -79,6 +83,7 @@ int	isio_redirect(t_token *tok_lst, int nb_tok, int *max)
 			tok_lst->next->type == DLESS && tok_lst->next->next &&
 			tok_lst->next->next->type == WORD)
 	{
+		printf("A NON La\n");
 		if (tok_lst->i > *max)
 			*max = tok_lst->i;
 			return (1);
@@ -106,6 +111,7 @@ int	iscmd_prefix(t_token *tok_lst, int nb_tok, int *max)
 	}
 	else if (isio_redirect(tok_lst, nb_tok, max))
 	{
+		printf("ON PASSE LA\n");
 		if (tok_lst->i > *max)
 			*max = tok_lst->i;
 			return (1);
@@ -123,9 +129,10 @@ int	is_simplecmd(t_token *tok_lst, int nb_tok, int *max)
 			*max = tok_lst->i;
 			return (1);
 	}
-	else if (iscmd_prefix(tok_lst, nb_tok, max) && tok_lst->next->type &&
+	else if (printf("ON PASSE\n") && iscmd_prefix(tok_lst, nb_tok, max) && tok_lst->next->type &&
 			tok_lst->next->type == WORD)
 	{
+		printf("C'est bien la, et i = %d\n", tok_lst->next->i);
 		if (tok_lst->i > *max)
 			*max = tok_lst->i;
 			return (1);
