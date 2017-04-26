@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/24 12:10:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/26 14:53:13 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/26 15:22:03 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,22 +89,22 @@ int	isio_redirect(t_token *tok_lst, int nb_tok, int *max, int mv)
 	{
 		if (mv - 1 > *max)
 			*max = mv - 1;
-			return (mv);
+			return (mv + tmp);
 	}
 	else if (tok_lst->type == DLESS && tok_lst->next &&
 			tok_lst->next->type == WORD)
 	{
-		if (2 - 1 > *max)
-			*max = 2 - 1;
-			return (2);
+		if (2 + mv - 1 > *max)
+			*max = 2 + mv - 1;
+			return (2 + mv);
 	}
 	else if (tok_lst->type == IO_NUMBER && tok_lst->next &&
 			tok_lst->next->type == DLESS && tok_lst->next->next &&
 			tok_lst->next->next->type == WORD)
 	{
-		if (3 - 1 > *max)
-			*max = 3 - 1;
-			return (3);
+		if (3 + mv - 1 > *max)
+			*max = 3 + mv - 1;
+			return (3 + mv);
 	}
 	return (0);
 }
@@ -156,20 +156,20 @@ int	main(void)
 
 	max = 0;
 	mv = 0;
-	nb_tok = 3;
+	nb_tok = 4;
 	tok_lst = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->i = 0;
-	tok_lst->type = GREAT;
-	tok_lst->content = ft_strdup(">");
+	tok_lst->type = DGREAT;
+	tok_lst->content = ft_strdup(">>");
 	tok_lst->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->i = 1;
 	tok_lst->next->type = WORD;
 	tok_lst->next->content = ft_strdup("ls");
 	tok_lst->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->i = 2;
-	tok_lst->next->next->type = GREAT;
-	tok_lst->next->next->content = ft_strdup(">");
-	tok_lst->next->next->next = NULL;(t_token*)ft_memalloc(sizeof(t_token));//NULL;
+	tok_lst->next->next->type = DLESS;
+	tok_lst->next->next->content = ft_strdup("<<");
+	tok_lst->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));//NULL;
 	tok_lst->next->next->next->i = 3;
 	tok_lst->next->next->next->type = WORD;
 	tok_lst->next->next->next->content = ft_strdup("lol");
