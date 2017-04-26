@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/24 13:49:21 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/24 14:22:35 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/26 11:12:37 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,22 +112,22 @@ int	test4(void)
 
 void	launch_test_1to25(void)
 {
-	if (test1())
+	/*if (test1())
 		printf("\033[32m[OK] \033[0m[ls]\n");
 	else
 		printf("\033[31m[FAIL] \033[0m[ls]\n");
 	if (!test2())
 		printf("\033[32m[OK] \033[0m[ls >]\n");
 	else
-		printf("\033[31m[FAIL] \033[0m[ls >]\n");
+		printf("\033[31m[FAIL] \033[0m[ls >]\n");*/
 	if (test3())
 		printf("\033[32m[OK] \033[0m[> ls]\n");
 	else
 		printf("\033[31m[FAIL] \033[0m[> ls]\n");
-	if (test4())
+	/*if (test4())
 		printf("\033[32m[OK] \033[0m[> ls cat]\n");
 	else
-		printf("\033[31m[FAIL] \033[0m[> ls cat]\n");
+		printf("\033[31m[FAIL] \033[0m[> ls cat]\n");*/
 }
 
 int	main(void)
