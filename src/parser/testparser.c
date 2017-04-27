@@ -6,13 +6,13 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/24 13:49:21 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/27 12:51:01 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/27 13:04:35 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
 
-int	ispipe_sequence(t_token *tok_lst, int nb_tok, int mv, int mode);
+int	isand_or(t_token *tok_lst, int nb_tok, int mv, int mode);
 
 int	test1(void)
 {
@@ -27,7 +27,7 @@ int	test1(void)
 	tok_lst->type = WORD;
 	tok_lst->content = ft_strdup("ls");
 	tok_lst->next = NULL;
-	if (nb_tok == ispipe_sequence(tok_lst, nb_tok, 0, 1))
+	if (nb_tok == isand_or(tok_lst, nb_tok, 0, 1))
 		return (1);
 	else
 		return (0);
@@ -50,7 +50,7 @@ int	test2(void)
 	tok_lst->next->type = GREAT;
 	tok_lst->next->content = ft_strdup(">");
 	tok_lst->next->next = NULL;
-	if (nb_tok == ispipe_sequence(tok_lst, nb_tok, 0, 1))
+	if (nb_tok == isand_or(tok_lst, nb_tok, 0, 1))
 	{
 		return (1);
 	}
@@ -75,7 +75,7 @@ int	test3(void)
 	tok_lst->next->type = WORD;
 	tok_lst->next->content = ft_strdup("ls");
 	tok_lst->next->next = NULL;
-	if (nb_tok == ispipe_sequence(tok_lst, nb_tok, 0, 1))
+	if (nb_tok == isand_or(tok_lst, nb_tok, 0, 1))
 		return (1);
 	else
 		return (0);
@@ -102,7 +102,7 @@ int	test4(void)
 	tok_lst->next->next->type = WORD;
 	tok_lst->next->next->content = ft_strdup("cat");
 	tok_lst->next->next->next = NULL;
-	if (nb_tok == ispipe_sequence(tok_lst, nb_tok, 0, 1))
+	if (nb_tok == isand_or(tok_lst, nb_tok, 0, 1))
 		return (1);
 	else
 	{
@@ -129,7 +129,7 @@ int	test5(void)
 	tok_lst->next->next->type = WORD;
 	tok_lst->next->next->content = ft_strdup("cat");
 	tok_lst->next->next->next = NULL;
-	if (nb_tok == ispipe_sequence(tok_lst, nb_tok, 0, 1))
+	if (nb_tok == isand_or(tok_lst, nb_tok, 0, 1))
 		return (1);
 	else
 	{
@@ -160,7 +160,7 @@ int	test6(void)
 	tok_lst->next->next->next->type = WORD;
 	tok_lst->next->next->next->content = ft_strdup("cat");
 	tok_lst->next->next->next->next = NULL;
-	if (nb_tok == ispipe_sequence(tok_lst, nb_tok, 0, 1))
+	if (nb_tok == isand_or(tok_lst, nb_tok, 0, 1))
 		return (1);
 	else
 	{
@@ -191,7 +191,7 @@ int	test7(void)
 	tok_lst->next->next->next->type = WORD;
 	tok_lst->next->next->next->content = ft_strdup("cat");
 	tok_lst->next->next->next->next = NULL;
-	if (nb_tok == ispipe_sequence(tok_lst, nb_tok, 0, 1))
+	if (nb_tok == isand_or(tok_lst, nb_tok, 0, 1))
 		return (1);
 	else
 	{
@@ -222,7 +222,7 @@ int	test8(void)
 	tok_lst->next->next->next->type = WORD;
 	tok_lst->next->next->next->content = ft_strdup("file");
 	tok_lst->next->next->next->next = NULL;
-	if (nb_tok == ispipe_sequence(tok_lst, nb_tok, 0, 1))
+	if (nb_tok == isand_or(tok_lst, nb_tok, 0, 1))
 		return (1);
 	else
 	{
@@ -253,7 +253,7 @@ int	test9(void)
 	tok_lst->next->next->next->type = WORD;
 	tok_lst->next->next->next->content = ft_strdup("cat");
 	tok_lst->next->next->next->next = NULL;
-	if (nb_tok == ispipe_sequence(tok_lst, nb_tok, 0, 1))
+	if (nb_tok == isand_or(tok_lst, nb_tok, 0, 1))
 		return (1);
 	else
 	{

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/24 12:10:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/27 12:43:27 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/27 13:06:12 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,5 +231,23 @@ int	ispipe_sequence(t_token *tok_lst, int nb_tok, int mv, int mode)
 	{
 		return (mv);
 	}
+	return (0);
+}
+
+int	isand_or(t_token *tok_lst, int nb_tok, int mv)
+{
+	int	tmp;
+
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (0);
+		tmp--;
+	}
+	if ((mv = ispipe_sequence(tok_lst, nb_tok, 0, 1)))
+		return (mv);
 	return (0);
 }
