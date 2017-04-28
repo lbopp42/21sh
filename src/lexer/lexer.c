@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/31 12:24:52 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/02 17:19:47 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/28 12:49:57 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,10 @@ void	treat_char(int *i, t_token **tok_lst, t_state **state_lst)
 	if (isquote(i) != WORD)
 		state_management(state_lst, i);
 	if (get_last_state(*state_lst) == NULL)
-		type = find_type(i);
+		type = isop(i);
 	else
-		type = get_last_state(*state_lst)->state;
-	if (isquote(i) == WORD || (*state_lst && (*state_lst)->state != isquote(i)))
+		type = WORD;//get_last_state(*state_lst)->state;
+	//if (isquote(i) == WORD || (*state_lst && (*state_lst)->state != isquote(i))*/)
 		token_management(tok_lst, *state_lst, i, type);
 }
 
