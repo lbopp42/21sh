@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/28 12:50:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/29 13:00:56 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/29 13:08:33 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ int		is_digit_token(char *content)
 void	state_management(t_state **st_lst, int i)
 {
 	t_state	*tmp;
+	t_state	*first;
 
 	if (!*st_lst)
 	{
@@ -114,16 +115,33 @@ void	state_management(t_state **st_lst, int i)
 	{
 		tmp = *st_lst;
 		while (tmp->next)
+		{
+			first = tmp;
 			tmp = tmp->next;
+		}
 		if (g_line[i] == '"' && tmp->state == DQUOTE)
 		{
-			tmp = NULL;
+			if (!(*st_lst)->next)
+			{
+				free(*st_lst);
+				*st_lst = NULL;
+				return ;
+			}
 			free(tmp);
+			first->next = NULL;
+			tmp = NULL;
 		}
 		else if (g_line[i] == '\'' && tmp->state == QUOTE)
 		{
-			tmp = NULL;
+			if (!(*st_lst)->next)
+			{
+				free(*st_lst);
+				*st_lst = NULL;
+				return ;
+			}
 			free(tmp);
+			first->next = NULL;
+			tmp = NULL;
 		}
 		else
 		{
@@ -239,6 +257,8 @@ void	lexer_posix(t_token **tok_lst)
 		else
 			break;
 	}
+	if (st_lst)
+		ft_putendl_fd("Lexical error", 2);
 	*tok_lst = first;
 }
 
