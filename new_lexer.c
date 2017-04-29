@@ -6,24 +6,24 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/28 12:50:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/29 12:03:19 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/29 13:00:56 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
 
 /*
-**	This function return WORD if it don't recognize an operator
-**	Operator managed:
-**	SEMICOLON = ;
-**	PIPE = |
-**	LESS = <
-**	GREAT = >
-**	DLESS = <<
-**	DGREAT = >>
-**	GREATAND = >&
-**	LESSAND = <&
-*/
+ **	This function return WORD if it don't recognize an operator
+ **	Operator managed:
+ **	SEMICOLON = ;
+ **	PIPE = |
+ **	LESS = <
+ **	GREAT = >
+ **	DLESS = <<
+ **	DGREAT = >>
+ **	GREATAND = >&
+ **	LESSAND = <&
+ */
 
 int		is_new_op(int i)
 {
@@ -96,7 +96,49 @@ int		is_digit_token(char *content)
 	return (1);
 }
 
-int		treatment_machine(t_token **tok_lst, int i)
+void	state_management(t_state **st_lst, int i)
+{
+	t_state	*tmp;
+
+	if (!*st_lst)
+	{
+		if (!(*st_lst = (t_state*)ft_memalloc(sizeof(t_state))))
+			return ;
+		if (g_line[i] == '"')
+			(*st_lst)->state = DQUOTE;
+		else
+			(*st_lst)->state = QUOTE;
+		(*st_lst)->next = NULL;
+	}
+	else
+	{
+		tmp = *st_lst;
+		while (tmp->next)
+			tmp = tmp->next;
+		if (g_line[i] == '"' && tmp->state == DQUOTE)
+		{
+			tmp = NULL;
+			free(tmp);
+		}
+		else if (g_line[i] == '\'' && tmp->state == QUOTE)
+		{
+			tmp = NULL;
+			free(tmp);
+		}
+		else
+		{
+			if (!(tmp->next = (t_state*)ft_memalloc(sizeof(t_state))))
+				return ;
+			if (g_line[i] == '"')
+				tmp->next->state = DQUOTE;
+			else
+				tmp->next->state = QUOTE;
+			tmp->next = NULL;
+		}
+	}
+}
+
+int		treatment_machine(t_token **tok_lst, t_state **st_lst, int i)
 {
 	int	type;
 
@@ -107,12 +149,12 @@ int		treatment_machine(t_token **tok_lst, int i)
 		return (0);
 	}
 	else if (*tok_lst && (*tok_lst)->type >= 0 && (*tok_lst)->type <= 7
-			&& (type = big_op((*tok_lst)->content, i)))
+			&& (type = big_op((*tok_lst)->content, i)) && !*st_lst)
 	{
 		add_to_current_tok(tok_lst, i, type);
 	}
 	else if (*tok_lst && (*tok_lst)->type >= 0 && (*tok_lst)->type <= 7
-			&& !big_op((*tok_lst)->content, i))
+			&& !big_op((*tok_lst)->content, i) && !*st_lst)
 	{
 		if (g_line[i] == ' ' || g_line[i] == '\n')
 			return (2);
@@ -121,30 +163,30 @@ int		treatment_machine(t_token **tok_lst, int i)
 	}
 	else if (g_line[i] == '\'' || g_line[i] == '"')
 	{
-		/* Change the state */
-		if (*tok_lst && (*tok_lst)->type == WORD)
-			add_to_current_tok(tok_lst, i, WORD);
-		else
-			*tok_lst = create_new_token(*tok_lst, i, type);
+		state_management(st_lst, i);
+			if (*tok_lst && (*tok_lst)->type == WORD)
+				add_to_current_tok(tok_lst, i, WORD);
+			else
+				*tok_lst = create_new_token(*tok_lst, i, type);
 	}
-	else if ((type = is_new_op(i)) != WORD)
+	else if ((type = is_new_op(i)) != WORD && !*st_lst)
 	{
 		if (*tok_lst)
 		{
 			if (is_digit_token((*tok_lst)->content) &&
 					(type == LESS || type == GREAT))
-			(*tok_lst)->type = IO_NUMBER;
+				(*tok_lst)->type = IO_NUMBER;
 			return (1);
 		}
 		*tok_lst = create_new_token(*tok_lst, i, type);
 	}
-	else if (g_line[i] == '\n')
+	else if (g_line[i] == '\n' && !*st_lst)
 	{
 		if (*tok_lst)
 			return (1);
 		*tok_lst = create_new_token(*tok_lst, i, NEWLINE);
 	}
-	else if (g_line[i] == ' ' || g_line[i] == '\t')
+	else if ((g_line[i] == ' ' || g_line[i] == '\t') && !*st_lst)
 	{
 		if (*tok_lst)
 			return (2);
@@ -161,36 +203,38 @@ int		treatment_machine(t_token **tok_lst, int i)
 }
 
 /*
-**	Actually need a strtrim before run this function.
-*/
+ **	Actually need a strtrim before run this function.
+ */
 
 void	lexer_posix(t_token **tok_lst)
 {
 	int	i;
 	int	tmp;
 	t_token	*first;
+	t_state *st_lst;
 
+	st_lst = NULL;
 	first = *tok_lst;
 	i = 0;
-	tmp = treatment_machine(tok_lst, i);
+	tmp = treatment_machine(tok_lst, &st_lst, i);
 	first = *tok_lst;
 	while (1)
 	{
 		if (tmp == 2)
 		{
 			i += 1;
-			tmp = treatment_machine(&(*tok_lst)->next, i);
+			tmp = treatment_machine(&(*tok_lst)->next, &st_lst, i);
 			*tok_lst = (*tok_lst)->next;
 		}
 		else if (tmp == 1)
 		{
-			tmp = treatment_machine(&(*tok_lst)->next, i);
+			tmp = treatment_machine(&(*tok_lst)->next, &st_lst, i);
 			*tok_lst = (*tok_lst)->next;
 		}
 		else if (tmp)
 		{
 			i += 1;
-			tmp = treatment_machine(tok_lst, i);
+			tmp = treatment_machine(tok_lst, &st_lst, i);
 		}
 		else
 			break;

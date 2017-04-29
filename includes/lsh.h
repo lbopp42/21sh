@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/23 16:33:16 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/29 12:58:07 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,6 @@ void	fill_tok_lst(t_token **tok_lst, t_state **state_lst);
 int		find_type(int *i);
 t_state	*get_last_state(t_state *state_lst);
 t_token	*get_last_token(t_token *tok_lst);
-void	state_management(t_state **state_lst, int *i);
 void	token_management(t_token **t_lst, t_state *s_lst, int *i, int type);
 
 #endif
