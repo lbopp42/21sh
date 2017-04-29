@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/28 12:50:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/29 11:47:35 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/29 12:03:19 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,12 +82,25 @@ t_token	*create_new_token(t_token *tok_lst, int i, int type)
 	return (tok_lst);
 }
 
+int		is_digit_token(char *content)
+{
+	int	i;
+
+	i = 0;
+	while (content[i])
+	{
+		if (!ft_isdigit(content[i]))
+			return (0);
+		i += 1;
+	}
+	return (1);
+}
+
 int		treatment_machine(t_token **tok_lst, int i)
 {
 	int	type;
 
 	type = WORD;
-	printf("On traite [%c]\n", g_line[i]);
 	if (!g_line[i])
 	{
 		*tok_lst = NULL;
@@ -101,7 +114,6 @@ int		treatment_machine(t_token **tok_lst, int i)
 	else if (*tok_lst && (*tok_lst)->type >= 0 && (*tok_lst)->type <= 7
 			&& !big_op((*tok_lst)->content, i))
 	{
-		printf("i = %d, et [%c]\n", i, g_line[i]);
 		if (g_line[i] == ' ' || g_line[i] == '\n')
 			return (2);
 		else
@@ -118,7 +130,12 @@ int		treatment_machine(t_token **tok_lst, int i)
 	else if ((type = is_new_op(i)) != WORD)
 	{
 		if (*tok_lst)
+		{
+			if (is_digit_token((*tok_lst)->content) &&
+					(type == LESS || type == GREAT))
+			(*tok_lst)->type = IO_NUMBER;
 			return (1);
+		}
 		*tok_lst = create_new_token(*tok_lst, i, type);
 	}
 	else if (g_line[i] == '\n')
@@ -134,12 +151,10 @@ int		treatment_machine(t_token **tok_lst, int i)
 	}
 	else if (*tok_lst && (*tok_lst)->type == WORD)
 	{
-		printf("On passe ici pour [%c]\n", g_line[i]);
 		add_to_current_tok(tok_lst, i, WORD);
 	}
 	else
 	{
-		printf("On creer un maillon WORD pour [%c]\n", g_line[i]);
 		*tok_lst = create_new_token(*tok_lst, i, WORD);
 	}
 	return (3);
@@ -180,11 +195,7 @@ void	lexer_posix(t_token **tok_lst)
 		else
 			break;
 	}
-	while (first)
-	{
-		printf("IN LIST [%s] DE TYPE [%d]\n", first->content, first->type);
-		first = first->next;
-	}
+	*tok_lst = first;
 }
 
 int	main(void)
