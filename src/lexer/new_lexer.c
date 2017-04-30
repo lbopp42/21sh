@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/30 10:07:05 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/30 16:57:53 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/30 17:44:42 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,12 +178,12 @@ int	treatment_char(t_token **tok_lst, t_state **st_lst, int i)
 		state_management(st_lst, i);
 		if (*tok_lst && !sp && (*tok_lst)->type == WORD)
 		{
-			sp = 0;
 			add_to_current_tok(tok_lst, i, WORD);
 			return (1);
 		}
 		else if (*tok_lst)
 		{
+			sp = 0;
 			create_new_token_next(tok_lst, i, WORD);
 			return (2);
 		}
@@ -232,14 +232,17 @@ int	treatment_char(t_token **tok_lst, t_state **st_lst, int i)
 	}
 	else
 	{
-		if (sp)
+		if (sp && *tok_lst)
 		{
 			sp = 0;
 			create_new_token_next(tok_lst, i, WORD);
 			return (2);
 		}
 		else
+		{
+			sp = 0;
 			create_new_token(tok_lst, i, WORD);
+		}
 	}
 	return (1);
 }
@@ -252,6 +255,8 @@ void	lexer_posix(t_token **tok_lst, t_state **st_lst)
 	t_token	*first;
 
 	i = 0;
+	test = 0;
+	first = NULL;
 	while (1)
 	{
 		tmp = treatment_char(tok_lst, st_lst, i);
@@ -275,7 +280,7 @@ void	lexer_posix(t_token **tok_lst, t_state **st_lst)
 	*tok_lst = first;
 }
 
-int	main(void)
+/*int	main(void)
 {
 	t_token	*tok_lst;
 	t_state	*st_lst;
@@ -292,4 +297,4 @@ int	main(void)
 		tok_lst = tok_lst->next;
 	}
 	return (1);
-}
+}*/

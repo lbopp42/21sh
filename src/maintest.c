@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/30 16:56:35 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/30 17:34:09 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,21 +143,15 @@ int	main(void)
 	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
-	printf("TEST\n");
 	while (tok_array2[i].content && tmp)
 	{
-		printf("test result = %s et tmp->content = %s\n", tok_array2[i].content, tmp->content);
-		printf("TEST IN\n");
 		if (tok_array2[i].type != tmp->type)
 			errortype++;
-		printf("TEST IN 2\n");
 		if (ft_strcmp(tok_array2[i].content, tmp->content))
 			errortoken++;
-		printf("TEST IN 3\n");
 		i++;
 		tmp = tmp->next;
 	}
-	printf("TEST2\n");
 	if (tok_array2[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
@@ -367,7 +361,7 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (tok_array10[i].content || tmp || errortype || errortoken || state_lst)
-		printf("\033[31m[FAIL] \033[0m");
+		printf("\033[31m[FAIL] \033[0m%d, %d", errortype, errortoken);
 	else
 		printf("\033[32m[OK]   \033[0m");
 	printf("[%s]\n", g_line);
