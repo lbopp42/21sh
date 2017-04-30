@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/04/02 16:59:08 by lbopp            ###   ########.fr        #
+#    Updated: 2017/04/30 09:53:11 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,16 +25,8 @@ LEXER_SRC = find_type.c\
 			token_management.c
 
 SRC_NAME = main.c
-SRC_TEST = src/lexer/find_type.c\
-		   src/lexer/isop.c\
-		   src/lexer/isquote.c\
-		   src/lexer/get_last_state.c\
-		   src/lexer/get_last_token.c\
-		   src/lexer/lexer.c\
-		   src/maintest.c\
-		   src/lexer/print_debug.c\
-		   src/lexer/state_management.c\
-		   src/lexer/token_management.c
+SRC_TEST = src/lexer/lexer.c\
+		   src/maintest.c
 SRC_PATH = src
 LEXER_PATH = src/lexer
 SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))

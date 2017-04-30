@@ -6,11 +6,13 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/03 16:37:20 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/30 09:55:04 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
+
+void	lexer_posix(t_token **tok_lst, t_state **st_lst);
 
 typedef struct	s_tok_test
 {
@@ -53,12 +55,12 @@ int	main(void)
 	};
 	t_tok_test	tok_array4[] = {
 		{WORD, "echo"},
-		{DQUOTE, "testtest2"},
+		{WORD, "\"test\"\"test2\""},
 		{0, NULL}	
 	};
 	t_tok_test	tok_array5[] = {
 		{WORD, "echo"},
-		{DQUOTE, "ls ; `cat`test2"},
+		{WORD, "\"ls ; `cat`\"\"test2\""},
 		{0, NULL}	
 	};
 	t_tok_test	tok_array6[] = {
@@ -97,7 +99,7 @@ int	main(void)
 		{0, NULL}
 	};
 	t_tok_test	tok_array10[] = {
-		{DQUOTE, "ls"},
+		{WORD, "\"ls\""},
 		{0, NULL}
 	};
 
@@ -108,7 +110,7 @@ int	main(void)
 	tok_lst = NULL;
 	g_line = NULL;
 	g_line = ft_strdup("ls");
-	fill_tok_lst(&tok_lst, &state_lst);
+	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array1[i].content && tmp)
@@ -134,7 +136,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("ls | cat ; test >> lol");
-	fill_tok_lst(&tok_lst, &state_lst);
+	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array2[i].content && tmp)
@@ -160,7 +162,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("ls| cat ;test>>lol");
-	fill_tok_lst(&tok_lst, &state_lst);
+	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array3[i].content && tmp)
@@ -186,7 +188,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("echo \"test\"\"test2\"");
-	fill_tok_lst(&tok_lst, &state_lst);
+	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array4[i].content && tmp)
@@ -212,7 +214,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("echo \"ls ; `cat`\"\"test2\"");
-	fill_tok_lst(&tok_lst, &state_lst);
+	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array5[i].content && tmp)
@@ -238,7 +240,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("mkdir test ; cd test ; ls -a ; ls | cat | wc -c > fifi ; cat fifi");
-	fill_tok_lst(&tok_lst, &state_lst);
+	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array6[i].content && tmp)
@@ -264,7 +266,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("ls       ;         cat");
-	fill_tok_lst(&tok_lst, &state_lst);
+	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array7[i].content && tmp)
@@ -290,7 +292,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("\"'\"'");
-	fill_tok_lst(&tok_lst, &state_lst);
+	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array8[i].content && tmp)
@@ -316,7 +318,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("");
-	fill_tok_lst(&tok_lst, &state_lst);
+	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array9[i].content && tmp)
@@ -342,7 +344,7 @@ int	main(void)
 	free(g_line);
 	g_line = NULL;
 	g_line = ft_strdup("\"ls\"");
-	fill_tok_lst(&tok_lst, &state_lst);
+	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
 	while (tok_array10[i].content && tmp)
