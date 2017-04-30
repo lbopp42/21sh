@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/30 09:55:04 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/30 16:56:35 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,8 +32,8 @@ int	main(void)
 	int			errortype;
 	int			errortoken;
 	t_state		*state_lst;
-	t_tok_test	tok_array1[] = {{WORD, "ls"}, {0, NULL}};
-	t_tok_test	tok_array2[] = {
+	const t_tok_test	tok_array1[] = {{WORD, "ls"}, {0, NULL}};
+	const t_tok_test	tok_array2[] = {
 		{WORD, "ls"},
 		{PIPE, "|"},
 		{WORD, "cat"},
@@ -43,7 +43,7 @@ int	main(void)
 		{WORD, "lol"},
 		{0, NULL}
 	};
-	t_tok_test	tok_array3[] = {
+	const t_tok_test	tok_array3[] = {
 		{WORD, "ls"},
 		{PIPE, "|"},
 		{WORD, "cat"},
@@ -53,17 +53,17 @@ int	main(void)
 		{WORD, "lol"},
 		{0, NULL}	
 	};
-	t_tok_test	tok_array4[] = {
+	const	t_tok_test	tok_array4[] = {
 		{WORD, "echo"},
 		{WORD, "\"test\"\"test2\""},
 		{0, NULL}	
 	};
-	t_tok_test	tok_array5[] = {
+	const t_tok_test	tok_array5[] = {
 		{WORD, "echo"},
 		{WORD, "\"ls ; `cat`\"\"test2\""},
 		{0, NULL}	
 	};
-	t_tok_test	tok_array6[] = {
+	const t_tok_test	tok_array6[] = {
 		{WORD, "mkdir"},
 		{WORD, "test"},
 		{SEMICOLON, ";"},
@@ -86,20 +86,24 @@ int	main(void)
 		{WORD, "fifi"},
 		{0, NULL}	
 	};
-	t_tok_test	tok_array7[] = {
+	const t_tok_test	tok_array7[] = {
 		{WORD, "ls"},
 		{SEMICOLON, ";"},
 		{WORD, "cat"},
 		{0, NULL}
 	};
-	t_tok_test	tok_array8[] = {
+	const t_tok_test	tok_array8[] = {
 		{0, NULL}
 	};
-	t_tok_test	tok_array9[] = {
+	const t_tok_test	tok_array9[] = {
 		{0, NULL}
 	};
-	t_tok_test	tok_array10[] = {
+	const t_tok_test	tok_array10[] = {
 		{WORD, "\"ls\""},
+		{0, NULL}
+	};
+	const t_tok_test	tok_array11[] = {
+		{WORD, "ls"},
 		{0, NULL}
 	};
 
@@ -139,15 +143,21 @@ int	main(void)
 	lexer_posix(&tok_lst, &state_lst);
 	i = 0;
 	tmp = tok_lst;
+	printf("TEST\n");
 	while (tok_array2[i].content && tmp)
 	{
+		printf("test result = %s et tmp->content = %s\n", tok_array2[i].content, tmp->content);
+		printf("TEST IN\n");
 		if (tok_array2[i].type != tmp->type)
 			errortype++;
+		printf("TEST IN 2\n");
 		if (ft_strcmp(tok_array2[i].content, tmp->content))
 			errortoken++;
+		printf("TEST IN 3\n");
 		i++;
 		tmp = tmp->next;
 	}
+	printf("TEST2\n");
 	if (tok_array2[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
@@ -336,7 +346,7 @@ int	main(void)
 		printf("\033[32m[OK]   \033[0m");
 	printf("[%s]\n", g_line);
 
-	/*		TEST 9		*/
+	/*		TEST 10		*/
 	state_lst = NULL;
 	errortype = 0;
 	errortoken = 0;
@@ -357,6 +367,32 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (tok_array10[i].content || tmp || errortype || errortoken || state_lst)
+		printf("\033[31m[FAIL] \033[0m");
+	else
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
+
+	/*		TEST 11		*/
+	state_lst = NULL;
+	errortype = 0;
+	errortoken = 0;
+	tok_lst = NULL;
+	free(g_line);
+	g_line = NULL;
+	g_line = ft_strdup("       ls");
+	lexer_posix(&tok_lst, &state_lst);
+	i = 0;
+	tmp = tok_lst;
+	while (tok_array11[i].content && tmp)
+	{
+		if (tok_array11[i].type != tmp->type)
+			errortype++;
+		if (ft_strcmp(tok_array11[i].content, tmp->content))
+			errortoken++;
+		i++;
+		tmp = tmp->next;
+	}
+	if (tok_array11[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");

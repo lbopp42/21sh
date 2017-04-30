@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/28 12:50:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/30 09:53:56 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/04/30 13:51:01 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int		big_op(char *content, int i)
 			return (curs);
 		curs += 1;
 	}
-	return (0);
+	return (WORD);
 }
 
 void	add_to_current_tok(t_token **tok_lst, int i, int type)
@@ -79,6 +79,7 @@ t_token	*create_new_token(t_token *tok_lst, int i, int type)
 		return (NULL);
 	tok_lst->type = type;
 	tok_lst->content = ft_strdup(tmp);
+	tok_lst->next = NULL;
 	return (tok_lst);
 }
 
@@ -160,20 +161,28 @@ int		treatment_machine(t_token **tok_lst, t_state **st_lst, int i)
 {
 	int	type;
 
+	printf("on test [%c] wow\n", g_line[i]);
 	type = WORD;
 	if (!g_line[i])
 	{
 		*tok_lst = NULL;
+		printf("ls fin\n");
 		return (0);
 	}
-	else if (*tok_lst && (*tok_lst)->type >= 0 && (*tok_lst)->type <= 7
+	if (!*tok_lst)
+	{
+		printf("TEST\n");
+	}
+	if (*tok_lst && printf("TEST 2\n") && (*tok_lst)->content && (*tok_lst)->type >= 0 && (*tok_lst)->type <= 7
 			&& (type = big_op((*tok_lst)->content, i)) && !*st_lst)
 	{
+		printf("test premier if\n");
 		add_to_current_tok(tok_lst, i, type);
 	}
 	else if (*tok_lst && (*tok_lst)->type >= 0 && (*tok_lst)->type <= 7
-			&& !big_op((*tok_lst)->content, i) && !*st_lst)
+			&& big_op((*tok_lst)->content, i) != WORD && !*st_lst)
 	{
+		printf("on fou quoi la\n");
 		if (g_line[i] == ' ' || g_line[i] == '\t' || g_line[i] == '\n')
 		{
 			if (g_line[i + 1] && (g_line[i + 1] == ' ' || g_line[i + 1] == '\t'))
@@ -186,6 +195,7 @@ int		treatment_machine(t_token **tok_lst, t_state **st_lst, int i)
 	}
 	else if (g_line[i] == '\'' || g_line[i] == '"')
 	{
+		printf("test quote\n");
 		state_management(st_lst, i);
 			if (*tok_lst && (*tok_lst)->type == WORD)
 				add_to_current_tok(tok_lst, i, WORD);
@@ -194,6 +204,7 @@ int		treatment_machine(t_token **tok_lst, t_state **st_lst, int i)
 	}
 	else if ((type = is_new_op(i)) != WORD && !*st_lst)
 	{
+		printf("non\n");
 		if (*tok_lst)
 		{
 			if (is_digit_token((*tok_lst)->content) &&
@@ -209,12 +220,13 @@ int		treatment_machine(t_token **tok_lst, t_state **st_lst, int i)
 			return (1);
 		*tok_lst = create_new_token(*tok_lst, i, NEWLINE);
 	}
-	else if ((g_line[i] == ' ' || g_line[i] == '\t') && !*st_lst)
+	else if (printf("test blank\n") && (g_line[i] == ' ' || g_line[i] == '\t') && !*st_lst)
 	{
-			if (g_line[i + 1] && (g_line[i + 1] == ' ' || g_line[i + 1] == '\t'))
-				return (3);
-			else
-				return (2);
+		printf("on entre dans le if blank\n");
+		if (g_line[i + 1] && (g_line[i + 1] == ' ' || g_line[i + 1] == '\t'))
+			return (3);
+		else
+			return (2);
 	}
 	else if (*tok_lst && (*tok_lst)->type == WORD)
 	{
@@ -222,6 +234,7 @@ int		treatment_machine(t_token **tok_lst, t_state **st_lst, int i)
 	}
 	else
 	{
+		printf("erreur !\n");
 		*tok_lst = create_new_token(*tok_lst, i, WORD);
 	}
 	return (3);
@@ -237,7 +250,6 @@ void	lexer_posix(t_token **tok_lst, t_state **st_lst)
 	int	tmp;
 	t_token	*first;
 
-	first = *tok_lst;
 	i = 0;
 	tmp = treatment_machine(tok_lst, st_lst, i);
 	first = *tok_lst;
@@ -245,17 +257,23 @@ void	lexer_posix(t_token **tok_lst, t_state **st_lst)
 	{
 		if (tmp == 2)
 		{
+			if (!first)
+				first = *tok_lst;
 			i += 1;
 			tmp = treatment_machine(&(*tok_lst)->next, st_lst, i);
 			*tok_lst = (*tok_lst)->next;
 		}
 		else if (tmp == 1)
 		{
+			if (!first)
+				first = *tok_lst;
 			tmp = treatment_machine(&(*tok_lst)->next, st_lst, i);
 			*tok_lst = (*tok_lst)->next;
 		}
 		else if (tmp)
 		{
+			if (!first)
+				first = *tok_lst;
 			i += 1;
 			tmp = treatment_machine(tok_lst, st_lst, i);
 		}
@@ -265,14 +283,16 @@ void	lexer_posix(t_token **tok_lst, t_state **st_lst)
 	*tok_lst = first;
 }
 
-/*int	main(void)
+int	main(void)
 {
 	t_token	*tok_lst;
+	t_state	*st_tok;
 
+	st_tok = NULL;
 	g_line = NULL;
 	tok_lst = NULL;
 	get_next_line(0, &g_line);
-	lexer_posix(&tok_lst);
+	lexer_posix(&tok_lst, &st_tok);
 	printf("===============================================\n");
 	while (tok_lst)
 	{
@@ -280,4 +300,4 @@ void	lexer_posix(t_token **tok_lst, t_state **st_lst)
 		tok_lst = tok_lst->next;
 	}
 	return (1);
-}*/
+}

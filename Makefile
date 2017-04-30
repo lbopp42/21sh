@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/04/30 09:53:11 by lbopp            ###   ########.fr        #
+#    Updated: 2017/04/30 16:45:18 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,7 @@ LEXER_SRC = find_type.c\
 			token_management.c
 
 SRC_NAME = main.c
-SRC_TEST = src/lexer/lexer.c\
+SRC_TEST = src/lexer/new_lexer.c\
 		   src/maintest.c
 SRC_PATH = src
 LEXER_PATH = src/lexer
