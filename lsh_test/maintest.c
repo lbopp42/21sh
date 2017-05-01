@@ -6,23 +6,11 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/01 09:41:23 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/01 12:31:17 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
-
-void	lexer_posix(t_token **tok_lst, t_state **st_lst);
-
-typedef struct	s_tok_test
-{
-	int		type;
-	char	*content;
-}				t_tok_test;
-
-/*
-** Main to test lsh
-*/
 
 int	main(void)
 {
@@ -32,7 +20,6 @@ int	main(void)
 	int			errortype;
 	int			errortoken;
 	t_state		*state_lst;
-	const t_tok_test	tok_array1[] = {{WORD, "ls"}, {0, NULL}};
 	const t_tok_test	tok_array2[] = {
 		{WORD, "ls"},
 		{PIPE, "|"},
@@ -113,6 +100,13 @@ int	main(void)
 		{WORD, "file"},
 		{0, NULL}
 	};
+	const t_tok_test	tok_array13[] = {
+		{WORD, "ls"},
+		{IO_NUMBER, "1"},
+		{GREATAND, ">&"},
+		{WORD, "-"},
+		{0, NULL}
+	};
 
 	state_lst = NULL;
 	printf("\n\033[36m=========  Testing lexer of lsh  =========\n\n\033[0m");
@@ -160,7 +154,6 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (tok_array2[i].content || tmp || errortype || errortoken || state_lst)
-		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
 	printf("[%s]\n", g_line);
@@ -420,6 +413,32 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (tok_array12[i].content || tmp || errortype || errortoken || state_lst)
+		printf("\033[31m[FAIL] \033[0m");
+	else
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
+
+	/*		TEST 13		*/
+	state_lst = NULL;
+	errortype = 0;
+	errortoken = 0;
+	tok_lst = NULL;
+	free(g_line);
+	g_line = NULL;
+	g_line = ft_strdup("ls 1>&-");
+	lexer_posix(&tok_lst, &state_lst);
+	i = 0;
+	tmp = tok_lst;
+	while (tok_array13[i].content && tmp)
+	{
+		if (tok_array13[i].type != tmp->type)
+			errortype++;
+		if (ft_strcmp(tok_array13[i].content, tmp->content))
+			errortoken++;
+		i++;
+		tmp = tmp->next;
+	}
+	if (tok_array13[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");

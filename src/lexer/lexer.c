@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/30 10:07:05 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/01 09:59:53 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/01 11:20:30 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -263,21 +263,28 @@ int	treatment_char(t_token **tok_lst, t_state **st_lst, int i)
 	return (1);
 }
 
-void	lexer_posix(t_token **tok_lst, t_state **st_lst)
+/*
+**	"test = 0;" is only usefull when we run test
+*/
+
+int	lexer_posix(t_token **tok_lst, t_state **st_lst)
 {
 	int	i;
+	int	nb_tok;
 	static int test = 0;
 	int	tmp;
 	t_token	*first;
 
 	i = 0;
 	test = 0;
+	nb_tok = 0;
 	first = NULL;
 	while (1)
 	{
 		tmp = treatment_char(tok_lst, st_lst, i);
 		if (*tok_lst && !test)
 		{
+			nb_tok += 1;
 			first = *tok_lst;
 			test += 1;
 		}
@@ -287,6 +294,7 @@ void	lexer_posix(t_token **tok_lst, t_state **st_lst)
 		}
 		else if (tmp == 2)
 		{
+			nb_tok += 1;
 			*tok_lst = (*tok_lst)->next;
 			i += 1;
 		}
@@ -294,6 +302,7 @@ void	lexer_posix(t_token **tok_lst, t_state **st_lst)
 			break ;
 	}
 	*tok_lst = first;
+	return (nb_tok);
 }
 
 /*int	main(void)

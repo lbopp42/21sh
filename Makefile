@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/04/30 16:45:18 by lbopp            ###   ########.fr        #
+#    Updated: 2017/05/01 12:40:18 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,8 +25,13 @@ LEXER_SRC = find_type.c\
 			token_management.c
 
 SRC_NAME = main.c
-SRC_TEST = src/lexer/new_lexer.c\
-		   src/maintest.c
+SRC_TEST = src/lexer/lexer.c\
+		   src/parser/parser.c\
+		   lsh_test/launch_tests.c\
+		   lsh_test/test_lexer1.c\
+		   lsh_test/test_lexer2.c\
+		   lsh_test/test_parser1.c\
+		   lsh_test/test_parser2.c
 SRC_PATH = src
 LEXER_PATH = src/lexer
 SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
@@ -53,8 +58,8 @@ $(NAME): $(OBJ)
 test:
 	@make -C libft
 	@echo "\033[32m=== Compilation of libft\t[DONE]\033[0m"
-	@$(CLANG) $(CFLAGS) -o 21sh $(SRC_TEST) -I includes -I libft/includes -lft -L libft
-	@echo "\033[32m=== Compilation\t[DONE]\033[0m" && ./21sh
+	@$(CLANG) $(CFLAGS) -o test_lsh $(SRC_TEST) -I includes -I libft/includes -lft -L libft
+	@echo "\033[32m=== Compilation\t[DONE]\033[0m" && ./test_lsh
 
 clean:
 	@make -C libft clean

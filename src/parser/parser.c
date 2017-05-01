@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/24 12:10:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/27 16:49:56 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/01 13:35:57 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,13 +156,13 @@ int	is_simplecmd(t_token *tok_lst, int nb_tok, int mv)
 	{
 		return (tmp + mv);
 	}
-	else if ((mv = iscmd_prefix(tok_lst, nb_tok, 0, 1)))
-	{
-		return (tmp + mv);
-	}
 	else if (tok_lst->type == WORD && (mv = iscmd_prefix(tok_lst, nb_tok, 1, 1)))
 	{
 		return (tmp + mv + 1);
+	}
+	else if ((mv = iscmd_prefix(tok_lst, nb_tok, 0, 1)))
+	{
+		return (tmp + mv);
 	}
 	else if (tok_lst->type == WORD)
 	{
@@ -226,12 +226,13 @@ int	ispipe_sequence(t_token *tok_lst, int nb_tok, int mv, int mode)
 		tmp--;
 	}
 	i++;
+	tmp = mv;
 	if (nb_tok - mv >= 3 * i - (i - 1) && (mv = ispipe_sequence(tok_lst, nb_tok, 0, 2)) &&
 			(mv = ispipe(tok_lst, mv)) && (((tmp = isnewline(tok_lst, mv)) &&
 				(mv = is_simplecmd(tok_lst, nb_tok, tmp))) ||
 				(mv = is_simplecmd(tok_lst, nb_tok, mv))))
 	{
-		return (mv);
+		return (tmp + mv);
 	}
 	else if ((mv = is_simplecmd(tok_lst, nb_tok, 0)))
 	{
@@ -253,8 +254,9 @@ int	isand_or(t_token *tok_lst, int nb_tok, int mv)
 			return (0);
 		tmp--;
 	}
+	tmp = mv;
 	if ((mv = ispipe_sequence(tok_lst, nb_tok, 0, 1)))
-		return (mv);
+		return (tmp + mv);
 	return (0);
 }
 
@@ -296,9 +298,13 @@ int	islist(t_token *tok_lst, int nb_tok, int mv, int mode)
 	i++;
 	if (nb_tok - mv >= 3 * i - (i - 1) && (mv = islist(tok_lst, nb_tok, 0, 2)) &&
 			(mv = isseparator_op(tok_lst, mv)) && (mv = isand_or(tok_lst, nb_tok, mv)))
+	{
 		return (mv);
+	}
 	else if ((mv = isand_or(tok_lst, nb_tok, mv)))
+	{
 		return (mv);
+	}
 	return (0);
 }
 
