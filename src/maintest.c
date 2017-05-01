@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:38:12 by lbopp             #+#    #+#             */
-/*   Updated: 2017/04/30 17:34:09 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/01 09:41:23 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,13 @@ int	main(void)
 	};
 	const t_tok_test	tok_array11[] = {
 		{WORD, "ls"},
+		{0, NULL}
+	};
+	const t_tok_test	tok_array12[] = {
+		{WORD, "ls"},
+		{PIPE, "|"},
+		{GREAT, ">"},
+		{WORD, "file"},
 		{0, NULL}
 	};
 
@@ -387,6 +394,32 @@ int	main(void)
 		tmp = tmp->next;
 	}
 	if (tok_array11[i].content || tmp || errortype || errortoken || state_lst)
+		printf("\033[31m[FAIL] \033[0m");
+	else
+		printf("\033[32m[OK]   \033[0m");
+	printf("[%s]\n", g_line);
+
+	/*		TEST 12		*/
+	state_lst = NULL;
+	errortype = 0;
+	errortoken = 0;
+	tok_lst = NULL;
+	free(g_line);
+	g_line = NULL;
+	g_line = ft_strdup("ls | > file");
+	lexer_posix(&tok_lst, &state_lst);
+	i = 0;
+	tmp = tok_lst;
+	while (tok_array12[i].content && tmp)
+	{
+		if (tok_array12[i].type != tmp->type)
+			errortype++;
+		if (ft_strcmp(tok_array12[i].content, tmp->content))
+			errortoken++;
+		i++;
+		tmp = tmp->next;
+	}
+	if (tok_array12[i].content || tmp || errortype || errortoken || state_lst)
 		printf("\033[31m[FAIL] \033[0m");
 	else
 		printf("\033[32m[OK]   \033[0m");
