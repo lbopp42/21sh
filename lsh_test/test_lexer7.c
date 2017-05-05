@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/05 09:39:18 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/05 10:01:39 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/05 10:05:37 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,6 @@ t_token	*test_lexer7(int *nb_tok[], int curs)
 		printf("\033[32m[OK]   \033[0m");
 	else
 		printf("\033[31m[FAIL] \033[0m");
-	printf("[%s]\n", g_line);
+	printf("[ls | cat | wc | NEWLINE echo]\n");
 	return (tok_lst);
 }

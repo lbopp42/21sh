@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/24 12:10:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/03 10:36:35 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/05 10:00:47 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,14 +98,12 @@ int	is_word(t_token *tok_lst, int mv)
 		return (0);
 }
 
-int	iscmd_prefix(t_token *tok_lst, int nb_tok, int mv, int mode)
+int	iscmd_prefix(t_token *tok_lst, int nb_tok, int mv)
 {
-	static int i = 0;
 	int	tmp;
+	int	max;
 
 	tmp = mv;
-	if (mode == 1)
-		i = 0;
 	while (tmp > 0)
 	{
 		if (tok_lst->next)
@@ -114,23 +112,15 @@ int	iscmd_prefix(t_token *tok_lst, int nb_tok, int mv, int mode)
 			return (0);
 		tmp--;
 	}
-	i++;
+	max = 0;
 	tmp = mv;
-	if (nb_tok - mv >= 4 * i - (i - 1) && (mv = iscmd_prefix(tok_lst, nb_tok, 0, 2)) &&
-			tok_lst->next && (mv = isio_redirect(tok_lst, nb_tok, mv)))
+	if ((mv = isio_redirect(tok_lst, nb_tok, 0)) || (mv = is_word(tok_lst, 0)))
 	{
-		return (mv);
+		max = mv;
+		while ((mv = isio_redirect(tok_lst, nb_tok, max)) || (mv = is_word(tok_lst, max)))
+			max = mv;
 	}
-	else if ((mv = isio_redirect(tok_lst, nb_tok, 0)))
-	{
-		return (mv);
-	}
-	else if (nb_tok - mv >= 4 * i - (i - 1) && (mv = iscmd_prefix(tok_lst, nb_tok, 0, 2)) &&
-			(mv = is_word(tok_lst, mv)))
-		return (mv);
-	else if (tok_lst->type == WORD)
-		return (tmp + 1);
-	return (0);
+	return (max);
 }
 
 int	is_simplecmd(t_token *tok_lst, int nb_tok, int mv)
@@ -147,20 +137,20 @@ int	is_simplecmd(t_token *tok_lst, int nb_tok, int mv)
 		tmp--;
 	}
 	tmp = mv;
-	if ((mv = iscmd_prefix(tok_lst, nb_tok, 0, 1)) && (mv = is_word(tok_lst, mv)) &&
-			(mv = iscmd_prefix(tok_lst, nb_tok, mv, 1)))
+	if ((mv = iscmd_prefix(tok_lst, nb_tok, 0)) && (mv = is_word(tok_lst, mv)) &&
+			(mv = iscmd_prefix(tok_lst, nb_tok, mv)))
 	{
 		return (tmp + mv);
 	}
-	else if ((mv = iscmd_prefix(tok_lst, nb_tok, 0, 1)) && (mv = is_word(tok_lst, mv)))
+	else if ((mv = iscmd_prefix(tok_lst, nb_tok, 0)) && (mv = is_word(tok_lst, mv)))
 	{
 		return (tmp + mv);
 	}
-	else if (tok_lst->type == WORD && (mv = iscmd_prefix(tok_lst, nb_tok, 1, 1)))
+	else if (tok_lst->type == WORD && (mv = iscmd_prefix(tok_lst, nb_tok, 1)))
 	{
 		return (tmp + mv + 1);
 	}
-	else if ((mv = iscmd_prefix(tok_lst, nb_tok, 0, 1)))
+	else if ((mv = iscmd_prefix(tok_lst, nb_tok, 0)))
 	{
 		return (tmp + mv);
 	}
@@ -209,14 +199,12 @@ int	isnewline(t_token *tok_lst, int mv)
 		return (0);
 }
 
-int	ispipe_sequence(t_token *tok_lst, int nb_tok, int mv, int mode)
+int	ispipe_sequence(t_token *tok_lst, int nb_tok, int mv)
 {
-	static int i = 0;
 	int	tmp;
+	int	max;
 
 	tmp = mv;
-	if (mode == 1)
-		i = 0;
 	while (tmp > 0)
 	{
 		if (tok_lst->next)
@@ -225,20 +213,16 @@ int	ispipe_sequence(t_token *tok_lst, int nb_tok, int mv, int mode)
 			return (0);
 		tmp--;
 	}
-	i++;
+	max = 0;
 	tmp = mv;
-	if (nb_tok - mv >= 3 * i - (i - 1) && (mv = ispipe_sequence(tok_lst, nb_tok, 0, 2)) &&
-			(mv = ispipe(tok_lst, mv)) && (((tmp = isnewline(tok_lst, mv)) &&
-				(mv = is_simplecmd(tok_lst, nb_tok, tmp))) ||
-				(mv = is_simplecmd(tok_lst, nb_tok, mv))))
+	if ((mv = is_simplecmd(tok_lst, nb_tok, 0)))
 	{
-		return (tmp + mv);
+		max = mv;
+		while ((mv = ispipe(tok_lst, max)) && (tmp = mv) &&
+				(((mv = isnewline(tok_lst, tmp)) && (mv = is_simplecmd(tok_lst, nb_tok, mv))) || (mv = is_simplecmd(tok_lst, nb_tok, tmp))))
+			max = mv;
 	}
-	else if ((mv = is_simplecmd(tok_lst, nb_tok, 0)))
-	{
-		return (mv);
-	}
-	return (0);
+	return (max);
 }
 
 int	isand_or(t_token *tok_lst, int nb_tok, int mv)
@@ -255,7 +239,7 @@ int	isand_or(t_token *tok_lst, int nb_tok, int mv)
 		tmp--;
 	}
 	tmp = mv;
-	if ((mv = ispipe_sequence(tok_lst, nb_tok, 0, 1)))
+	if ((mv = ispipe_sequence(tok_lst, nb_tok, 0)))
 		return (tmp + mv);
 	return (0);
 }
@@ -279,14 +263,12 @@ int	isseparator_op(t_token *tok_lst, int mv)
 		return (0);
 }
 
-int	islist(t_token *tok_lst, int nb_tok, int mv, int mode)
+int	islist(t_token *tok_lst, int nb_tok, int mv)
 {
-	static int i = 0;
 	int	tmp;
+	int	max;
 
 	tmp = mv;
-	if (mode == 1)
-		i = 0;
 	while (tmp > 0)
 	{
 		if (tok_lst->next)
@@ -295,17 +277,14 @@ int	islist(t_token *tok_lst, int nb_tok, int mv, int mode)
 			return (0);
 		tmp--;
 	}
-	i++;
-	if (nb_tok - mv >= 3 * i - (i - 1) && (mv = islist(tok_lst, nb_tok, 0, 2)) &&
-			(mv = isseparator_op(tok_lst, mv)) && (mv = isand_or(tok_lst, nb_tok, mv)))
+	max = 0;
+	if ((mv = isand_or(tok_lst, nb_tok, mv)))
 	{
-		return (mv);
+		max = mv;
+		while ((mv = isseparator_op(tok_lst, mv)) && (mv = isand_or(tok_lst, nb_tok, mv)))
+			max = mv;
 	}
-	else if ((mv = isand_or(tok_lst, nb_tok, mv)))
-	{
-		return (mv);
-	}
-	return (0);
+	return (max);
 }
 
 int	iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
@@ -321,10 +300,7 @@ int	iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 			return (0);
 		tmp--;
 	}
-	if (nb_tok >= 2 && (mv = islist(tok_lst, nb_tok, 0, 1)) &&
-			(mv = isseparator_op(tok_lst, mv)))
-		return (mv);
-	else if ((mv = islist(tok_lst, nb_tok, 0, 1)))
+	if ((mv = islist(tok_lst, nb_tok, 0)))
 		return (mv);
 	return (0);
 }

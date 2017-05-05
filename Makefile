@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/05/05 09:51:04 by lbopp            ###   ########.fr        #
+#    Updated: 2017/05/05 10:03:43 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,7 @@ LEXER_SRC = find_type.c\
 
 SRC_NAME = main.c
 SRC_TEST = src/lexer/lexer.c\
-		   src/parser/parser2.c\
+		   src/parser/parser.c\
 		   lsh_test/launch_tests.c\
 		   lsh_test/test_lexer1.c\
 		   lsh_test/test_lexer2.c\
