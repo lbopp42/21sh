@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/24 12:10:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/05 10:00:47 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/05 10:18:49 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -300,7 +300,10 @@ int	iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 			return (0);
 		tmp--;
 	}
-	if ((mv = islist(tok_lst, nb_tok, 0)))
+	if ((mv = islist(tok_lst, nb_tok, 0)) && (mv = isseparator_op(tok_lst, mv)))
 		return (mv);
-	return (0);
+	else if ((mv = islist(tok_lst, nb_tok, 0)))
+		return (mv);
+	else
+		return (0);
 }

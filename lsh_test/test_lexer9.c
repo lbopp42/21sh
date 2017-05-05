@@ -1,27 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test_lexer6.c                                      :+:      :+:    :+:   */
+/*   test_lexer9.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/05 09:34:26 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/05 10:11:14 by lbopp            ###   ########.fr       */
+/*   Created: 2017/05/05 10:09:19 by lbopp             #+#    #+#             */
+/*   Updated: 2017/05/05 10:11:13 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh_test.h"
 #include "lsh.h"
 
-t_token	*test_lexer6(int *nb_tok[], int curs)
+t_token	*test_lexer9(int *nb_tok[], int curs)
 {
 	t_token				*tok_lst;
 	t_token				*tmp;
 	int					i;
 	const t_tok_test	tok_array[] = {
-		{WORD, "ls"},
-		{PIPE, "|"},
-		{WORD, "cat"},
 		{0, NULL}
 	};
 	t_state				*st_lst;
@@ -31,7 +28,7 @@ t_token	*test_lexer6(int *nb_tok[], int curs)
 	st_lst = NULL;
 	tok_lst = NULL;
 	g_line = NULL;
-	g_line = ft_strdup("ls | cat");
+	g_line = ft_strdup("\"'\"'");
 	(*nb_tok)[curs] = lexer_posix(&tok_lst, &st_lst);
 	free(g_line);
 	i = 0;
@@ -45,10 +42,10 @@ t_token	*test_lexer6(int *nb_tok[], int curs)
 		i++;
 		tmp = tmp->next;
 	}
-	if (tok_array[i].content || tmp || error || st_lst)
-		printf("\033[31m[FAIL] \033[0m");
-	else
+	if (st_lst)
 		printf("\033[32m[OK]   \033[0m");
-	printf("[%s]\n", g_line);
+	else
+		printf("\033[31m[FAIL] \033[0m");
+	printf("[\"'\"'] [LEXICAL ERROR FOUND]\n");
 	return (tok_lst);
 }
