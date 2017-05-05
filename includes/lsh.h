@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/01 11:21:05 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/05 13:59:54 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,18 +49,14 @@ typedef struct	s_token
 	struct s_token	*next;
 }				t_token;
 
+void	add_to_current_tok(t_token **tok_lst, int i, int type);
+int		big_op(char *content, int i);
+void	create_new_token(t_token **tok_lst, int i, int type);
+void	create_new_token_next(t_token **tok_lst, int i, int type);
 int		iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv);
+int		is_digit_token(char *content);
+int		is_new_op(int i);
 int		lexer_posix(t_token **tok_lst, t_state **st_lst);
-
-// OLD
-void	print_lst(t_token *tok_lst);
-void	print_state_lst(t_state *state_lst);
-int		isop(int *i);
-int		isquote(int *i);
-void	fill_tok_lst(t_token **tok_lst, t_state **state_lst);
-int		find_type(int *i);
-t_state	*get_last_state(t_state *state_lst);
-t_token	*get_last_token(t_token *tok_lst);
-void	token_management(t_token **t_lst, t_state *s_lst, int *i, int type);
+void	state_management(t_state **st_lst, int i);
 
 #endif

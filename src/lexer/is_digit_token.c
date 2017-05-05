@@ -1,23 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test_parser2.c                                     :+:      :+:    :+:   */
+/*   is_digit_token.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/01 12:37:55 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/05 10:30:58 by lbopp            ###   ########.fr       */
+/*   Created: 2017/05/05 12:34:06 by lbopp             #+#    #+#             */
+/*   Updated: 2017/05/05 12:34:35 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lsh_test.h"
+#include "lsh.h"
 
-void	test_parser2(t_token *tok_lst, int nb_tok)
+int	is_digit_token(char *content)
 {
-	if (nb_tok == iscomplete_cmd(tok_lst, nb_tok, 0))
-		printf("\033[32m[OK]   \033[0m[ls | cat ; test >> lol]\n");
-	else
+	int	i;
+
+	i = 0;
+	while (content[i])
 	{
-		printf("\033[31m[FAIL] \033[0m[ls | cat ; test >> lol]\n");
+		if (!ft_isdigit(content[i]))
+			return (0);
+		i += 1;
 	}
+	return (1);
 }

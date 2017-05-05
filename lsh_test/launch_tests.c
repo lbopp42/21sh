@@ -6,13 +6,13 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/01 10:21:55 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/05 10:14:17 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/05 10:31:42 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
 #include "lsh_test.h"
-#define NB_TEST 9
+#define NB_TEST 10
 
 void	launch_test_lexer_from_1_to_25(t_token **array, int *i, int	**nb_tok)
 {
@@ -33,6 +33,8 @@ void	launch_test_lexer_from_1_to_25(t_token **array, int *i, int	**nb_tok)
 	array[*i] = test_lexer8(nb_tok, *i);
 	*i += 1;
 	array[*i] = test_lexer9(nb_tok, *i);
+	*i += 1;
+	array[*i] = test_lexer10(nb_tok, *i);
 }
 
 void	launch_test_parser_from_1_to_25(t_token **array, int *nb_tok)
@@ -59,6 +61,8 @@ void	launch_test_parser_from_1_to_25(t_token **array, int *nb_tok)
 	test_parser8(array[i], nb_tok[i]);
 	i += 1;
 	test_parser9(array[i], nb_tok[i]);
+	i += 1;
+	test_parser10(array[i], nb_tok[i]);
 	/*while (array[i])
 	{
 		printf("content = [%s] et type = [%d]\n", array[i]->content, array[i]->type);

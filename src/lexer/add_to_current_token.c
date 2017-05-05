@@ -1,23 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test_parser2.c                                     :+:      :+:    :+:   */
+/*   add_to_current_token.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/01 12:37:55 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/05 10:30:58 by lbopp            ###   ########.fr       */
+/*   Created: 2017/05/05 12:30:40 by lbopp             #+#    #+#             */
+/*   Updated: 2017/05/05 12:31:17 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lsh_test.h"
+#include "lsh.h"
 
-void	test_parser2(t_token *tok_lst, int nb_tok)
+void	add_to_current_tok(t_token **tok_lst, int i, int type)
 {
-	if (nb_tok == iscomplete_cmd(tok_lst, nb_tok, 0))
-		printf("\033[32m[OK]   \033[0m[ls | cat ; test >> lol]\n");
-	else
-	{
-		printf("\033[31m[FAIL] \033[0m[ls | cat ; test >> lol]\n");
-	}
+	char	tmp[2];
+
+	tmp[0] = g_line[i];
+	tmp[1] = '\0';
+	(*tok_lst)->content = ft_stradd((*tok_lst)->content, tmp);
+	(*tok_lst)->type = type;
 }
