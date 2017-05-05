@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/05/03 10:22:20 by lbopp            ###   ########.fr        #
+#    Updated: 2017/05/05 09:51:04 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,18 +26,24 @@ LEXER_SRC = find_type.c\
 
 SRC_NAME = main.c
 SRC_TEST = src/lexer/lexer.c\
-		   src/parser/parser.c\
+		   src/parser/parser2.c\
 		   lsh_test/launch_tests.c\
 		   lsh_test/test_lexer1.c\
 		   lsh_test/test_lexer2.c\
 		   lsh_test/test_lexer3.c\
 		   lsh_test/test_lexer4.c\
 		   lsh_test/test_lexer5.c\
+		   lsh_test/test_lexer6.c\
+		   lsh_test/test_lexer7.c\
+		   lsh_test/test_lexer8.c\
 		   lsh_test/test_parser1.c\
 		   lsh_test/test_parser2.c\
 		   lsh_test/test_parser3.c\
 		   lsh_test/test_parser4.c\
-		   lsh_test/test_parser5.c
+		   lsh_test/test_parser5.c\
+		   lsh_test/test_parser6.c\
+		   lsh_test/test_parser7.c\
+		   lsh_test/test_parser8.c
 SRC_PATH = src
 LEXER_PATH = src/lexer
 SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))

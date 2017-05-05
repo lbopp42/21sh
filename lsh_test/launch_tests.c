@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/01 10:21:55 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/03 10:30:49 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/05 09:51:54 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,12 @@ void	launch_test_lexer_from_1_to_25(t_token **array, int *i, int	**nb_tok)
 	array[*i] = test_lexer4(nb_tok, *i);
 	*i += 1;
 	array[*i] = test_lexer5(nb_tok, *i);
+	*i += 1;
+	array[*i] = test_lexer6(nb_tok, *i);
+	*i += 1;
+	array[*i] = test_lexer7(nb_tok, *i);
+	*i += 1;
+	array[*i] = test_lexer8(nb_tok, *i);
 }
 
 void	launch_test_parser_from_1_to_25(t_token **array, int *nb_tok)
@@ -33,15 +39,21 @@ void	launch_test_parser_from_1_to_25(t_token **array, int *nb_tok)
 	i = 0;
 	(void)array;
 	(void)nb_tok;
-	//test_parser1(array[i], nb_tok[i]);
+	test_parser1(array[i], nb_tok[i]);
 	i += 1;
-	//test_parser2(array[i], nb_tok[i]);
+	test_parser2(array[i], nb_tok[i]);
 	i += 1;
-	//test_parser3(array[i], nb_tok[i]);
+	test_parser3(array[i], nb_tok[i]);
 	i += 1;
-	//test_parser4(array[i], nb_tok[i]);
+	test_parser4(array[i], nb_tok[i]);
 	i += 1;
 	test_parser5(array[i], nb_tok[i]);
+	i += 1;
+	test_parser6(array[i], nb_tok[i]);
+	i += 1;
+	test_parser7(array[i], nb_tok[i]);
+	i += 1;
+	test_parser8(array[i], nb_tok[i]);
 	/*while (array[i])
 	{
 		printf("content = [%s] et type = [%d]\n", array[i]->content, array[i]->type);
@@ -51,12 +63,12 @@ void	launch_test_parser_from_1_to_25(t_token **array, int *nb_tok)
 
 int	main(void)
 {
-	t_token	*array[5];
+	t_token	*array[8];
 	int		*nb_tok;
 	int		i;
 
 	i = 0;
-	nb_tok = (int*)ft_memalloc(sizeof(int) * 5);
+	nb_tok = (int*)ft_memalloc(sizeof(int) * 8);
 	printf("\n\033[36m=========  Testing lexer of lsh  =========\n\n\033[0m");
 	launch_test_lexer_from_1_to_25(array, &i, &nb_tok);
 	printf("\n\033[36m=========    End of lexer test   =========\033[0m");

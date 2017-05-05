@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test2.c                                            :+:      :+:    :+:   */
+/*   test_lexer7.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/01 11:01:08 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/05 09:35:38 by lbopp            ###   ########.fr       */
+/*   Created: 2017/05/05 09:39:18 by lbopp             #+#    #+#             */
+/*   Updated: 2017/05/05 10:01:39 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh_test.h"
 #include "lsh.h"
 
-t_token	*test_lexer2(int *nb_tok[], int curs)
+t_token	*test_lexer7(int *nb_tok[], int curs)
 {
 	t_token				*tok_lst;
 	t_token				*tmp;
@@ -22,10 +22,11 @@ t_token	*test_lexer2(int *nb_tok[], int curs)
 		{WORD, "ls"},
 		{PIPE, "|"},
 		{WORD, "cat"},
-		{SEMICOLON, ";"},
-		{WORD, "test"},
-		{DGREAT, ">>"},
-		{WORD, "lol"},
+		{PIPE, "|"},
+		{WORD, "wc"},
+		{PIPE, "|"},
+		{NEWLINE, "\n"},
+		{WORD, "echo"},
 		{0, NULL}
 	};
 	t_state				*st_lst;
@@ -35,7 +36,7 @@ t_token	*test_lexer2(int *nb_tok[], int curs)
 	st_lst = NULL;
 	tok_lst = NULL;
 	g_line = NULL;
-	g_line = ft_strdup("ls | cat ; test >> lol");
+	g_line = ft_strdup("ls | cat | wc | \n echo");
 	(*nb_tok)[curs] = lexer_posix(&tok_lst, &st_lst);
 	free(g_line);
 	i = 0;
@@ -50,9 +51,9 @@ t_token	*test_lexer2(int *nb_tok[], int curs)
 		tmp = tmp->next;
 	}
 	if (tok_array[i].content || tmp || error || st_lst)
-		printf("\033[31m[FAIL] \033[0m");
-	else
 		printf("\033[32m[OK]   \033[0m");
+	else
+		printf("\033[31m[FAIL] \033[0m");
 	printf("[%s]\n", g_line);
 	return (tok_lst);
 }
