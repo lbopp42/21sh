@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/05/05 13:42:19 by lbopp            ###   ########.fr        #
+#    Updated: 2017/05/10 09:45:55 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,8 +29,12 @@ SRC_TEST = src/lexer/lexer.c\
 		   src/lexer/add_to_current_token.c\
 		   src/lexer/create_new_token.c\
 		   src/lexer/is_digit_token.c\
+		   src/lexer/is_piece_of_bigop.c\
 		   src/lexer/management_of_op.c\
 		   src/lexer/state_management.c\
+		   src/lexer/treatment_of_quote.c\
+		   src/lexer/treatment_of_word.c\
+		   src/lexer/treatment_newline.c\
 		   src/parser/parser.c\
 		   lsh_test/launch_tests.c\
 		   lsh_test/test_lexer1.c\

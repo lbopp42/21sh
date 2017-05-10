@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/05 13:59:54 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/10 10:06:07 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,14 @@ void	create_new_token(t_token **tok_lst, int i, int type);
 void	create_new_token_next(t_token **tok_lst, int i, int type);
 int		iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv);
 int		is_digit_token(char *content);
+int		is_piece_of_bigop(t_token **tok_lst, t_state **st_lst, int *sp, int i);
 int		is_new_op(int i);
 int		lexer_posix(t_token **tok_lst, t_state **st_lst);
 void	state_management(t_state **st_lst, int i);
+int		treatment_of_quote(t_token **tok_lst, t_state **st_lst, int *sp, int i);
+int		treatment_of_old_word(t_token **tok_lst, int *sp, int i);
+int		treatment_of_new_word(t_token **tok_lst, int *sp, int i);
+int		treatment_newline(t_token **tok_lst, int i, int type);
+int		treatment_new_op(t_token **tok_lst, int *sp, int i, int type);
 
 #endif

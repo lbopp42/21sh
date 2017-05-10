@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/05 12:26:46 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/05 12:28:38 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/10 09:46:41 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,4 +44,20 @@ int		is_new_op(int i)
 		id++;
 	}
 	return (WORD);
+}
+
+int		treatment_new_op(t_token **tok_lst, int *sp, int i, int type)
+{
+	*sp = 0;
+	if (*tok_lst)
+	{
+		if ((type == GREAT || type == LESS) &&
+				is_digit_token((*tok_lst)->content))
+			(*tok_lst)->type = IO_NUMBER;
+		create_new_token_next(tok_lst, i, type);
+		return (2);
+	}
+	else
+		create_new_token(tok_lst, i, type);
+	return (1);
 }
