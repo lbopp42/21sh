@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/10 10:06:07 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/11 10:40:07 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,20 @@ enum {
 	IO_NUMBER,
 	BLANK,
 };
+
+typedef struct	s_ast_node
+{
+	int					type;
+	char				*content;
+	struct s_ast_node	*right;
+	struct s_ast_node	*left;
+}				t_ast_node;
+
+typedef struct	s_tuple
+{
+	int					mv;
+	struct s_ast_node	*ast_tree;
+}				t_tuple;
 
 typedef struct	s_state
 {
