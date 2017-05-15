@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/15 11:07:46 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/15 13:27:29 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -459,23 +459,142 @@ t_tuple	*ispipe_sequence(t_token *tok_lst, int nb_tok, int mv)
 	return (max_tuple);
 }
 
+t_tuple	*isand_or(t_token *tok_lst, int nb_tok, int mv)
+{
+	int		tmp;
+	t_tuple	*tuple_parse;
+
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (NULL);
+		tmp--;
+	}
+	tmp = mv;
+	if ((tuple_parse = ispipe_sequence(tok_lst, nb_tok, 0)))
+	{
+		tuple_parse->mv += mv;
+		return (tuple_parse);
+	}
+	return (NULL);
+}
+
+t_tuple	*isseparator_op(t_token *tok_lst, int mv)
+{
+	int		tmp;
+	t_tuple	*tuple_parse;
+
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (NULL);
+		tmp--;
+	}
+	if (tok_lst->type == SEMICOLON)
+	{
+		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
+		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, NULL);
+		tuple_parse->mv = mv + 1;
+		return (tuple_parse);
+	}
+	else
+		return (NULL);
+}
+
+t_tuple	*islist(t_token *tok_lst, int nb_tok, int mv)
+{
+	int	tmp;
+	t_tuple	*tuple_parse;
+	t_tuple	*tmp_tuple;
+	t_tuple	*max_tuple;
+
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (0);
+		tmp--;
+	}
+	max_tuple = NULL;
+	if ((tuple_parse = isand_or(tok_lst, nb_tok, 0)))
+	{
+		max_tuple = tuple_parse;
+		while (42)
+		{
+			if ((tuple_parse = isseparator_op(tok_lst, max_tuple->mv)))
+			{
+				tuple_parse->ast_tree->left = max_tuple->ast_tree;
+				if ((tmp_tuple = isand_or(tok_lst, nb_tok, tuple_parse->mv)))
+				{
+					tuple_parse->ast_tree->right = tmp_tuple->ast_tree;
+					tuple_parse->mv = tmp_tuple->mv;
+					max_tuple = tuple_parse;
+					continue ;
+				}
+			}
+			break ;
+		}
+	}
+	return (max_tuple);
+}
+
+t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
+{
+	int		tmp;
+	t_tuple	*tmp_tuple;
+	t_tuple	*tuple_parse;
+
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (NULL);
+		tmp--;
+	}
+	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
+	{
+		if ((tmp_tuple = isseparator_op(tok_lst, tuple_parse->mv)))
+		{
+			tmp_tuple->ast_tree->left = tuple_parse->ast_tree;
+			tmp_tuple->mv += mv;
+			return (tmp_tuple);
+		}
+	}
+	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
+	{
+		tuple_parse->mv += mv;
+		return (tuple_parse);
+	}
+	return (NULL);
+}
+
 int	main(void)
 {
 	t_tuple	*tuple_end;
 	t_token	*tok_lst;
 
 	tok_lst = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->type = GREAT;
-	tok_lst->content = ft_strdup(">");
+	tok_lst->type = WORD;
+	tok_lst->content = ft_strdup("ls");
 	tok_lst->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->type = WORD;
-	tok_lst->next->content = ft_strdup("file");
+	tok_lst->next->type = SEMICOLON;
+	tok_lst->next->content = ft_strdup(";");
 	tok_lst->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->type = WORD;
-	tok_lst->next->next->content = ft_strdup("ls");
+	tok_lst->next->next->content = ft_strdup("cat");
 	tok_lst->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->type = WORD;
-	tok_lst->next->next->next->content = ft_strdup("-a");
+	tok_lst->next->next->next->content = ft_strdup("-e");
 	tok_lst->next->next->next->next = NULL;/*(t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->next->type = PIPE;
 	tok_lst->next->next->next->next->content = ft_strdup("|");
@@ -483,93 +602,10 @@ int	main(void)
 	tok_lst->next->next->next->next->next->type = WORD;
 	tok_lst->next->next->next->next->next->content = ft_strdup("wc");
 	tok_lst->next->next->next->next->next->next = NULL;*/
-	tuple_end = ispipe_sequence(tok_lst, 4, 0);
+	tuple_end = iscomplete_cmd(tok_lst, 4, 0);
 	if (tuple_end)
 	{
 		printf("mv final = %d\n", tuple_end->mv);
 		print_AST(tuple_end->ast_tree, 0, 0);
 	}
 }
-
-/*int	isand_or(t_token *tok_lst, int nb_tok, int mv)
-{
-	int	tmp;
-
-	tmp = mv;
-	while (tmp > 0)
-	{
-		if (tok_lst->next)
-			tok_lst = tok_lst->next;
-		else
-			return (0);
-		tmp--;
-	}
-	tmp = mv;
-	if ((mv = ispipe_sequence(tok_lst, nb_tok, 0)))
-		return (tmp + mv);
-	return (0);
-}
-
-int	isseparator_op(t_token *tok_lst, int mv)
-{
-	int	tmp;
-
-	tmp = mv;
-	while (tmp > 0)
-	{
-		if (tok_lst->next)
-			tok_lst = tok_lst->next;
-		else
-			return (0);
-		tmp--;
-	}
-	if (tok_lst->type == SEMICOLON)
-		return (mv + 1);
-	else
-		return (0);
-}
-
-int	islist(t_token *tok_lst, int nb_tok, int mv)
-{
-	int	tmp;
-	int	max;
-
-	tmp = mv;
-	while (tmp > 0)
-	{
-		if (tok_lst->next)
-			tok_lst = tok_lst->next;
-		else
-			return (0);
-		tmp--;
-	}
-	max = 0;
-	if ((mv = isand_or(tok_lst, nb_tok, mv)))
-	{
-		max = mv;
-		while ((mv = isseparator_op(tok_lst, mv)) && (mv = isand_or(tok_lst, nb_tok, mv)))
-			max = mv;
-	}
-	return (max);
-}
-
-int	iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
-{
-	int	tmp;
-
-	tmp = mv;
-	while (tmp > 0)
-	{
-		if (tok_lst->next)
-			tok_lst = tok_lst->next;
-		else
-			return (0);
-		tmp--;
-	}
-	if ((mv = islist(tok_lst, nb_tok, 0)) && (mv = isseparator_op(tok_lst, mv)))
-		return (mv);
-	else if ((mv = islist(tok_lst, nb_tok, 0)))
-		return (mv);
-	else
-		return (0);
-}*/

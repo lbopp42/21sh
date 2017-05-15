@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/11 10:40:07 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/15 13:16:12 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void	add_to_current_tok(t_token **tok_lst, int i, int type);
 int		big_op(char *content, int i);
 void	create_new_token(t_token **tok_lst, int i, int type);
 void	create_new_token_next(t_token **tok_lst, int i, int type);
-int		iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv);
+t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv);
 int		is_digit_token(char *content);
 int		is_piece_of_bigop(t_token **tok_lst, t_state **st_lst, int *sp, int i);
 int		is_new_op(int i);
