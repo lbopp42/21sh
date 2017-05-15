@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/03 10:06:13 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/03 10:24:05 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/15 15:11:56 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,10 @@
 
 void	test_parser3(t_token *tok_lst, int nb_tok)
 {
-	if (nb_tok == iscomplete_cmd(tok_lst, nb_tok, 0))
+	t_tuple	*tmp;
+
+	tmp = iscomplete_cmd(tok_lst, nb_tok, 0);
+	if (nb_tok == tmp->mv)
 		printf("\033[32m[OK]   \033[0m[echo \"test\"\"test2\"]\n");
 	else
 		printf("\033[31m[FAIL] \033[0m[echo \"test\"\"test2\"]\n");
