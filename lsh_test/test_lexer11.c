@@ -1,19 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test2.c                                            :+:      :+:    :+:   */
+/*   test_lexer11.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/01 11:01:08 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/17 16:08:49 by lbopp            ###   ########.fr       */
+/*   Created: 2017/05/17 15:49:58 by lbopp             #+#    #+#             */
+/*   Updated: 2017/05/17 15:52:44 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh_test.h"
 #include "lsh.h"
 
-t_token	*test_lexer2(int *nb_tok[], int curs)
+t_token	*test_lexer11(int *nb_tok[], int curs)
 {
 	t_token				*tok_lst;
 	t_token				*tmp;
@@ -35,7 +35,7 @@ t_token	*test_lexer2(int *nb_tok[], int curs)
 	st_lst = NULL;
 	tok_lst = NULL;
 	g_line = NULL;
-	g_line = ft_strdup("ls | cat ; test >> lol");
+	g_line = ft_strdup("ls|cat;test>>lol");
 	(*nb_tok)[curs] = lexer_posix(&tok_lst, &st_lst);
 	free(g_line);
 	i = 0;

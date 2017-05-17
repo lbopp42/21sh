@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test_parser2.c                                     :+:      :+:    :+:   */
+/*   test_parser12.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/01 12:37:55 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/17 16:41:21 by lbopp            ###   ########.fr       */
+/*   Created: 2017/05/17 15:59:30 by lbopp             #+#    #+#             */
+/*   Updated: 2017/05/17 16:01:08 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 static char	**ast_to_array(char *content)
 {
 	static int	i = 0;
-	static char	*array[7];
+	static char	*array[1];
 
 	if (!content)
 		return (array);
@@ -38,7 +38,7 @@ static void	check_ast_tree(t_ast_node *ast_tree)
 static int	is_valid_ast(t_ast_node *ast_tree)
 {
 	char		**array;
-	const char	*array_ref[8] = {"ls", "cat", "|", "test", "lol", ">>", ";", NULL};
+	const char	*array_ref[2] = {"ls", NULL};
 	int			i;
 
 	check_ast_tree(ast_tree);
@@ -53,15 +53,15 @@ static int	is_valid_ast(t_ast_node *ast_tree)
 	return (1);
 }
 
-void	test_parser2(t_token *tok_lst, int nb_tok)
+void	test_parser12(t_token *tok_lst, int nb_tok)
 {
 	t_tuple	*tmp;
 
 	tmp = iscomplete_cmd(tok_lst, nb_tok, 0);
 	if (nb_tok == tmp->mv && is_valid_ast(tmp->ast_tree))
-		printf("\033[32m[OK]   \033[0m[ls | cat ; test >> lol]\n");
+		printf("\033[32m[OK]   \033[0m[      ls    ]\n");
 	else
 	{
-		printf("\033[31m[FAIL] \033[0m[ls | cat ; test >> lol]\n");
+		printf("\033[31m[FAIL] \033[0m[      ls    ]\n");
 	}
 }

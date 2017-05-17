@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test_parser2.c                                     :+:      :+:    :+:   */
+/*   test_parser11.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/01 12:37:55 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/17 16:41:21 by lbopp            ###   ########.fr       */
+/*   Created: 2017/05/17 15:53:26 by lbopp             #+#    #+#             */
+/*   Updated: 2017/05/17 15:54:55 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,15 +53,13 @@ static int	is_valid_ast(t_ast_node *ast_tree)
 	return (1);
 }
 
-void	test_parser2(t_token *tok_lst, int nb_tok)
+void		test_parser11(t_token *tok_lst, int nb_tok)
 {
 	t_tuple	*tmp;
 
 	tmp = iscomplete_cmd(tok_lst, nb_tok, 0);
 	if (nb_tok == tmp->mv && is_valid_ast(tmp->ast_tree))
-		printf("\033[32m[OK]   \033[0m[ls | cat ; test >> lol]\n");
+		printf("\033[32m[OK]   \033[0m[ls|cat;test>>lol]\n");
 	else
-	{
-		printf("\033[31m[FAIL] \033[0m[ls | cat ; test >> lol]\n");
-	}
+		printf("\033[31m[FAIL] \033[0m[ls|cat;test>>lol]\n");
 }

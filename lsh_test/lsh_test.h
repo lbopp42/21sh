@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/01 10:25:37 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/05 10:32:01 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/17 16:42:06 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,9 @@ t_token	*test_lexer7(int *nb_tok[], int curs);
 t_token	*test_lexer8(int *nb_tok[], int curs);
 t_token	*test_lexer9(int *nb_tok[], int curs);
 t_token	*test_lexer10(int *nb_tok[], int curs);
+t_token	*test_lexer11(int *nb_tok[], int curs);
+t_token	*test_lexer12(int *nb_tok[], int curs);
+t_token	*test_lexer13(int *nb_tok[], int curs);
 
 void	test_parser1(t_token *tok_lst, int nb_tok);
 void	test_parser2(t_token *tok_lst, int nb_tok);
@@ -42,5 +45,8 @@ void	test_parser7(t_token *tok_lst, int nb_tok);
 void	test_parser8(t_token *tok_lst, int nb_tok);
 void	test_parser9(t_token *tok_lst, int nb_tok);
 void	test_parser10(t_token *tok_lst, int nb_tok);
+void	test_parser11(t_token *tok_lst, int nb_tok);
+void	test_parser12(t_token *tok_lst, int nb_tok);
+void	test_parser13(t_token *tok_lst, int nb_tok);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/17 14:42:56 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/17 17:19:07 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -612,8 +612,8 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 	tok_lst->type = WORD;
 	tok_lst->content = ft_strdup("ls");
 	tok_lst->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->type = PIPE;
-	tok_lst->next->content = ft_strdup("|");
+	tok_lst->next->type = GREAT;
+	tok_lst->next->content = ft_strdup(">");
 	tok_lst->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->type = WORD;
 	tok_lst->next->next->content = ft_strdup("cat");
@@ -622,16 +622,16 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 	tok_lst->next->next->next->content = ft_strdup("|");
 	tok_lst->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->content = ft_strdup("wc");
+	tok_lst->next->next->next->next->content = ft_strdup("cat");
 	tok_lst->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->next->type = PIPE;
-	tok_lst->next->next->next->next->next->content = ft_strdup("|");
+	tok_lst->next->next->next->next->next->type = WORD;
+	tok_lst->next->next->next->next->next->content = ft_strdup("-e");
 	tok_lst->next->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->next->next->type = NEWLINE;
-	tok_lst->next->next->next->next->next->next->content = ft_strdup("\n");
+	tok_lst->next->next->next->next->next->next->type = PIPE;
+	tok_lst->next->next->next->next->next->next->content = ft_strdup("|");
 	tok_lst->next->next->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->next->next->next->content = ft_strdup("echo");
+	tok_lst->next->next->next->next->next->next->next->content = ft_strdup("wc");
 	tok_lst->next->next->next->next->next->next->next->next = NULL;
 	tuple_end = iscomplete_cmd(tok_lst, 4, 0);
 	if (tuple_end)
