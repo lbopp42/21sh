@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 09:21:07 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/10 09:21:13 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/17 15:32:23 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ int	is_piece_of_bigop(t_token **tok_lst, t_state **st_lst, int *sp, int i)
 	{
 		if (g_line[i] != ' ' && g_line[i] != '\t')
 		{
+			if (g_line[i] == '\n')
+				return (0);
 			create_new_token_next(tok_lst, i, is_new_op(i));
 			return (2);
 		}

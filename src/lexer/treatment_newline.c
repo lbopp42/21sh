@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 09:44:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/10 09:44:25 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/17 15:32:19 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ int	treatment_newline(t_token **tok_lst, int i, int type)
 		return (2);
 	}
 	else
+	{
 		create_new_token(tok_lst, i, type);
+	}
 	return (1);
 }

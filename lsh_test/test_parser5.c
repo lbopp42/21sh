@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/03 10:20:08 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/17 10:59:35 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/17 13:41:00 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static void	check_ast_tree(t_ast_node *ast_tree)
 static int	is_valid_ast(t_ast_node *ast_tree)
 {
 	char		**array;
-	const char	*array_ref[16] = {"mkdir test", "cd test", ";", "ls -a", ";", "ls", "cat", "|", "wc -c", "fifi", ">", "|", ";", "cat fifi", NULL};
+	const char	*array_ref[16] = {"mkdir test", "cd test", ";", "ls -a", ";", "ls", "cat", "|", "wc -c", "|", "fifi", ">", ";", "cat fifi", ";", NULL};
 	int			i;
 
 	check_ast_tree(ast_tree);
@@ -46,7 +46,6 @@ static int	is_valid_ast(t_ast_node *ast_tree)
 	i = 0;
 	while (array_ref[i])
 	{
-		printf("array = [%s] et array_ref = [%s]\n", array[i], array_ref[i]);
 		if (!ft_strequ(array[i], array_ref[i]))
 			return (0);
 		i += 1;
