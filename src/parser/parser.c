@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/18 09:32:44 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/18 12:47:23 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,9 +231,7 @@ t_tuple	*iscmd_prefix(t_token *tok_lst, int nb_tok, int mv)
 					ft_stradd(max_tuple->ast_tree->content, tuple_parse->ast_tree->content);
 			}
 			else if (!max_tuple->ast_tree->left && tuple_parse->ast_tree->type == WORD)
-			{
 				max_tuple->ast_tree->left = tuple_parse->ast_tree;
-			}
 			else if (max_tuple->ast_tree->left && max_tuple->ast_tree->left->type == WORD
 					&& tuple_parse->ast_tree->type == WORD)
 			{
@@ -627,15 +625,15 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 	tok_lst->type = WORD;
 	tok_lst->content = ft_strdup("ls");
 	tok_lst->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->type = GREAT;
-	tok_lst->next->content = ft_strdup(">");
+	tok_lst->next->type = WORD;
+	tok_lst->next->content = ft_strdup("-a");
 	tok_lst->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->type = WORD;
-	tok_lst->next->next->content = ft_strdup("cat");
+	tok_lst->next->next->type = GREAT;
+	tok_lst->next->next->content = ft_strdup(">");
 	tok_lst->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->type = PIPE;
-	tok_lst->next->next->next->content = ft_strdup("|");
-	tok_lst->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
+	tok_lst->next->next->next->type = WORD;
+	tok_lst->next->next->next->content = ft_strdup("file");
+	tok_lst->next->next->next->next = NULL;(t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->next->type = WORD;
 	tok_lst->next->next->next->next->content = ft_strdup("cat");
 	tok_lst->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));

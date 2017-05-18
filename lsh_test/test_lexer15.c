@@ -1,31 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test2.c                                            :+:      :+:    :+:   */
+/*   test_lexer15.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/01 11:01:08 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/18 09:46:45 by lbopp            ###   ########.fr       */
+/*   Created: 2017/05/18 10:13:48 by lbopp             #+#    #+#             */
+/*   Updated: 2017/05/18 10:20:02 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh_test.h"
 #include "lsh.h"
 
-t_token	*test_lexer2(int *nb_tok[], int curs)
+t_token	*test_lexer15(int *nb_tok[], int curs)
 {
 	t_token				*tok_lst;
 	t_token				*tmp;
 	int					i;
 	const t_tok_test	tok_array[] = {
 		{WORD, "ls"},
+		{WORD, "-a"},
+		{WORD, "-l"},
 		{PIPE, "|"},
 		{WORD, "cat"},
-		{SEMICOLON, ";"},
-		{WORD, "test"},
-		{DGREAT, ">>"},
-		{WORD, "lol"},
+		{WORD, "-e"},
 		{0, NULL}
 	};
 	t_state				*st_lst;
@@ -35,7 +34,7 @@ t_token	*test_lexer2(int *nb_tok[], int curs)
 	st_lst = NULL;
 	tok_lst = NULL;
 	g_line = NULL;
-	g_line = ft_strdup("ls | cat ; test >> lol");
+	g_line = ft_strdup("ls -a -l|cat -e");
 	(*nb_tok)[curs] = lexer_posix(&tok_lst, &st_lst);
 	free(g_line);
 	i = 0;

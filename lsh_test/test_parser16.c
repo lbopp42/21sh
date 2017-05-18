@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test_parser13.c                                    :+:      :+:    :+:   */
+/*   test_parser16.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/17 16:33:35 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/18 09:49:55 by lbopp            ###   ########.fr       */
+/*   Created: 2017/05/18 10:20:14 by lbopp             #+#    #+#             */
+/*   Updated: 2017/05/18 10:39:25 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 static char	**ast_to_array(char *content)
 {
 	static int	i = 0;
-	static char	*array[11];
+	static char	*array[5];
 
 	if (!content)
 		return (array);
@@ -38,7 +38,7 @@ static void	check_ast_tree(t_ast_node *ast_tree)
 static int	is_valid_ast(t_ast_node *ast_tree)
 {
 	char		**array;
-	const char	*array_ref[12] = {"ls", "cat", ">", "file1", ">", "file2", ">", "cat -e", "|", "wc -c", "|", NULL};
+	const char	*array_ref[6] = {"ls -a", "file", ">", "cat", "|", NULL};
 	int			i;
 
 	check_ast_tree(ast_tree);
@@ -46,6 +46,7 @@ static int	is_valid_ast(t_ast_node *ast_tree)
 	i = 0;
 	while (array_ref[i])
 	{
+		printf("array = [%s] et array_ref = [%s]\n", array[i], array_ref[i]);
 		if (!ft_strequ(array[i], array_ref[i]))
 			return (0);
 		i += 1;
@@ -53,15 +54,15 @@ static int	is_valid_ast(t_ast_node *ast_tree)
 	return (1);
 }
 
-void	test_parser13(t_token *tok_lst, int nb_tok)
+void	test_parser16(t_token *tok_lst, int nb_tok)
 {
 	t_tuple	*tmp;
 
 	tmp = iscomplete_cmd(tok_lst, nb_tok, 0);
 	if (nb_tok == tmp->mv && is_valid_ast(tmp->ast_tree))
-		printf("\033[32m[OK]   \033[0m[ls > cat > file1>file2 | cat -e|wc -c]\n");
+		printf("\033[32m[OK]   \033[0m[>file ls -a|cat]\n");
 	else
 	{
-		printf("\033[31m[FAIL] \033[0m[ls > cat > file1>file2 | cat -e|wc -c]\n");
+		printf("\033[31m[FAIL] \033[0m[>file ls -a|cat]\n");
 	}
 }

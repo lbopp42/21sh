@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/05/17 16:42:43 by lbopp            ###   ########.fr        #
+#    Updated: 2017/05/18 10:22:37 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -50,6 +50,9 @@ SRC_TEST = src/lexer/lexer.c\
 		   lsh_test/test_lexer11.c\
 		   lsh_test/test_lexer12.c\
 		   lsh_test/test_lexer13.c\
+		   lsh_test/test_lexer14.c\
+		   lsh_test/test_lexer15.c\
+		   lsh_test/test_lexer16.c\
 		   lsh_test/test_parser1.c\
 		   lsh_test/test_parser2.c\
 		   lsh_test/test_parser3.c\
@@ -62,7 +65,10 @@ SRC_TEST = src/lexer/lexer.c\
 		   lsh_test/test_parser10.c\
 		   lsh_test/test_parser11.c\
 		   lsh_test/test_parser12.c\
-		   lsh_test/test_parser13.c
+		   lsh_test/test_parser13.c\
+		   lsh_test/test_parser14.c\
+		   lsh_test/test_parser15.c\
+		   lsh_test/test_parser16.c
 SRC_PATH = src
 LEXER_PATH = src/lexer
 SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
