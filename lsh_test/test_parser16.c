@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/18 10:20:14 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/18 10:39:25 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/18 12:51:35 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ static int	is_valid_ast(t_ast_node *ast_tree)
 	i = 0;
 	while (array_ref[i])
 	{
-		printf("array = [%s] et array_ref = [%s]\n", array[i], array_ref[i]);
 		if (!ft_strequ(array[i], array_ref[i]))
 			return (0);
 		i += 1;

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser_AST.c                                       :+:      :+:    :+:   */
+/*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/17 12:56:00 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/18 12:26:38 by lbopp            ###   ########.fr       */
+/*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
+/*   Updated: 2017/05/22 14:01:31 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,15 @@ void	print_AST(t_ast_node *ast_tree, int mode, int layer)
 	if (!ast_tree)
 		return ;
 	if (ast_tree->left)
+	{
+		//printf("OK LEFT\n");
 		print_AST(ast_tree->left, 1, layer + 1);
+	}
 	if (ast_tree->right)
+	{
+		//printf("OK RIGHT\n");
 		print_AST(ast_tree->right, 2, layer + 1);
+	}
 	if (mode == 1)
 		printf("LEFT = [%s], LAYER = %d\n", ast_tree->content, layer);
 	else if (mode == 2)
@@ -58,15 +64,11 @@ t_ast_node	*create_ast_node(t_token *tok_root, t_token *tok_left, t_token *tok_r
 	return (new_node);
 }
 
-t_tuple	*isio_file(t_token *tok_lst, int nb_tok, t_tuple *last)
+t_tuple	*isio_file(t_token *tok_lst, int mv)
 {
 	int			tmp;
-	int			mv;
 	t_tuple		*tuple_parse;
 
-	mv = 0;
-	if (last)
-		mv = last->mv;
 	tmp = mv;
 	while (tmp > 0)
 	{
@@ -76,95 +78,87 @@ t_tuple	*isio_file(t_token *tok_lst, int nb_tok, t_tuple *last)
 			return (NULL);
 		tmp--;
 	}
-	(void)nb_tok;
 	if (tok_lst->type == LESS && tok_lst->next && tok_lst->next->type == WORD)
 	{
 		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
-		if (last)
-			tuple_parse->ast_tree =
-				create_ast_node(tok_lst, last->ast_tree, tok_lst->next);
-		else
-			tuple_parse->ast_tree =
-				create_ast_node(tok_lst, NULL, tok_lst->next);
+		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, tok_lst->next);
 		tuple_parse->mv = mv + 2;
 		return (tuple_parse);
 	}
 	else if (tok_lst->type == LESSAND && tok_lst->next && tok_lst->next->type == WORD)
 	{
 		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
-		if (last)
-			tuple_parse->ast_tree =
-				create_ast_node(tok_lst, last->ast_tree, tok_lst->next);
-		else
-			tuple_parse->ast_tree =
-				create_ast_node(tok_lst, NULL, tok_lst->next);
+		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, tok_lst->next);
 		tuple_parse->mv = mv + 2;
 		return (tuple_parse);
 	}
 	else if (tok_lst->type == GREAT && tok_lst->next && tok_lst->next->type == WORD)
 	{
 		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
-		if (last)
-			tuple_parse->ast_tree =
-				create_ast_node(tok_lst, last->ast_tree, tok_lst->next);
-		else
-			tuple_parse->ast_tree =
-				create_ast_node(tok_lst, NULL, tok_lst->next);
+		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, tok_lst->next);
 		tuple_parse->mv = mv + 2;
 		return (tuple_parse);
 	}
 	else if (tok_lst->type == GREATAND && tok_lst->next && tok_lst->next->type == WORD)
 	{
 		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
-		if (last)
-			tuple_parse->ast_tree =
-				create_ast_node(tok_lst, last->ast_tree, tok_lst->next);
-		else
-			tuple_parse->ast_tree =
-				create_ast_node(tok_lst, NULL, tok_lst->next);
+		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, tok_lst->next);
 		tuple_parse->mv = mv + 2;
 		return (tuple_parse);
 	}
 	else if (tok_lst->type == DGREAT && tok_lst->next && tok_lst->next->type == WORD)
 	{
 		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
-		if (last)
-			tuple_parse->ast_tree =
-				create_ast_node(tok_lst, last->ast_tree, tok_lst->next);
-		else
-			tuple_parse->ast_tree =
-				create_ast_node(tok_lst, NULL, tok_lst->next);
+		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, tok_lst->next);
 		tuple_parse->mv = mv + 2;
 		return (tuple_parse);
 	}
 	return (NULL);
 }
 
-t_tuple	*isio_number(t_token *tok_lst, int nb_tok, int mv)
+t_tuple	*push_redir(t_tuple *new_tuple, t_tuple *last)
 {
-	int		tmp;
-	t_tuple	*tuple_parse;
+	t_ast_node	*tmp;
+	t_ast_node	*tmp_word;
+	t_ast_node	*first;
 
-	tmp = mv;
-	while (tmp > 0)
+	tmp = last->ast_tree;
+	first = NULL;
+	while (tmp->left)
 	{
-		if (tok_lst->next)
-			tok_lst = tok_lst->next;
+		first = tmp;
+		tmp = tmp->left;
+	}
+	if (tmp->type == WORD && first)
+	{
+		tmp_word = tmp;
+		first->left = new_tuple->ast_tree;
+		if (new_tuple->ast_tree->left)
+		{
+			new_tuple->ast_tree->left->left = tmp_word;
+			new_tuple->ast_tree->left->left->left = NULL;
+			new_tuple->ast_tree->left->left->right = NULL;
+		}
 		else
-			return (NULL);
-		tmp--;
+		{
+			new_tuple->ast_tree->left = tmp_word;
+			new_tuple->ast_tree->left->left = NULL;
+			new_tuple->ast_tree->left->right = NULL;
+		}
 	}
-	if (tok_lst->type == IO_NUMBER)
+	else if (first)
+		tmp->left = new_tuple->ast_tree;
+	else
 	{
-		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
-		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, NULL);
-		tuple_parse->mv = mv + 1;
-		return (tuple_parse);
+		print_AST(new_tuple->ast_tree, 0, 0);
+		new_tuple->ast_tree->left = tmp;
+		last->ast_tree = new_tuple->ast_tree;
 	}
-	return (NULL);
+	last->mv += new_tuple->mv;
+	return (last);
 }
 
-t_tuple	*isio_redirect(t_token *tok_lst, int nb_tok, t_tuple *last)
+t_tuple	*isio_redirect(t_token *tok_lst, t_tuple *last)
 {
 	int			tmp;
 	int			mv;
@@ -182,22 +176,47 @@ t_tuple	*isio_redirect(t_token *tok_lst, int nb_tok, t_tuple *last)
 			return (NULL);
 		tmp--;
 	}
-	if ((tuple_parse = isio_file(tok_lst, nb_tok, NULL)))
+	if ((tuple_parse = isio_file(tok_lst, 0)))
+	{
+		if ((tuple_parse->ast_tree->type == GREATAND ||
+				tuple_parse->ast_tree->type == LESSAND) && last)
+		{
+			printf("ON VA DANS PUSH\n");
+			tuple_parse = push_redir(tuple_parse, last);
+		}
+		else if (last)
+		{
+			tuple_parse->ast_tree->left = last->ast_tree;
+			tuple_parse->mv += mv;
+		}
+		else
+			tuple_parse->mv += mv;
+		printf("ON SORT QUAND MEME\n");
 		return (tuple_parse);
-	else if ((tuple_parse = isio_number(tok_lst, nb_tok, last->mv)) &&
-			(tuple_parse = isio_file(tok_lst, nb_tok, tuple_parse)))
+	}
+	else if (tok_lst->type == IO_NUMBER &&
+			(tuple_parse = isio_file(tok_lst, 1)))
+	{
+		tuple_parse->ast_tree->left = create_ast_node(tok_lst, NULL, NULL);
+		if ((tuple_parse->ast_tree->type == GREATAND ||
+				tuple_parse->ast_tree->type == LESSAND) && last)
+			tuple_parse = push_redir(tuple_parse, last);
+		else if (last)
+		{
+			tuple_parse->ast_tree->left = last->ast_tree;
+			tuple_parse->mv += mv;
+		}
+		else
+			tuple_parse->mv += mv;
 		return (tuple_parse);
+	}
 	else if (tok_lst->type == DLESS && tok_lst->next &&
 			tok_lst->next->type == WORD)
 	{
 		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
-		if (last)
-			tuple_parse->ast_tree =
-				create_ast_node(tok-lst, last->ast_tree, tok_lst->next);
-		else
-			tuple_parse->ast_tree =
-				create_ast_node(tok-lst, NULL, tok_lst->next);
 		tuple_parse->mv = mv + 2;
+		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, tok_lst->next);
+		tuple_parse->ast_tree->left = last->ast_tree;
 		return (tuple_parse);
 	}
 	else if (tok_lst->type == IO_NUMBER && tok_lst->next &&
@@ -205,13 +224,19 @@ t_tuple	*isio_redirect(t_token *tok_lst, int nb_tok, t_tuple *last)
 			tok_lst->next->next->type == WORD)
 	{
 		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
-		tuple_parse->ast_tree =
-			create_ast_node(tok_lst->next, tok_lst, tok_lst->next->next);
-		tuple_parse->mv = mv + 3;
+		tuple_parse->mv = mv + 2;
+		tuple_parse->ast_tree = create_ast_node(tok_lst->next, tok_lst, tok_lst->next->next);
 		return (tuple_parse);
 	}
 	return (NULL);
 }
+
+
+/*
+**	The static [i] is here to avoid an infinity loop
+**	4 * i - (i - 1) : this is to avoid an infinity loop too
+**	-> It will begin with 3 and increase 2 by 2
+*/
 
 t_tuple	*is_word(t_token *tok_lst, int mv)
 {
@@ -238,7 +263,7 @@ t_tuple	*is_word(t_token *tok_lst, int mv)
 		return (NULL);
 }
 
-t_tuple	*iscmd_prefix(t_token *tok_lst, int nb_tok, t_tuple *last)
+t_tuple	*iscmd_prefix(t_token *tok_lst, int nb_tok, int mv)
 {
 	int		tmp;
 	t_tuple	*tuple_parse;
@@ -256,51 +281,376 @@ t_tuple	*iscmd_prefix(t_token *tok_lst, int nb_tok, t_tuple *last)
 	max_tuple = NULL;
 	tuple_parse = NULL;
 	tmp = mv;
-	if ((tuple_parse = isio_redirect(tok_lst, nb_tok, 0)) || (tuple_parse = is_word(tok_lst, 0)))
+	(void)nb_tok;
+	if ((tuple_parse = isio_redirect(tok_lst, NULL)) || (tuple_parse = is_word(tok_lst, 0)))
 	{
 		max_tuple = tuple_parse;
-		//printf("================\n");
-		//print_AST(max_tuple->ast_tree, 0, 0);
-		while ((tuple_parse = isio_redirect(tok_lst, nb_tok, max_tuple->mv)) ||
+		while ((tuple_parse = isio_redirect(tok_lst, max_tuple)) ||
 				(tuple_parse = is_word(tok_lst, max_tuple->mv)))
+			max_tuple = tuple_parse;
+	}
+	return (max_tuple);
+}
+
+/*void	change_last_left(t_ast_node	**ast_tree, t_token *tok_lst)
+{
+	char	*tmp_word;
+
+	if ((*ast_tree)->left)
+		change_last_left(&(*ast_tree)->left, tok_lst);
+	else
+	{
+		if ((*ast_tree)->type == WORD)
 		{
-			if (max_tuple->ast_tree->type == WORD && tuple_parse->ast_tree->type == WORD)
+			tmp_word = ft_strdup((*ast_tree)->content);
+			free((*ast_tree)->content);
+			(*ast_tree)->content = ft_strjoin(tok_lst->content, " ");
+			(*ast_tree)->content = ft_stradd((*ast_tree)->content, tmp_word);
+		}
+		else
+			(*ast_tree)->left = create_ast_node(tok_lst, NULL, NULL);
+	}
+}
+
+t_tuple	*is_simplecmd(t_token *tok_lst, int nb_tok, t_tuple *last_tuple)
+{
+	int		tmp;
+	int		mv;
+	t_tuple	*tuple_parse;
+	t_tuple	*tmp_tuple;
+	char	*tmp_string;
+
+	if (last_tuple)
+	{
+		mv = last_tuple->mv;
+	}
+	else
+		mv = 0;
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (NULL);
+		tmp--;
+	}
+	tmp = mv;
+	//printf("On entre pour [%s] et mv = %d\n", tok_lst->content, mv);
+	if ((tuple_parse = iscmd_prefix(tok_lst, nb_tok, 0)))
+	{
+		if ((tmp_tuple = is_word(tok_lst, tuple_parse->mv)))
+		{
+			if (tuple_parse->ast_tree->type == WORD)
 			{
-				max_tuple->ast_tree->content = ft_stradd(max_tuple->ast_tree->content, " ");
-				max_tuple->ast_tree->content =
-					ft_stradd(max_tuple->ast_tree->content, tuple_parse->ast_tree->content);
+				tuple_parse->ast_tree->content = ft_stradd(tuple_parse->ast_tree->content, " ");
+				tuple_parse->ast_tree->content =
+					ft_stradd(tuple_parse->ast_tree->content, tmp_tuple->ast_tree->content);
 			}
-			else if (!max_tuple->ast_tree->left && tuple_parse->ast_tree->type == WORD)
+			else
+				tuple_parse->ast_tree->left = tmp_tuple->ast_tree;
+			tuple_parse->mv = tmp_tuple->mv;
+			if ((tmp_tuple = iscmd_prefix(tok_lst, nb_tok, tuple_parse->mv)))
 			{
-				max_tuple->ast_tree->left = tuple_parse->ast_tree;
+				if (!tuple_parse->ast_tree->left)
+					tuple_parse->ast_tree->left = tmp_tuple->ast_tree;
+				else
+				{
+					tmp_tuple->ast_tree->left = tuple_parse->ast_tree;
+					tuple_parse->ast_tree = tmp_tuple->ast_tree;
+				}
+				tuple_parse->mv = tmp_tuple->mv;
+				print_AST(tuple_parse->ast_tree, 0, 0);
+				return (tuple_parse);
 			}
-			else if (max_tuple->ast_tree->left && max_tuple->ast_tree->left->type == WORD
-					&& tuple_parse->ast_tree->type == WORD && !max_tuple->ast_tree->right)
+		}
+	}
+	if ((tuple_parse = iscmd_prefix(tok_lst, nb_tok, 0)))
+	{
+		if ((tmp_tuple = is_word(tok_lst, tuple_parse->mv)))
+		{
+			if (!tuple_parse->ast_tree->left)
+				tuple_parse->ast_tree->left = tmp_tuple->ast_tree;
+			else
 			{
-				//printf("IL ENTRE LA\n");
-				max_tuple->ast_tree->left->content = ft_stradd(max_tuple->ast_tree->left->content, " ");
-				max_tuple->ast_tree->left->content =
-					ft_stradd(max_tuple->ast_tree->left->content, tuple_parse->ast_tree->content);
+				if (tuple_parse->ast_tree->type == WORD)
+				{
+					tuple_parse->ast_tree->content = ft_stradd(tuple_parse->ast_tree->content, " ");
+					tuple_parse->ast_tree->content =
+						ft_stradd(tuple_parse->ast_tree->content, tmp_tuple->ast_tree->content);
+				}
+				else
+				{
+					tmp_tuple->ast_tree->left = tuple_parse->ast_tree;
+					tuple_parse = tmp_tuple;
+				}
 			}
-			else if (max_tuple->ast_tree->right && max_tuple->ast_tree->right->type == WORD &&
-					tuple_parse->ast_tree->type == WORD)
+			tuple_parse->mv = tmp_tuple->mv;
+			return (tuple_parse);
+		}
+	}
+	if (tok_lst->type == WORD && (tuple_parse = iscmd_prefix(tok_lst, nb_tok, 1)))
+	{
+		if (!last_tuple)
+			change_last_left(&tuple_parse->ast_tree, tok_lst);
+		else
+		{
+			if (tuple_parse->ast_tree->type == WORD)
 			{
-				max_tuple->ast_tree->right->content = ft_stradd(max_tuple->ast_tree->right->content, " ");
-				max_tuple->ast_tree->right->content =
-					ft_stradd(max_tuple->ast_tree->right->content, tuple_parse->ast_tree->content);
+				tmp_string = ft_strdup(tuple_parse->ast_tree->content);
+				free(tuple_parse->ast_tree->content);
+				tuple_parse->ast_tree->content = ft_strdup(tok_lst->content);
+				tuple_parse->ast_tree->content = ft_stradd(tuple_parse->ast_tree->content, " ");
+				tuple_parse->ast_tree->content = ft_stradd(tuple_parse->ast_tree->content, tmp_string);
+				last_tuple->ast_tree->right = tuple_parse->ast_tree;
+				tuple_parse->ast_tree = last_tuple->ast_tree;
 			}
 			else
 			{
-				tuple_parse->ast_tree->left = max_tuple->ast_tree;
-				max_tuple = tuple_parse;
+				last_tuple->ast_tree->right = create_ast_node(tok_lst, NULL, NULL);
+				if (tuple_parse->ast_tree->left && tuple_parse->ast_tree->left->type == WORD)
+				{
+					last_tuple->ast_tree->right->content =
+						ft_stradd(last_tuple->ast_tree->right->content, " ");	
+					last_tuple->ast_tree->right->content =
+						ft_stradd(last_tuple->ast_tree->right->content, tuple_parse->ast_tree->left->content);	
+				tuple_parse->ast_tree->left = last_tuple->ast_tree;
+				}
 			}
-			max_tuple->mv = tuple_parse->mv;
-		//printf("================\n");
-		//print_AST(max_tuple->ast_tree, 0, 0);
+		}
+		tuple_parse->mv += 1 + mv;
+		return (tuple_parse);
+	}
+	if ((tmp_tuple = iscmd_prefix(tok_lst, nb_tok, 0)))
+	{
+		tuple_parse = tmp_tuple;
+		if (last_tuple)
+		{
+			last_tuple->ast_tree->right = tmp_tuple->ast_tree;
+			tuple_parse = last_tuple;
+		}
+		tuple_parse->mv = tmp_tuple->mv + mv;
+		return (tuple_parse);
+	}
+	if (tok_lst->type == WORD)
+	{
+		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
+		tuple_parse->mv = 1;
+		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, NULL);
+		return (tuple_parse);
+	}
+	return (NULL);
+}
+
+t_tuple	*ispipe(t_token *tok_lst, int mv)
+{
+	int		tmp;
+	t_tuple	*new_tuple;
+
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (NULL);
+		tmp--;
+	}
+	if (tok_lst->type == PIPE)
+	{
+		new_tuple = (t_tuple*)ft_memalloc(sizeof(t_tuple));
+		new_tuple->mv = mv + 1;
+		new_tuple->ast_tree = create_ast_node(tok_lst, NULL, NULL);
+		return (new_tuple);
+	}
+	else
+		return (NULL);
+}
+
+int		isnewline(t_token *tok_lst, t_tuple **last_tuple)
+{
+	int	tmp;
+
+	tmp = (*last_tuple)->mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (0);
+		tmp--;
+	}
+	if (tok_lst->type == NEWLINE)
+	{
+		(*last_tuple)->mv += 1;
+		return (1);
+	}
+	else
+		return (0);
+}
+
+t_tuple	*ispipe_sequence(t_token *tok_lst, int nb_tok, int mv)
+{
+	int		tmp;
+	t_tuple	*tmp_tuple;
+	t_tuple	*max_tuple;
+	t_tuple	*new_tuple;
+
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (NULL);
+		tmp--;
+	}
+	max_tuple = NULL;
+	tmp = mv;
+	if ((new_tuple = is_simplecmd(tok_lst, nb_tok, NULL)))
+	{
+		max_tuple = new_tuple;
+		while (42)
+		{
+			if ((tmp_tuple = ispipe(tok_lst, max_tuple->mv)))
+			{
+				tmp_tuple->ast_tree->left = max_tuple->ast_tree;
+				if (isnewline(tok_lst, &tmp_tuple) &&
+						(new_tuple = is_simplecmd(tok_lst, nb_tok, tmp_tuple)))
+				{
+					max_tuple = new_tuple;
+					continue ;
+				}
+				if ((new_tuple = is_simplecmd(tok_lst, nb_tok, tmp_tuple)))
+				{
+					max_tuple = new_tuple;
+					continue ;
+				}
+			}
+			break;
 		}
 	}
 	return (max_tuple);
 }
+
+t_tuple	*isand_or(t_token *tok_lst, int nb_tok, int mv)
+{
+	int		tmp;
+	t_tuple	*tuple_parse;
+
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (NULL);
+		tmp--;
+	}
+	tmp = mv;
+	if ((tuple_parse = ispipe_sequence(tok_lst, nb_tok, 0)))
+	{
+		tuple_parse->mv += mv;
+		return (tuple_parse);
+	}
+	return (NULL);
+}
+
+t_tuple	*isseparator_op(t_token *tok_lst, int mv)
+{
+	int		tmp;
+	t_tuple	*tuple_parse;
+
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (NULL);
+		tmp--;
+	}
+	if (tok_lst->type == SEMICOLON)
+	{
+		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
+		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, NULL);
+		tuple_parse->mv = mv + 1;
+		return (tuple_parse);
+	}
+	else
+		return (NULL);
+}
+
+t_tuple	*islist(t_token *tok_lst, int nb_tok, int mv)
+{
+	int	tmp;
+	t_tuple	*tuple_parse;
+	t_tuple	*tmp_tuple;
+	t_tuple	*max_tuple;
+
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (0);
+		tmp--;
+	}
+	max_tuple = NULL;
+	if ((tuple_parse = isand_or(tok_lst, nb_tok, 0)))
+	{
+		max_tuple = tuple_parse;
+		while (42)
+		{
+			if ((tuple_parse = isseparator_op(tok_lst, max_tuple->mv)))
+			{
+				tuple_parse->ast_tree->left = max_tuple->ast_tree;
+				if ((tmp_tuple = isand_or(tok_lst, nb_tok, tuple_parse->mv)))
+				{
+					tuple_parse->ast_tree->right = tmp_tuple->ast_tree;
+					tuple_parse->mv = tmp_tuple->mv;
+					max_tuple = tuple_parse;
+					continue ;
+				}
+			}
+			break ;
+		}
+	}
+	return (max_tuple);
+}
+
+t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
+{
+	int		tmp;
+	t_tuple	*tmp_tuple;
+	t_tuple	*tuple_parse;
+
+	tmp = mv;
+	while (tmp > 0)
+	{
+		if (tok_lst->next)
+			tok_lst = tok_lst->next;
+		else
+			return (NULL);
+		tmp--;
+	}
+	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
+	{
+		if ((tmp_tuple = isseparator_op(tok_lst, tuple_parse->mv)))
+		{
+			tmp_tuple->ast_tree->left = tuple_parse->ast_tree;
+			tmp_tuple->mv += mv;
+			return (tmp_tuple);
+		}
+	}
+	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
+	{
+		tuple_parse->mv += mv;
+		return (tuple_parse);
+	}
+	return (NULL);
+}*/
 
 int	main(void)
 {
@@ -311,31 +661,36 @@ int	main(void)
 	tok_lst->type = WORD;
 	tok_lst->content = ft_strdup("ls");
 	tok_lst->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->type = SEMICOLON;
-	tok_lst->next->content = ft_strdup(";");
+	tok_lst->next->type = IO_NUMBER;
+	tok_lst->next->content = ft_strdup("1");
 	tok_lst->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->type = GREAT;
-	tok_lst->next->next->content = ft_strdup(">");
+	tok_lst->next->next->type = GREATAND;
+	tok_lst->next->next->content = ft_strdup(">&");
 	tok_lst->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->type = WORD;
-	tok_lst->next->next->next->content = ft_strdup("fifi");
-	tok_lst->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->content = ft_strdup("wc");
+	tok_lst->next->next->next->content = ft_strdup("-");
+	tok_lst->next->next->next->next = NULL;/*(t_token*)ft_memalloc(sizeof(t_token));
+	tok_lst->next->next->next->next->type = GREATAND;
+	tok_lst->next->next->next->next->content = ft_strdup(">&");
 	tok_lst->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->next->content = ft_strdup("-c");
-	tok_lst->next->next->next->next->next->next = NULL;/*(t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->next->next->type = GREAT;
-	tok_lst->next->next->next->next->next->next->content = ft_strdup(">");
+	tok_lst->next->next->next->next->next->content = ft_strdup("-");
+	tok_lst->next->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
+	tok_lst->next->next->next->next->next->next->type = DLESS;
+	tok_lst->next->next->next->next->next->next->content = ft_strdup("<<");
 	tok_lst->next->next->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->next->next->next->content = ft_strdup("fifi");
-	tok_lst->next->next->next->next->next->next->next->next = NULL;*/
-	tuple_end = iscomplete_cmd(tok_lst, 4, 0);
+	tok_lst->next->next->next->next->next->next->next->content = ft_strdup("ls");
+	tok_lst->next->next->next->next->next->next->next->next = NULL;(t_token*)ft_memalloc(sizeof(t_token));
+	tok_lst->next->next->next->next->next->next->next->next->type = WORD;
+	tok_lst->next->next->next->next->next->next->next->next->content = ft_strdup("-c");
+	tok_lst->next->next->next->next->next->next->next->next->next = NULL;*/
+	tuple_end = iscmd_prefix(tok_lst, 4, 0);
+	printf("ON SORT DE TOUT !\n");
 	if (tuple_end)
 	{
 		printf("mv final = %d\n", tuple_end->mv);
+		printf("ICI\n");
 		print_AST(tuple_end->ast_tree, 0, 0);
 	}
 }
