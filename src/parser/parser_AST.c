@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/22 14:01:31 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/22 17:08:39 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,15 @@ t_tuple	*isio_file(t_token *tok_lst, int mv)
 	return (NULL);
 }
 
+/*
+**	The if (!first) is here if last is a WORD.
+**	example : ls >&-
+**********************************************
+**	The if (new_tuple->ast_tree->left) is here
+**	if we have IO_NUMBER or not.
+**	example: ls 1>&-
+*/
+
 t_tuple	*push_redir(t_tuple *new_tuple, t_tuple *last)
 {
 	t_ast_node	*tmp;
@@ -129,10 +138,13 @@ t_tuple	*push_redir(t_tuple *new_tuple, t_tuple *last)
 		first = tmp;
 		tmp = tmp->left;
 	}
-	if (tmp->type == WORD && first)
+	if (tmp->type == WORD)
 	{
 		tmp_word = tmp;
-		first->left = new_tuple->ast_tree;
+		if (!first)
+			last->ast_tree = new_tuple->ast_tree;
+		else
+			first->left = new_tuple->ast_tree;
 		if (new_tuple->ast_tree->left)
 		{
 			new_tuple->ast_tree->left->left = tmp_word;
@@ -146,14 +158,8 @@ t_tuple	*push_redir(t_tuple *new_tuple, t_tuple *last)
 			new_tuple->ast_tree->left->right = NULL;
 		}
 	}
-	else if (first)
-		tmp->left = new_tuple->ast_tree;
 	else
-	{
-		print_AST(new_tuple->ast_tree, 0, 0);
-		new_tuple->ast_tree->left = tmp;
-		last->ast_tree = new_tuple->ast_tree;
-	}
+		tmp->left = new_tuple->ast_tree;
 	last->mv += new_tuple->mv;
 	return (last);
 }
@@ -180,10 +186,7 @@ t_tuple	*isio_redirect(t_token *tok_lst, t_tuple *last)
 	{
 		if ((tuple_parse->ast_tree->type == GREATAND ||
 				tuple_parse->ast_tree->type == LESSAND) && last)
-		{
-			printf("ON VA DANS PUSH\n");
 			tuple_parse = push_redir(tuple_parse, last);
-		}
 		else if (last)
 		{
 			tuple_parse->ast_tree->left = last->ast_tree;
@@ -191,7 +194,6 @@ t_tuple	*isio_redirect(t_token *tok_lst, t_tuple *last)
 		}
 		else
 			tuple_parse->mv += mv;
-		printf("ON SORT QUAND MEME\n");
 		return (tuple_parse);
 	}
 	else if (tok_lst->type == IO_NUMBER &&
@@ -238,12 +240,27 @@ t_tuple	*isio_redirect(t_token *tok_lst, t_tuple *last)
 **	-> It will begin with 3 and increase 2 by 2
 */
 
-t_tuple	*is_word(t_token *tok_lst, int mv)
+void	add_to_last_left(t_ast_node **ast_tree, t_token *tok_lst)
 {
-	int		tmp;
-	t_tuple	*tuple_parse;
+	if ((*ast_tree)->left)
+		add_to_last_left(&(*ast_tree)->left, tok_lst);
+	else
+	{
+		if ((*ast_tree)->type == WORD)
+		{
+			(*ast_tree)->content = ft_strjoin((*ast_tree)->content, " ");
+			(*ast_tree)->content = ft_stradd((*ast_tree)->content, tok_lst->content);
+		}
+		else
+			(*ast_tree)->left = create_ast_node(tok_lst, NULL, NULL);
+	}
+}
 
-	tmp = mv;
+t_tuple	*is_word(t_token *tok_lst, t_tuple *last)
+{
+	int			tmp;
+
+	tmp = (last) ? last->mv : 0;
 	while (tmp > 0)
 	{
 		if (tok_lst->next)
@@ -254,10 +271,18 @@ t_tuple	*is_word(t_token *tok_lst, int mv)
 	}
 	if (tok_lst->type == WORD)
 	{
-		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
-		tuple_parse->mv = mv + 1;
-		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, NULL);
-		return (tuple_parse);
+		if (!last)
+		{
+			last = (t_tuple*)ft_memalloc(sizeof(t_tuple));
+			last->ast_tree = create_ast_node(tok_lst, NULL, NULL);
+			last->mv = 1;
+		}
+		else
+		{
+			add_to_last_left(&last->ast_tree, tok_lst);
+			last->mv += 1;
+		}
+		return (last);
 	}
 	else
 		return (NULL);
@@ -286,7 +311,7 @@ t_tuple	*iscmd_prefix(t_token *tok_lst, int nb_tok, int mv)
 	{
 		max_tuple = tuple_parse;
 		while ((tuple_parse = isio_redirect(tok_lst, max_tuple)) ||
-				(tuple_parse = is_word(tok_lst, max_tuple->mv)))
+				(tuple_parse = is_word(tok_lst, max_tuple)))
 			max_tuple = tuple_parse;
 	}
 	return (max_tuple);
@@ -658,33 +683,33 @@ int	main(void)
 	t_token	*tok_lst;
 
 	tok_lst = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->type = WORD;
-	tok_lst->content = ft_strdup("ls");
+	tok_lst->type = GREAT;
+	tok_lst->content = ft_strdup("");
 	tok_lst->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->type = IO_NUMBER;
-	tok_lst->next->content = ft_strdup("1");
+	tok_lst->next->type = WORD;
+	tok_lst->next->content = ft_strdup("file");
 	tok_lst->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->type = GREATAND;
-	tok_lst->next->next->content = ft_strdup(">&");
+	tok_lst->next->next->type = WORD;
+	tok_lst->next->next->content = ft_strdup("ls");
 	tok_lst->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->type = WORD;
-	tok_lst->next->next->next->content = ft_strdup("-");
-	tok_lst->next->next->next->next = NULL;/*(t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->type = GREATAND;
-	tok_lst->next->next->next->next->content = ft_strdup(">&");
+	tok_lst->next->next->next->content = ft_strdup("-a");
+	tok_lst->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
+	tok_lst->next->next->next->next->type = GREAT;
+	tok_lst->next->next->next->next->content = ft_strdup(">");
 	tok_lst->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->next->content = ft_strdup("-");
+	tok_lst->next->next->next->next->next->content = ft_strdup("file2");
 	tok_lst->next->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->next->next->type = DLESS;
-	tok_lst->next->next->next->next->next->next->content = ft_strdup("<<");
+	tok_lst->next->next->next->next->next->next->type = IO_NUMBER;
+	tok_lst->next->next->next->next->next->next->content = ft_strdup("1");
 	tok_lst->next->next->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->next->next->next->content = ft_strdup("ls");
-	tok_lst->next->next->next->next->next->next->next->next = NULL;(t_token*)ft_memalloc(sizeof(t_token));
+	tok_lst->next->next->next->next->next->next->next->type = GREATAND;
+	tok_lst->next->next->next->next->next->next->next->content = ft_strdup(">&");
+	tok_lst->next->next->next->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->next->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->next->next->next->next->content = ft_strdup("-c");
-	tok_lst->next->next->next->next->next->next->next->next->next = NULL;*/
+	tok_lst->next->next->next->next->next->next->next->next->content = ft_strdup("-");
+	tok_lst->next->next->next->next->next->next->next->next->next = NULL;
 	tuple_end = iscmd_prefix(tok_lst, 4, 0);
 	printf("ON SORT DE TOUT !\n");
 	if (tuple_end)
