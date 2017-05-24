@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/05/18 10:22:37 by lbopp            ###   ########.fr        #
+#    Updated: 2017/05/24 10:36:34 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,7 +35,7 @@ SRC_TEST = src/lexer/lexer.c\
 		   src/lexer/treatment_of_quote.c\
 		   src/lexer/treatment_of_word.c\
 		   src/lexer/treatment_newline.c\
-		   src/parser/parser.c\
+		   src/parser/parser_AST.c\
 		   lsh_test/launch_tests.c\
 		   lsh_test/test_lexer1.c\
 		   lsh_test/test_lexer2.c\

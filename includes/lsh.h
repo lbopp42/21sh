@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/20 11:18:42 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/24 09:57:37 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ enum {
 	DQUOTE,
 	BQUOTE,
 	WORD,
+	ASSIGNMENT_WORD,
 	NEWLINE,
 	IO_NUMBER,
 	BLANK,
