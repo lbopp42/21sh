@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/24 12:46:45 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/24 13:36:46 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -461,7 +461,7 @@ void	go_to_left(t_ast_node **ast_old, t_ast_node *ast_pipe)
 {
 	static t_ast_node *first = NULL;
 
-	if ((*ast_old)->left)
+	if ((*ast_old)->left && (*ast_old)->type != GREATAND && (*ast_old)->type != LESSAND)
 	{
 		first = *ast_old;
 		go_to_left(&(*ast_old)->left, ast_pipe);
@@ -514,7 +514,8 @@ t_tuple	*ispipe_sequence(t_token *tok_lst, int nb_tok, int mv)
 				}
 				if ((new_tuple = is_simplecmd(tok_lst, nb_tok, tmp_tuple->mv)))
 				{
-					if (new_tuple->ast_tree->type != WORD)
+					if (new_tuple->ast_tree->type != WORD && new_tuple->ast_tree->type != GREATAND
+							&& new_tuple->ast_tree->type != LESSAND)
 					{
 						go_to_left(&new_tuple->ast_tree, tmp_tuple->ast_tree);
 						tmp_tuple->ast_tree = new_tuple->ast_tree;
@@ -523,6 +524,8 @@ t_tuple	*ispipe_sequence(t_token *tok_lst, int nb_tok, int mv)
 						tmp_tuple->ast_tree->right = new_tuple->ast_tree;
 					tmp_tuple->mv = new_tuple->mv;
 					max_tuple = tmp_tuple;
+					/*printf("========= MAX_TUPLE ==============\n");
+					print_AST(max_tuple->ast_tree, 0, 0);*/
 					continue ;
 				}
 			}
@@ -651,6 +654,8 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 	return (NULL);
 }
 
+//TODO GREATAND AND LESSAND WITH PIPE
+
 /*int	main(void)
 {
 	t_tuple	*tuple_end;
@@ -666,18 +671,18 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 	tok_lst->next->next->type = WORD;
 	tok_lst->next->next->content = ft_strdup("cat");
 	tok_lst->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->type = PIPE;
-	tok_lst->next->next->next->content = ft_strdup("|");
+	tok_lst->next->next->next->type = GREAT;
+	tok_lst->next->next->next->content = ft_strdup(">");
 	tok_lst->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->content = ft_strdup("wc");
+	tok_lst->next->next->next->next->content = ft_strdup("file");
 	tok_lst->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->next->content = ft_strdup("-c");
+	tok_lst->next->next->next->next->next->type = GREATAND;
+	tok_lst->next->next->next->next->next->content = ft_strdup(">&");
 	tok_lst->next->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->next->next->type = GREAT;
-	tok_lst->next->next->next->next->next->next->content = ft_strdup(">");
-	tok_lst->next->next->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
+	tok_lst->next->next->next->next->next->next->type = WORD;
+	tok_lst->next->next->next->next->next->next->content = ft_strdup("-");
+	tok_lst->next->next->next->next->next->next->next = NULL;(t_token*)ft_memalloc(sizeof(t_token));
 	tok_lst->next->next->next->next->next->next->next->type = WORD;
 	tok_lst->next->next->next->next->next->next->next->content = ft_strdup("fifi");
 	tok_lst->next->next->next->next->next->next->next->next = NULL;(t_token*)ft_memalloc(sizeof(t_token));
