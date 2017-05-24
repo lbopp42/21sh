@@ -6,60 +6,81 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/20 11:32:45 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/24 16:42:07 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
 
-void	exec_pipe(char **env)
-{
-	pid_t	pid;
-	int		pipe_fd[2];
-	char	**ls;
-	char	**cat;
+#define READ_END 0
+#define WRITE_END 1
 
-	ls = (char**)ft_memalloc(sizeof(char*) * 2);
-	ls[1] = ft_strdup("ls");
-	ls[2] = ft_strdup("-a");
-	cat = (char**)ft_memalloc(sizeof(char*) * 2);
-	cat[1] = ft_strdup("cat");
-	cat[2] = ft_strdup("-e");
-	pipe(pipe_fd);
-	pid = fork();
-	if (pid == 0)
+void	run_pipe(t_ast_node *ast_tree)
+{
+	pid_t	child = -1;
+	char	**cmd1;
+	char	*tmp;
+	char	**cmd2;
+	int		pdes[2];
+
+	cmd1 = ft_strsplitquote(ast_tree->left->content, ' ');
+	cmd2 = ft_strsplitquote(ast_tree->right->content, ' ');
+	tmp = ft_strdup(cmd1[0]);
+	free(cmd1[0]);
+	cmd1[0] = ft_strdup("/bin/");
+	cmd1[0] = ft_stradd(cmd1[0], tmp);
+	free(tmp);
+	tmp = ft_strdup(cmd2[0]);
+	free(cmd2[0]);
+	cmd2[0] = ft_strdup("/bin/");
+	cmd2[0] = ft_stradd(cmd2[0], tmp);
+	free(tmp);
+	pipe(pdes);
+	child = fork();
+	if (child == 0)
 	{
-		close(pipe_fd[0]);
-		dup2(pipe_fd[1], 1);
-		execve(ls[1], ls + 1, env);
+		dup2(pdes[WRITE_END], STDOUT_FILENO);
+		close(pdes[READ_END]);
+		execve(cmd1[0], cmd1, NULL);
+	}
+	if (child > 0)
+	{
+		dup2(pdes[READ_END], STDIN_FILENO);
+		close(pdes[WRITE_END]);
+		wait(NULL);
+		execve(cmd2[0], cmd2, NULL);
 		return ;
 	}
-	else
-	{
-		close(pipe_fd[1]);
-		execve(cat[1], cat, env);
-	}
-	return ;
 }
 
-static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
+void	exec_pipe(t_ast_node *ast_tree)
+{
+	pid_t	child;
+
+	child = fork();
+	if (child == 0)
+	{
+		run_pipe(ast_tree);
+		return ;
+	}
+	if (child > 0)
+		wait(NULL);
+}
+
+static void print_my_ast(t_ast_node *ast_tree)
 {
 	if (!ast_tree)
 		return ;
 	if (ast_tree->left)
-		print_my_ast(ast_tree->left, 1, layer + 1);
+		print_my_ast(ast_tree->left);
 	if (ast_tree->right)
-		print_my_ast(ast_tree->right, 2, layer + 1);
-	if (mode == 1)
-		printf("LEFT = [%s]\n", ast_tree->content);
-	else if (mode == 2)
-		printf("RIGHT = [%s]\n", ast_tree->content);
-	else
-		printf("ROOT = [%s]\n", ast_tree->content);
+		print_my_ast(ast_tree->right);
+	if (ast_tree->type == PIPE)
+		exec_pipe(ast_tree);
 }
 
 void	execution(t_ast_node *ast_tree, char **env)
 {
-	print_my_ast(ast_tree, 0, 0);
-	exec_pipe(env);
+	(void)env;
+	print_my_ast(ast_tree);
 }
