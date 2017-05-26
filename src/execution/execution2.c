@@ -6,71 +6,63 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/25 10:50:40 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/25 15:30:19 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
+#include <sys/wait.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define READ_END 0
 #define WRITE_END 1
 
-int		g_test_fd;
-
-void	run_pipe(t_ast_node *ast_tree)
+int		loop_pipe(char *command)
 {
-	pid_t	child = -1;
-	char	**cmd1;
-	char	*tmp;
-	char	**cmd2;
-	int		pdes[2];
+	int			fdes[2];
+	char		**cmd;
+	char		*tmp;
+	pid_t		pid;
+	static int	fd_in = 0;
 
-	cmd1 = ft_strsplitquote(ast_tree->left->content, ' ');
-	cmd2 = ft_strsplitquote(ast_tree->right->content, ' ');
-	tmp = ft_strdup(cmd1[0]);
-	free(cmd1[0]);
-	cmd1[0] = ft_strdup("/bin/");
-	cmd1[0] = ft_stradd(cmd1[0], tmp);
-	free(tmp);
-	tmp = ft_strdup(cmd2[0]);
-	free(cmd2[0]);
-	cmd2[0] = ft_strdup("/bin/");
-	cmd2[0] = ft_stradd(cmd2[0], tmp);
-	free(tmp);
-	pipe(pdes);
-	child = fork();
-	if (child == 0)
+	printf("On entre pour [%s]\n", command);
+	if (command && (!ft_strncmp(command, "cat", 3) || !ft_strncmp(command, "ls", 2)))
 	{
-		dup2(pdes[WRITE_END], STDOUT_FILENO);
-		close(pdes[READ_END]);
-		execve(cmd1[0], cmd1, NULL);
+		cmd = ft_strsplitquote(command, ' ');
+		tmp = ft_strdup(cmd[0]);
+		cmd[0] = ft_strjoin("/bin/", tmp);
 	}
-	if (child > 0)
+	else if (command)
 	{
-		dup2(pdes[READ_END], STDIN_FILENO);
-		close(pdes[WRITE_END]);
-		wait(NULL);
-		g_test_fd = pdes[READ_END];
-		printf("HERE TEST_FD = %d\n", g_test_fd);
-		execve(cmd2[0], cmd2, NULL);
-		return ;
+		cmd = ft_strsplitquote(command, ' ');
+		tmp = ft_strdup(cmd[0]);
+		cmd[0] = ft_strjoin("/usr/bin/", tmp);
 	}
-}
-
-void	exec_pipe(t_ast_node *ast_tree)
-{
-	pid_t	child;
-
-	child = fork();
-	if (child == 0)
+	pipe(fdes);
+	pid = fork();
+	if (pid == -1)
+		exit(EXIT_FAILURE);
+	else if (pid == 0)
 	{
-		run_pipe(ast_tree);
-		return ;
+		dup2(fd_in, 0);
+		if (command != NULL)
+			dup2(fdes[WRITE_END], 1);
+		close(fdes[READ_END]);
+		printf("on exec [%s]\n", cmd[0]);
+		execve(cmd[0], cmd, NULL);
+		exit(EXIT_FAILURE);
 	}
-	if (child > 0)
+	else
 	{
 		wait(NULL);
-		printf("TEST_FD = %d\n", g_test_fd);
+		close(fdes[WRITE_END]);
+		if (command != NULL)
+			fd_in = fdes[READ_END];
+		else
+			close(fdes[READ_END]);
+		return (1);
 	}
 }
 
@@ -83,12 +75,17 @@ static void print_my_ast(t_ast_node *ast_tree)
 	if (ast_tree->right)
 		print_my_ast(ast_tree->right);
 	if (ast_tree->type == PIPE)
-		exec_pipe(ast_tree);
+	{
+		if (loop_pipe(ast_tree->left->content))
+		{
+			if (loo	p_pipe(ast_tree->right->content))
+				loop_pipe(NULL);
+		}
+	}
 }
 
 void	execution(t_ast_node *ast_tree, char **env)
 {
 	(void)env;
-	g_test_fd = 0;
 	print_my_ast(ast_tree);
 }
