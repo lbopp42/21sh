@@ -6,11 +6,12 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/30 16:09:05 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/31 13:17:32 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
+#include <fcntl.h>
 
 #define READ_END 0
 #define WRITE_END 1
@@ -100,7 +101,6 @@ void	run_pipe(t_ast_node *ast_tree)
 	cmd = NULL;
 	pipe(p);
 	child = fork();
-	//printf("On run_pipe pour [%s] et [%s]\n", ast_tree->left->content, ast_tree->right->content);
 	if (child == 0)
 	{
 		dup2(p[WRITE_END], STDOUT_FILENO);
@@ -118,8 +118,57 @@ void	run_pipe(t_ast_node *ast_tree)
 			cmd[0] = ft_strjoin("/usr/bin/", tmp);
 		else
 			cmd[0] = ft_strjoin("/bin/", tmp);
-		//printf("On va executer la cmd [%s]\n", cmd[0]);
 		execve(cmd[0], cmd, NULL);
+	}
+}
+
+void	run_redir_great(t_ast_node *ast_tree)
+{
+	pid_t	child;
+	int		new_fd;
+	static	int	first = 0;
+
+	child = fork();
+	if (child == 0)
+	{
+		new_fd = open(ast_tree->right->content, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+		if (first == 0)
+		{
+			dup2(new_fd, 1);
+			close(new_fd);
+			first = 1;
+		}
+		main_exec(ast_tree->left);
+	}
+	if (child > 0)
+	{
+		wait(NULL);
+		first = 0;
+	}
+}
+
+void	run_redir_less(t_ast_node *ast_tree)
+{
+	pid_t	child;
+	int		new_fd;
+	static	int	first = 0;
+
+	child = fork();
+	if (child == 0)
+	{
+		new_fd = open(ast_tree->right->content, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR);
+		if (first == 0)
+		{
+			dup2(new_fd, 0);
+			close(new_fd);
+			first = 1;
+		}
+		main_exec(ast_tree->left);
+	}
+	if (child > 0)
+	{
+		wait(NULL);
+		first = 0;
 	}
 }
 
@@ -128,11 +177,12 @@ int		main_exec(t_ast_node *ast_tree)
 	char	**cmd;
 	char	*tmp;
 
-	//printf("ICI on a [%s]\n", ast_tree->content);
 	if (ast_tree->type == PIPE)
-	{
 		run_pipe(ast_tree);
-	}
+	else if (ast_tree->type == GREAT)
+		run_redir_great(ast_tree);
+	else if (ast_tree->type == LESS)
+		run_redir_less(ast_tree);
 	else
 	{
 		cmd = ft_strsplit(ast_tree->content, ' ');
