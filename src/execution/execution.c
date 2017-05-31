@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/31 13:17:32 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/31 16:32:01 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 #define READ_END 0
 #define WRITE_END 1
+#define ERROR_NO_FILE 1
 
 /*void	run_pipe(t_ast_node *ast_tree)
 {
@@ -109,6 +110,7 @@ void	run_pipe(t_ast_node *ast_tree)
 	}
 	if (child > 0)
 	{
+		wait(NULL);
 		dup2(p[READ_END], STDIN_FILENO);
 		close(p[WRITE_END]);
 		cmd = ft_strsplit(ast_tree->right->content, ' ');
@@ -124,51 +126,68 @@ void	run_pipe(t_ast_node *ast_tree)
 
 void	run_redir_great(t_ast_node *ast_tree)
 {
-	pid_t	child;
 	int		new_fd;
 	static	int	first = 0;
 
-	child = fork();
-	if (child == 0)
+	new_fd = open(ast_tree->right->content, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR);
+	if (first == 0)
 	{
-		new_fd = open(ast_tree->right->content, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
-		if (first == 0)
-		{
-			dup2(new_fd, 1);
-			close(new_fd);
-			first = 1;
-		}
-		main_exec(ast_tree->left);
+		dup2(new_fd, 1);
+		first = 1;
 	}
-	if (child > 0)
+	close(new_fd);
+	main_exec(ast_tree->left);
+	first = 0;
+}
+
+void	run_redir_dgreat(t_ast_node *ast_tree)
+{
+	int		new_fd;
+	static	int	first = 0;
+
+	new_fd = open(ast_tree->right->content, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
+	if (first == 0)
 	{
-		wait(NULL);
-		first = 0;
+		dup2(new_fd, 1);
+		first = 1;
 	}
+	close(new_fd);
+	main_exec(ast_tree->left);
 }
 
 void	run_redir_less(t_ast_node *ast_tree)
 {
-	pid_t	child;
 	int		new_fd;
 	static	int	first = 0;
 
+	new_fd = open(ast_tree->right->content, O_RDONLY, S_IRUSR | S_IWUSR);
+	if (new_fd == -1)
+	{
+		ft_putstr_fd("lsh: ", 2);
+		ft_putstr_fd(ast_tree->right->content, 2);
+		ft_putstr_fd(": No such file or directory\n", 2);
+		return ;
+	}
+	if (first == 0)
+	{
+		dup2(new_fd, 0);
+		first = 1;
+	}
+	close(new_fd);
+	main_exec(ast_tree->left);
+}
+
+void	run_semicolon(t_ast_node *ast_tree)
+{
+	pid_t	child;
+
 	child = fork();
 	if (child == 0)
-	{
-		new_fd = open(ast_tree->right->content, O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR);
-		if (first == 0)
-		{
-			dup2(new_fd, 0);
-			close(new_fd);
-			first = 1;
-		}
 		main_exec(ast_tree->left);
-	}
 	if (child > 0)
 	{
 		wait(NULL);
-		first = 0;
+		main_exec(ast_tree->right);
 	}
 }
 
@@ -177,19 +196,24 @@ int		main_exec(t_ast_node *ast_tree)
 	char	**cmd;
 	char	*tmp;
 
+	//Faire un tableau de pointeur sur fonction ou autre.
 	if (ast_tree->type == PIPE)
 		run_pipe(ast_tree);
 	else if (ast_tree->type == GREAT)
 		run_redir_great(ast_tree);
 	else if (ast_tree->type == LESS)
 		run_redir_less(ast_tree);
+	else if (ast_tree->type == SEMICOLON)
+		run_semicolon(ast_tree);
+	else if (ast_tree->type == DGREAT)
+		run_redir_dgreat(ast_tree);
 	else
 	{
 		cmd = ft_strsplit(ast_tree->content, ' ');
 		tmp = ft_strdup(cmd[0]);
 		free(cmd[0]);
 		if (!ft_strcmp(cmd[0], "wc") || !ft_strcmp(cmd[0], "sort"))
-			cmd[0] = ft_strjoin("/usr/bin", tmp);
+			cmd[0] = ft_strjoin("/usr/bin/", tmp);
 		else
 			cmd[0] = ft_strjoin("/bin/", tmp);
 		execve(cmd[0], cmd, NULL);

@@ -6,13 +6,13 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/20 11:32:47 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/05/31 15:12:56 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
 
-/*void	free_tok_lst(t_token **tok_lst)
+void	free_tok_lst(t_token **tok_lst)
 {
 	if (!*tok_lst)
 		return ;
@@ -29,7 +29,21 @@ void	free_state_lst(t_state **state_lst)
 	if ((*state_lst)->next)
 		free_state_lst(&(*state_lst)->next);
 	free(*state_lst);
-}*/
+}
+
+void	free_ast_tree(t_ast_node **ast_tree)
+{
+	if (!*ast_tree)
+		return ;
+	else if ((*ast_tree)->left)
+		free_ast_tree(&(*ast_tree)->left);
+	else if ((*ast_tree)->right)
+		free_ast_tree(&(*ast_tree)->right);
+	free((*ast_tree)->content);
+	(*ast_tree)->content = NULL;
+	free(*ast_tree);
+	*ast_tree = NULL;
+}
 
 int		main(int ac, char **av, char **env)
 {
@@ -40,23 +54,32 @@ int		main(int ac, char **av, char **env)
 
 	(void)ac;
 	(void)av;
-	g_line = NULL;
-	state_lst = NULL;
-	tok_lst = NULL;
-	get_next_line(0, &g_line);
-	nb_tok = lexer_posix(&tok_lst, &state_lst);
-	if (state_lst)
+	while (1)
 	{
-		//free_state_lst(&state_lst);
-		ft_putendl("Lexical problem !");
-		exit(EXIT_FAILURE);
+		ft_putstr("$> ");
+		g_line = NULL;
+		tuple_parse = NULL;
+		state_lst = NULL;
+		tok_lst = NULL;
+		get_next_line(0, &g_line);
+		nb_tok = lexer_posix(&tok_lst, &state_lst);
+		free(g_line);
+		if (state_lst)
+		{
+			free_state_lst(&state_lst);
+			ft_putendl("Lexical problem !");
+			exit(EXIT_FAILURE);
+		}
+		tuple_parse = iscomplete_cmd(tok_lst, 0, 0);
+		free_tok_lst(&tok_lst);
+		if (nb_tok != tuple_parse->mv)
+		{
+			ft_putendl("Syntax error !\n");
+			exit(EXIT_FAILURE);
+		}
+		execution(tuple_parse->ast_tree, env);
+		free_ast_tree(&tuple_parse->ast_tree);
+		free(tuple_parse);
 	}
-	tuple_parse = iscomplete_cmd(tok_lst, 0, 0);
-	if (nb_tok != tuple_parse->mv)
-	{
-		ft_putendl("Syntax error !\n");
-		exit(EXIT_FAILURE);
-	}
-	execution(tuple_parse->ast_tree, env);
 	return (1);
 }
