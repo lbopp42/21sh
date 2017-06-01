@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/31 16:32:01 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/01 10:54:27 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void	exec_pipe(t_ast_node *ast_tree)
 	}
 }*/
 
-static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
+/*static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
 {
 	if (!ast_tree)
 		return ;
@@ -88,7 +88,7 @@ static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
 		printf("LEFT = [%s] layer = %d\n", ast_tree->content, layer);
 	if (mode == 2)
 		printf("RIGHT = [%s] layer = %d\n", ast_tree->content, layer);
-}
+}*/
 
 int		main_exec(t_ast_node *ast_tree);
 
@@ -191,12 +191,43 @@ void	run_semicolon(t_ast_node *ast_tree)
 	}
 }
 
+void	run_redir_dless(t_ast_node *ast_tree)
+{
+	pid_t	child;
+	int		p[2];
+	char	*line;
+
+	line = NULL;
+	pipe(p);
+	child = fork();
+	if (child == 0)
+	{
+		dup2(p[WRITE_END], STDOUT_FILENO);
+		close(p[READ_END]);
+		while (get_next_line(0, &line))
+		{
+			if (ft_strequ(line, ast_tree->right->content))
+				break ;
+			ft_putendl(line);
+		}
+		exit(0);
+	}
+	if (child > 0)
+	{
+		wait(NULL);
+		ft_strdel(&line);
+		dup2(p[READ_END], STDIN_FILENO);
+		close(p[WRITE_END]);
+		main_exec(ast_tree->left);
+	}
+}
+
 int		main_exec(t_ast_node *ast_tree)
 {
 	char	**cmd;
 	char	*tmp;
 
-	//Faire un tableau de pointeur sur fonction ou autre.
+	//Faire un tableau de pointeur sur fonction ou autre + leaks.
 	if (ast_tree->type == PIPE)
 		run_pipe(ast_tree);
 	else if (ast_tree->type == GREAT)
@@ -207,15 +238,22 @@ int		main_exec(t_ast_node *ast_tree)
 		run_semicolon(ast_tree);
 	else if (ast_tree->type == DGREAT)
 		run_redir_dgreat(ast_tree);
+	else if (ast_tree->type == DLESS)
+		run_redir_dless(ast_tree);
 	else
 	{
 		cmd = ft_strsplit(ast_tree->content, ' ');
 		tmp = ft_strdup(cmd[0]);
-		free(cmd[0]);
 		if (!ft_strcmp(cmd[0], "wc") || !ft_strcmp(cmd[0], "sort"))
+		{	
+			free(cmd[0]);
 			cmd[0] = ft_strjoin("/usr/bin/", tmp);
+		}
 		else
+		{
+			free(cmd[0]);
 			cmd[0] = ft_strjoin("/bin/", tmp);
+		}
 		execve(cmd[0], cmd, NULL);
 	}
 	return (0);

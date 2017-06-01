@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/31 15:12:56 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/01 10:15:36 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,10 @@ int		main(int ac, char **av, char **env)
 			ft_putendl("Lexical problem !");
 			exit(EXIT_FAILURE);
 		}
-		tuple_parse = iscomplete_cmd(tok_lst, 0, 0);
+		if (g_line && g_line[0])
+			tuple_parse = iscomplete_cmd(tok_lst, 0, 0);
+		else
+			exit(0);
 		free_tok_lst(&tok_lst);
 		if (nb_tok != tuple_parse->mv)
 		{
