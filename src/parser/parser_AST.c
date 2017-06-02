@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/02 16:02:05 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/02 17:41:38 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ t_tuple	*push_redir(t_tuple *new_tuple, t_tuple *last)
 	return (last);
 }
 
-void	here_doc(char *delimiter, int option)
+char	*here_doc(char *delimiter, int option)
 {
 	static t_list	*hd_list = NULL;
 	t_list			*tmp_list;
@@ -154,14 +154,22 @@ void	here_doc(char *delimiter, int option)
 		if (!hd_list)
 		{
 			hd_list = (t_list*)ft_memalloc(sizeof(t_list));
-			hd_list->content = ft_strnew(0);
+			hd_list->content = NULL;
 			while (get_next_line(0, &line))
 			{
 				if (ft_strequ(line, delimiter))
 					break ;
-				hd_list->content = ft_stradd(hd_list->content, line);
+				if (!hd_list->content)
+				{
+					hd_list->content = ft_strdup(line);
+					hd_list->content = ft_strjoin(hd_list->content, "\n");
+				}
+				else
+				{
+					hd_list->content = ft_stradd(hd_list->content, line);
+					hd_list->content = ft_strjoin(hd_list->content, "\n");
+				}
 				ft_strdel(&line);
-				hd_list->content = ft_stradd(hd_list->content, "\n");
 			}
 			hd_list->next = NULL;
 		}
@@ -176,21 +184,30 @@ void	here_doc(char *delimiter, int option)
 			{
 				if (ft_strequ(line, delimiter))
 					break ;
-				tmp_list->next->content = ft_stradd(tmp_list->next->content, line);
+				if (!tmp_list->next->content)
+				{
+					tmp_list->next->content = ft_strdup(line);
+					tmp_list->next->content = ft_strjoin(tmp_list->next->content, "\n");
+				}
+				else
+				{
+					tmp_list->next->content = ft_stradd(tmp_list->next->content, line);
+					tmp_list->next->content = ft_strjoin(tmp_list->next->content, "\n");
+				}
 				ft_strdel(&line);
-				tmp_list->next->content = ft_stradd(tmp_list->next->content, "\n");
 			}
 			tmp_list->next->next = NULL;
 		}
 	}
-	if (!option)
+	else if (!option)
 	{
-		while (hd_list)
-		{
-			printf("[%s]\n", hd_list->content);
-			hd_list = hd_list->next;
-		}
+		line = ft_strdup(hd_list->content);
+		tmp_list = hd_list;
+		free(tmp_list);
+		hd_list = hd_list->next;
+		return (line);
 	}
+	return (NULL);
 }
 
 t_tuple	*isio_redirect(t_token *tok_lst, t_tuple *last)

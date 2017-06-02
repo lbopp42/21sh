@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/02 15:58:02 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/02 17:33:09 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ int		main(int ac, char **av, char **env)
 			ft_putendl("Syntax error !\n");
 			exit(EXIT_FAILURE);
 		}
-		here_doc(NULL, 0);
 		execution(tuple_parse->ast_tree, env);
 		free_ast_tree(&tuple_parse->ast_tree);
 		free(tuple_parse);

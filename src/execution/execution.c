@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/02 15:55:47 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/02 17:41:09 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,44 +131,33 @@ void	run_semicolon(t_ast_node *ast_tree)
 	main_exec(ast_tree->right, 0);
 }
 
-/*void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
+void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
 {
 	char	*line;
+	pid_t	child;
 	int		p[2];
 	int		tmp_in;
-	pid_t	child;
-	int		ret;
 
 	pipe(p);
 	child = fork();
 	if (child == 0)
 	{
-		printf("On passe\n");
-		dup2(p[1], 1);
-		close(p[0]);
-		line = NULL;
-		while ((ret = get_next_line(0, &line)))
-		{
-			if (ft_strequ(line, ast_tree->right->content))
-				break ;
-			ft_putendl(line);
-			ft_strdel(&line);
-		}
-		dprintf(2, "ret = [%d]\n", ret);
-		exit(1);
+		dup2(p[WRITE_END], 1);
+		close(READ_END);
+		line = here_doc(NULL, 0);
+		ft_putstr(line);
+		exit(0);
 	}
 	else
 	{
 		wait(NULL);
-		//ft_strdel(&line);
 		tmp_in = dup(0);
-		dup2(p[0], 0);
-		close(p[1]);
+		dup2(p[READ_END], 0);
+		close(p[WRITE_END]);
 		main_exec(ast_tree->left, in_fork);
-		close(0);
 		dup2(tmp_in, 0);
 	}
-}*/
+}
 
 /*int		ft_isnumber(char *content)
 {
@@ -280,9 +269,9 @@ int		main_exec(t_ast_node *ast_tree, int in_fork)
 		run_semicolon(ast_tree);
 	else if (ast_tree->type == DGREAT)
 		run_redir_dgreat(ast_tree, in_fork);
-	/*else if (ast_tree->type == DLESS)
+	else if (ast_tree->type == DLESS)
 		run_redir_dless(ast_tree, in_fork);
-	else if (ast_tree->type == GREATAND)
+	/*else if (ast_tree->type == GREATAND)
 		run_greatand(ast_tree);*/
 	else
 	{
