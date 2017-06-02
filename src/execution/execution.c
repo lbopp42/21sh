@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/01 10:54:27 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/02 12:13:26 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,63 +16,6 @@
 #define READ_END 0
 #define WRITE_END 1
 #define ERROR_NO_FILE 1
-
-/*void	run_pipe(t_ast_node *ast_tree)
-{
-	pid_t	child = -1;
-	char	**cmd1;
-	char	*tmp;
-	char	**cmd2;
-	int		pdes[2];
-
-	cmd1 = ft_strsplitquote(ast_tree->left->content, ' ');
-	cmd2 = ft_strsplitquote(ast_tree->right->content, ' ');
-	tmp = ft_strdup(cmd1[0]);
-	free(cmd1[0]);
-	cmd1[0] = ft_strdup("/bin/");
-	cmd1[0] = ft_stradd(cmd1[0], tmp);
-	free(tmp);
-	tmp = ft_strdup(cmd2[0]);
-	free(cmd2[0]);
-	cmd2[0] = ft_strdup("/bin/");
-	cmd2[0] = ft_stradd(cmd2[0], tmp);
-	free(tmp);
-	pipe(pdes);
-	child = fork();
-	if (child == 0)
-	{
-		dup2(pdes[WRITE_END], STDOUT_FILENO);
-		close(pdes[READ_END]);
-		execve(cmd1[0], cmd1, NULL);
-	}
-	if (child > 0)
-	{
-		dup2(pdes[READ_END], STDIN_FILENO);
-		close(pdes[WRITE_END]);
-		wait(NULL);
-		g_test_fd = pdes[READ_END];
-		printf("HERE TEST_FD = %d\n", g_test_fd);
-		execve(cmd2[0], cmd2, NULL);
-		return ;
-	}
-}
-
-void	exec_pipe(t_ast_node *ast_tree)
-{
-	pid_t	child;
-
-	child = fork();
-	if (child == 0)
-	{
-		run_pipe(ast_tree);
-		return ;
-	}
-	if (child > 0)
-	{
-		wait(NULL);
-		printf("TEST_FD = %d\n", g_test_fd);
-	}
-}*/
 
 /*static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
 {
@@ -90,57 +33,52 @@ void	exec_pipe(t_ast_node *ast_tree)
 		printf("RIGHT = [%s] layer = %d\n", ast_tree->content, layer);
 }*/
 
-int		main_exec(t_ast_node *ast_tree);
+int		main_exec(t_ast_node *ast_tree, int in_fork);
+//void	exec_cmd(char *content, int in, int out);
 
 void	run_pipe(t_ast_node *ast_tree)
 {
 	pid_t	child;
 	int		p[2];
-	char	**cmd;
-	char	*tmp;
 
-	cmd = NULL;
 	pipe(p);
 	child = fork();
 	if (child == 0)
 	{
 		dup2(p[WRITE_END], STDOUT_FILENO);
 		close(p[READ_END]);
-		main_exec(ast_tree->left);
+		close(p[WRITE_END]);
+		main_exec(ast_tree->left, 1);
 	}
 	if (child > 0)
-	{
 		wait(NULL);
 		dup2(p[READ_END], STDIN_FILENO);
 		close(p[WRITE_END]);
-		cmd = ft_strsplit(ast_tree->right->content, ' ');
-		tmp = ft_strdup(cmd[0]);
-		free(cmd[0]);
-		if (!ft_strcmp(cmd[0], "wc") || !ft_strcmp(cmd[0], "sort"))
-			cmd[0] = ft_strjoin("/usr/bin/", tmp);
-		else
-			cmd[0] = ft_strjoin("/bin/", tmp);
-		execve(cmd[0], cmd, NULL);
-	}
+		close(p[READ_END]);
+		main_exec(ast_tree->right, 1);
 }
 
-void	run_redir_great(t_ast_node *ast_tree)
+void	run_redir_great(t_ast_node *ast_tree, int in_fork)
 {
 	int		new_fd;
+	int		tmp_in;
 	static	int	first = 0;
 
 	new_fd = open(ast_tree->right->content, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR);
+	tmp_in = dup(1);
 	if (first == 0)
 	{
 		dup2(new_fd, 1);
 		first = 1;
 	}
 	close(new_fd);
-	main_exec(ast_tree->left);
+	main_exec(ast_tree->left, in_fork);
+	close(1);
+	dup2(tmp_in, 1);
 	first = 0;
 }
 
-void	run_redir_dgreat(t_ast_node *ast_tree)
+/*void	run_redir_dgreat(t_ast_node *ast_tree)
 {
 	int		new_fd;
 	static	int	first = 0;
@@ -177,29 +115,23 @@ void	run_redir_less(t_ast_node *ast_tree)
 	main_exec(ast_tree->left);
 }
 
-void	run_semicolon(t_ast_node *ast_tree)
+*/void	run_semicolon(t_ast_node *ast_tree)
 {
-	pid_t	child;
-
-	child = fork();
-	if (child == 0)
-		main_exec(ast_tree->left);
-	if (child > 0)
-	{
-		wait(NULL);
-		main_exec(ast_tree->right);
-	}
-}
+	main_exec(ast_tree->left, 0);
+	main_exec(ast_tree->right, 0);
+}/*
 
 void	run_redir_dless(t_ast_node *ast_tree)
 {
 	pid_t	child;
+	pid_t	child2;
 	int		p[2];
 	char	*line;
 
 	line = NULL;
 	pipe(p);
 	child = fork();
+	child2 = fork();
 	if (child == 0)
 	{
 		dup2(p[WRITE_END], STDOUT_FILENO);
@@ -215,31 +147,132 @@ void	run_redir_dless(t_ast_node *ast_tree)
 	if (child > 0)
 	{
 		wait(NULL);
-		ft_strdel(&line);
-		dup2(p[READ_END], STDIN_FILENO);
-		close(p[WRITE_END]);
-		main_exec(ast_tree->left);
+		if (child2 == 0)
+		{
+			ft_strdel(&line);
+			dup2(p[READ_END], STDIN_FILENO);
+			close(p[WRITE_END]);
+			main_exec(ast_tree->left);
+		}
+		if (child2 > 0)
+			wait(NULL);
 	}
 }
 
-int		main_exec(t_ast_node *ast_tree)
+int		ft_isnumber(char *content)
+{
+	int	i;
+
+	i = 0;
+	while (content[i])
+	{
+		if (content[i] - '0' < 0 && content[i] - '0' > 9)
+			return (0);
+		i += 1;
+	}
+	return (1);
+}
+
+void	run_greatand(t_ast_node *ast_tree)
+{
+	int	fd_move;
+	int	fd_new;
+
+	fd_move = 1;
+	if (ast_tree->left->type == IO_NUMBER)
+		fd_move = ft_atoi(ast_tree->left->content);
+	if (ft_strequ(ast_tree->right->content, "-"))
+		close(fd_move);
+	else
+	{
+		if (ft_isnumber(ast_tree->right->content) && (fd_new = dup(ft_atoi(ast_tree->right->content))) == -1) //TODO
+		{
+			ft_putstr_fd("lsh: ", 2);
+			ft_putstr_fd(ast_tree->right->content, 2);
+			ft_putendl_fd(": Bad file descriptor", 2);
+			exit(1);
+		}
+		else if (!ft_isnumber(ast_tree->right->content))
+			fd_new = open(ast_tree->right->content, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR);
+		dup2(fd_move, fd_new);
+		close(fd_move);
+		if (ast_tree->left->type == IO_NUMBER)
+			main_exec(ast_tree->left->left);
+		else
+			main_exec(ast_tree->left);
+	}
+}*/
+
+/*
+**	If the command isn't a builtin we exec_cmd().
+*/
+
+/*void	exec_cmd(char *content, int in, int out)
+{
+	pid_t	child;
+	int		p[2];
+
+	pipe(p);
+	child = fork();
+	if (child == 0)
+	{
+		dup2(p[WRITE_END], out);
+		close(p[WRITE_END]);
+		close(p[READ_END]);
+	}
+	if (child > 0)
+	{
+		wait(NULL);
+		dup2(p[READ_END], in);
+		close(p[READ_END]);
+		close(p[WRITE_END]);
+	}
+}*/
+
+void	launch_pipe(t_ast_node *ast_tree)
+{
+	pid_t		child;
+	static int	fork_nb = 0;
+
+	if (fork_nb == 0)
+	{
+		fork_nb = 1;
+		child = fork();
+		if (child == 0)
+		{
+			run_pipe(ast_tree);
+		}
+		if (child > 0)
+		{
+			wait(NULL);
+			fork_nb = 0;
+		}
+	}
+	else
+		run_pipe(ast_tree);
+}
+
+int		main_exec(t_ast_node *ast_tree, int in_fork)
 {
 	char	**cmd;
 	char	*tmp;
+	pid_t	child;
 
 	//Faire un tableau de pointeur sur fonction ou autre + leaks.
 	if (ast_tree->type == PIPE)
-		run_pipe(ast_tree);
+		launch_pipe(ast_tree);
 	else if (ast_tree->type == GREAT)
-		run_redir_great(ast_tree);
-	else if (ast_tree->type == LESS)
-		run_redir_less(ast_tree);
+		run_redir_great(ast_tree, in_fork);
+	/*else if (ast_tree->type == LESS)
+		run_redir_less(ast_tree);*/
 	else if (ast_tree->type == SEMICOLON)
 		run_semicolon(ast_tree);
-	else if (ast_tree->type == DGREAT)
+	/*else if (ast_tree->type == DGREAT)
 		run_redir_dgreat(ast_tree);
 	else if (ast_tree->type == DLESS)
 		run_redir_dless(ast_tree);
+	else if (ast_tree->type == GREATAND)
+		run_greatand(ast_tree);*/
 	else
 	{
 		cmd = ft_strsplit(ast_tree->content, ' ');
@@ -254,24 +287,24 @@ int		main_exec(t_ast_node *ast_tree)
 			free(cmd[0]);
 			cmd[0] = ft_strjoin("/bin/", tmp);
 		}
-		execve(cmd[0], cmd, NULL);
+		if (in_fork)
+			execve(cmd[0], cmd, NULL);
+		else
+		{
+			child = fork();
+			if (child == 0)
+				execve(cmd[0], cmd, NULL);
+			else
+				wait(NULL);
+		}
 	}
 	return (0);
 }
 
 int		execution(t_ast_node *ast_tree, char **env)
 {
-	pid_t	child;
-
 	(void)env;
-	child = fork();
-	if (child == 0)
-	{
-		main_exec(ast_tree);
-		return (0);
-	}
-	if (child > 0)
-		wait(NULL);
+	main_exec(ast_tree, 0);
 	//print_my_ast(ast_tree, 0, 0);
 	return (0);
 }
