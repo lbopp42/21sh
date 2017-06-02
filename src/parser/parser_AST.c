@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/01 09:15:38 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/02 16:02:05 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,57 @@ t_tuple	*push_redir(t_tuple *new_tuple, t_tuple *last)
 	return (last);
 }
 
+void	here_doc(char *delimiter, int option)
+{
+	static t_list	*hd_list = NULL;
+	t_list			*tmp_list;
+	char			*line;
+
+	if (option == 1)
+	{
+		line = NULL;
+		if (!hd_list)
+		{
+			hd_list = (t_list*)ft_memalloc(sizeof(t_list));
+			hd_list->content = ft_strnew(0);
+			while (get_next_line(0, &line))
+			{
+				if (ft_strequ(line, delimiter))
+					break ;
+				hd_list->content = ft_stradd(hd_list->content, line);
+				ft_strdel(&line);
+				hd_list->content = ft_stradd(hd_list->content, "\n");
+			}
+			hd_list->next = NULL;
+		}
+		else
+		{
+			tmp_list = hd_list;
+			while (tmp_list->next)
+				tmp_list = tmp_list->next;
+			tmp_list->next = (t_list*)ft_memalloc(sizeof(t_list));
+			tmp_list->next->content = ft_strnew(0);
+			while (get_next_line(0, &line))
+			{
+				if (ft_strequ(line, delimiter))
+					break ;
+				tmp_list->next->content = ft_stradd(tmp_list->next->content, line);
+				ft_strdel(&line);
+				tmp_list->next->content = ft_stradd(tmp_list->next->content, "\n");
+			}
+			tmp_list->next->next = NULL;
+		}
+	}
+	if (!option)
+	{
+		while (hd_list)
+		{
+			printf("[%s]\n", hd_list->content);
+			hd_list = hd_list->next;
+		}
+	}
+}
+
 t_tuple	*isio_redirect(t_token *tok_lst, t_tuple *last)
 {
 	int			tmp;
@@ -193,6 +244,7 @@ t_tuple	*isio_redirect(t_token *tok_lst, t_tuple *last)
 	else if (tok_lst->type == DLESS && tok_lst->next &&
 			tok_lst->next->type == WORD)
 	{
+		here_doc(tok_lst->next->content, 1);
 		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
 		tuple_parse->mv = mv + 2;
 		tuple_parse->ast_tree = create_ast_node(tok_lst, NULL, tok_lst->next);

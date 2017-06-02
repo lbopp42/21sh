@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/30 10:27:35 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/02 15:57:34 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ typedef struct	s_token
 }				t_token;
 
 int		execution(t_ast_node *ast_tree, char **env);
+void	here_doc(char *delimiter, int option);
 
 
 void	add_to_current_tok(t_token **tok_lst, int i, int type);

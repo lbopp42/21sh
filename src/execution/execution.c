@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/02 12:31:42 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/02 15:55:47 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,47 +129,48 @@ void	run_semicolon(t_ast_node *ast_tree)
 {
 	main_exec(ast_tree->left, 0);
 	main_exec(ast_tree->right, 0);
-}/*
+}
 
-void	run_redir_dless(t_ast_node *ast_tree)
+/*void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
 {
-	pid_t	child;
-	pid_t	child2;
-	int		p[2];
 	char	*line;
+	int		p[2];
+	int		tmp_in;
+	pid_t	child;
+	int		ret;
 
-	line = NULL;
 	pipe(p);
 	child = fork();
-	child2 = fork();
 	if (child == 0)
 	{
-		dup2(p[WRITE_END], STDOUT_FILENO);
-		close(p[READ_END]);
-		while (get_next_line(0, &line))
+		printf("On passe\n");
+		dup2(p[1], 1);
+		close(p[0]);
+		line = NULL;
+		while ((ret = get_next_line(0, &line)))
 		{
 			if (ft_strequ(line, ast_tree->right->content))
 				break ;
 			ft_putendl(line);
+			ft_strdel(&line);
 		}
-		exit(0);
+		dprintf(2, "ret = [%d]\n", ret);
+		exit(1);
 	}
-	if (child > 0)
+	else
 	{
 		wait(NULL);
-		if (child2 == 0)
-		{
-			ft_strdel(&line);
-			dup2(p[READ_END], STDIN_FILENO);
-			close(p[WRITE_END]);
-			main_exec(ast_tree->left);
-		}
-		if (child2 > 0)
-			wait(NULL);
+		//ft_strdel(&line);
+		tmp_in = dup(0);
+		dup2(p[0], 0);
+		close(p[1]);
+		main_exec(ast_tree->left, in_fork);
+		close(0);
+		dup2(tmp_in, 0);
 	}
-}
+}*/
 
-int		ft_isnumber(char *content)
+/*int		ft_isnumber(char *content)
 {
 	int	i;
 
@@ -280,7 +281,7 @@ int		main_exec(t_ast_node *ast_tree, int in_fork)
 	else if (ast_tree->type == DGREAT)
 		run_redir_dgreat(ast_tree, in_fork);
 	/*else if (ast_tree->type == DLESS)
-		run_redir_dless(ast_tree);
+		run_redir_dless(ast_tree, in_fork);
 	else if (ast_tree->type == GREATAND)
 		run_greatand(ast_tree);*/
 	else
