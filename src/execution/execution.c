@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/02 12:24:01 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/02 12:31:42 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,22 +78,27 @@ void	run_redir_great(t_ast_node *ast_tree, int in_fork)
 	first = 0;
 }
 
-/*void	run_redir_dgreat(t_ast_node *ast_tree)
+void	run_redir_dgreat(t_ast_node *ast_tree, int in_fork)
 {
 	int		new_fd;
 	static	int	first = 0;
+	int		tmp_out;
 
 	new_fd = open(ast_tree->right->content, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
+	tmp_out = dup(1);
 	if (first == 0)
 	{
 		dup2(new_fd, 1);
 		first = 1;
 	}
 	close(new_fd);
-	main_exec(ast_tree->left);
+	main_exec(ast_tree->left, in_fork);
+	close(1);
+	first = 0;
+	dup2(tmp_out, 1);
 }
 
-*/void	run_redir_less(t_ast_node *ast_tree, int in_fork)
+void	run_redir_less(t_ast_node *ast_tree, int in_fork)
 {
 	int		new_fd;
 	static	int	first = 0;
@@ -272,9 +277,9 @@ int		main_exec(t_ast_node *ast_tree, int in_fork)
 		run_redir_less(ast_tree, in_fork);
 	else if (ast_tree->type == SEMICOLON)
 		run_semicolon(ast_tree);
-	/*else if (ast_tree->type == DGREAT)
-		run_redir_dgreat(ast_tree);
-	else if (ast_tree->type == DLESS)
+	else if (ast_tree->type == DGREAT)
+		run_redir_dgreat(ast_tree, in_fork);
+	/*else if (ast_tree->type == DLESS)
 		run_redir_dless(ast_tree);
 	else if (ast_tree->type == GREATAND)
 		run_greatand(ast_tree);*/
