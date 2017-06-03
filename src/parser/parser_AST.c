@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/03 10:17:11 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/03 10:25:57 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,6 +275,7 @@ t_tuple	*isio_redirect(t_token *tok_lst, t_tuple *last)
 			tok_lst->next->type == DLESS && tok_lst->next->next &&
 			tok_lst->next->next->type == WORD)
 	{
+		here_doc(tok_lst->next->next->content, 1);
 		tuple_parse = (t_tuple*)ft_memalloc(sizeof(t_tuple));
 		tuple_parse->mv = mv + 3;
 		tuple_parse->ast_tree = create_ast_node(tok_lst->next, tok_lst, tok_lst->next->next);
