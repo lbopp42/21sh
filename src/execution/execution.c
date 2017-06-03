@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/02 17:41:09 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/03 10:17:41 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,29 +133,41 @@ void	run_semicolon(t_ast_node *ast_tree)
 
 void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
 {
-	char	*line;
-	pid_t	child;
-	int		p[2];
-	int		tmp_in;
+	char		*line;
+	pid_t		child;
+	int			p[2];
+	int			tmp_in;
 
 	pipe(p);
+	line = here_doc(NULL, 0);
 	child = fork();
 	if (child == 0)
 	{
 		dup2(p[WRITE_END], 1);
 		close(READ_END);
-		line = here_doc(NULL, 0);
 		ft_putstr(line);
 		exit(0);
 	}
 	else
 	{
 		wait(NULL);
-		tmp_in = dup(0);
-		dup2(p[READ_END], 0);
+		dprintf(2, "On passe bien ici\n");
+		if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
+		{
+			tmp_in = dup(ft_atoi(ast_tree->left->content));
+			dup2(p[READ_END], ft_atoi(ast_tree->left->content));
+		}
+		else
+		{
+			tmp_in = dup(0);
+			dup2(p[READ_END], 0);
+		}
 		close(p[WRITE_END]);
 		main_exec(ast_tree->left, in_fork);
-		dup2(tmp_in, 0);
+		if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
+			dup2(tmp_in, ft_atoi(ast_tree->left->content));
+		else
+			dup2(tmp_in, 0);
 	}
 }
 
