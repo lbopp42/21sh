@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/03 10:31:35 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/03 12:37:42 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #define WRITE_END 1
 #define ERROR_NO_FILE 1
 
-/*static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
+static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
 {
 	if (!ast_tree)
 		return ;
@@ -31,7 +31,7 @@
 		printf("LEFT = [%s] layer = %d\n", ast_tree->content, layer);
 	if (mode == 2)
 		printf("RIGHT = [%s] layer = %d\n", ast_tree->content, layer);
-}*/
+}
 
 int		main_exec(t_ast_node *ast_tree, int in_fork);
 //void	exec_cmd(char *content, int in, int out);
@@ -172,7 +172,7 @@ void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
 	}
 }
 
-/*int		ft_isnumber(char *content)
+int		ft_isnumber(char *content)
 {
 	int	i;
 
@@ -186,16 +186,23 @@ void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
 	return (1);
 }
 
-void	run_greatand(t_ast_node *ast_tree)
+void	run_greatand(t_ast_node *ast_tree, int in_fork)
 {
 	int	fd_move;
 	int	fd_new;
+	int	tmp_fd;
 
 	fd_move = 1;
+	printf("A DROITE = [%s]\n", ast_tree->right->content);
+	printf("A GAUCHE = [%s]\n", ast_tree->left->content);
 	if (ast_tree->left->type == IO_NUMBER)
 		fd_move = ft_atoi(ast_tree->left->content);
+	tmp_fd = dup(fd_move);
 	if (ft_strequ(ast_tree->right->content, "-"))
+	{
+		printf("On ferme [%d]\n", fd_move);
 		close(fd_move);
+	}
 	else
 	{
 		if (ft_isnumber(ast_tree->right->content) && (fd_new = dup(ft_atoi(ast_tree->right->content))) == -1) //TODO
@@ -209,12 +216,17 @@ void	run_greatand(t_ast_node *ast_tree)
 			fd_new = open(ast_tree->right->content, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR);
 		dup2(fd_move, fd_new);
 		close(fd_move);
-		if (ast_tree->left->type == IO_NUMBER)
-			main_exec(ast_tree->left->left);
-		else
-			main_exec(ast_tree->left);
 	}
-}*/
+	if (ast_tree->left->type == IO_NUMBER)
+	{
+		printf("On lance la commande d'ici\n");
+		main_exec(ast_tree->left->left, in_fork);
+	}
+	else
+		main_exec(ast_tree->left->left, in_fork);
+	dup2(tmp_fd, fd_move);
+	printf("On reset [%d]\n", fd_move);
+}
 
 /*
 **	If the command isn't a builtin we exec_cmd().
@@ -284,8 +296,8 @@ int		main_exec(t_ast_node *ast_tree, int in_fork)
 		run_redir_dgreat(ast_tree, in_fork);
 	else if (ast_tree->type == DLESS)
 		run_redir_dless(ast_tree, in_fork);
-	/*else if (ast_tree->type == GREATAND)
-		run_greatand(ast_tree);*/
+	else if (ast_tree->type == GREATAND)
+		run_greatand(ast_tree, in_fork);
 	else
 	{
 		cmd = ft_strsplit(ast_tree->content, ' ');
@@ -317,7 +329,7 @@ int		main_exec(t_ast_node *ast_tree, int in_fork)
 int		execution(t_ast_node *ast_tree, char **env)
 {
 	(void)env;
+	print_my_ast(ast_tree, 0, 0);
 	main_exec(ast_tree, 0);
-	//print_my_ast(ast_tree, 0, 0);
 	return (0);
 }
