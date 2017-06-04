@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/03 10:25:57 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/04 13:39:20 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,7 +253,7 @@ t_tuple	*isio_redirect(t_token *tok_lst, t_tuple *last)
 			tuple_parse = push_redir(tuple_parse, last);
 		else if (last)
 		{
-			tuple_parse->ast_tree->left = last->ast_tree;
+			tuple_parse->ast_tree->left->left = last->ast_tree;
 			tuple_parse->mv += mv;
 		}
 		else

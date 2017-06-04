@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/04 13:03:08 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/04 13:39:46 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,76 +58,94 @@ void	run_pipe(t_ast_node *ast_tree)
 		main_exec(ast_tree->right, 1, 10);
 }
 
-// Faire avec le fd si ast_tree->left est un IONUMBER
-
 void	run_redir_great(t_ast_node *ast_tree, int in_fork)
 {
 	int		new_fd;
 	int		tmp_out;
 	static	int	first = 0;
+	int		fd_default;
 
+	fd_default = 1;
 	new_fd = open(ast_tree->right->content, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR);
-	tmp_out = dup(1);
+	if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
+		fd_default = ft_atoi(ast_tree->left->content);
+	tmp_out = dup(fd_default);
 	if (first == 0)
 	{
-		dup2(new_fd, 1);
+		dup2(new_fd, fd_default);
 		first = 1;
 	}
 	close(new_fd);
-	main_exec(ast_tree->left, in_fork, 10);
-	close(1);
-	dup2(tmp_out, 1);
+	if (ast_tree->left && ast_tree->left->type == IO_NUMBER && ast_tree->left->left)
+		main_exec(ast_tree->left->left, in_fork, 10);
+	else if (ast_tree->left)
+		main_exec(ast_tree->left, in_fork, 10);
+	close(fd_default);
+	dup2(tmp_out, fd_default);
 	first = 0;
 }
-
-// Faire avec le fd si ast_tree->left est un IONUMBER
 
 void	run_redir_dgreat(t_ast_node *ast_tree, int in_fork)
 {
 	int		new_fd;
 	static	int	first = 0;
 	int		tmp_out;
+	int		fd_default;
 
+	fd_default = 1;
 	new_fd = open(ast_tree->right->content, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
-	tmp_out = dup(1);
+	if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
+		fd_default = ft_atoi(ast_tree->left->content);
+	tmp_out = dup(fd_default);
 	if (first == 0)
 	{
-		dup2(new_fd, 1);
+		dup2(new_fd, fd_default);
 		first = 1;
 	}
 	close(new_fd);
-	main_exec(ast_tree->left, in_fork, 10);
-	close(1);
+	if (ast_tree->left && ast_tree->left->type == IO_NUMBER && ast_tree->left->left)
+		main_exec(ast_tree->left->left, in_fork, 10);
+	else if (ast_tree->left)
+		main_exec(ast_tree->left, in_fork, 10);
+	close(fd_default);
 	first = 0;
-	dup2(tmp_out, 1);
+	dup2(tmp_out, fd_default);
 }
-
-// Faire avec le fd si ast_tree->left est un IONUMBER
 
 void	run_redir_less(t_ast_node *ast_tree, int in_fork)
 {
 	int		new_fd;
 	static	int	first = 0;
 	int		tmp_in;
+	int		fd_default;
 
+	fd_default = 0;
+	if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
+		fd_default = ft_atoi(ast_tree->left->content);
 	new_fd = open(ast_tree->right->content, O_RDONLY, S_IRUSR | S_IWUSR);
-	tmp_in = dup(0);
+	tmp_in = dup(fd_default);
 	if (new_fd == -1)
 	{
 		ft_putstr_fd("lsh: ", 2);
 		ft_putstr_fd(ast_tree->right->content, 2);
 		ft_putstr_fd(": No such file or directory\n", 2);
-		return ;
+		if (in_fork)
+			exit(1);
+		else
+			return ;
 	}
 	if (first == 0)
 	{
-		dup2(new_fd, 0);
+		dup2(new_fd, fd_default);
 		first = 1;
 	}
 	close(new_fd);
-	main_exec(ast_tree->left, in_fork, 10);
-	close(0);
-	dup2(tmp_in, 0);
+	if (ast_tree->left && ast_tree->left->type == IO_NUMBER && ast_tree->left->left)
+		main_exec(ast_tree->left->left, in_fork, 10);
+	else if (ast_tree->left)
+		main_exec(ast_tree->left, in_fork, 10);
+	close(fd_default);
+	dup2(tmp_in, fd_default);
 	first = 0;
 }
 
