@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/02 16:41:13 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/05 10:54:38 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define LSH_H
 
 char	*g_line;
+char	**g_env;
 
 #include "libft.h"
 #include <stdio.h>
@@ -66,6 +67,7 @@ typedef struct	s_token
 
 int		execution(t_ast_node *ast_tree, char **env);
 char	*here_doc(char *delimiter, int option);
+void	main_expand(t_ast_node **ast_tree);
 
 
 void	add_to_current_tok(t_token **tok_lst, int i, int type);
@@ -77,7 +79,7 @@ int		is_digit_token(char *content);
 int		is_piece_of_bigop(t_token **tok_lst, t_state **st_lst, int *sp, int i);
 int		is_new_op(int i);
 int		lexer_posix(t_token **tok_lst, t_state **st_lst);
-void	state_management(t_state **st_lst, int i);
+void	state_management(t_state **st_lst, char c);
 int		treatment_of_quote(t_token **tok_lst, t_state **st_lst, int *sp, int i);
 int		treatment_of_old_word(t_token **tok_lst, int *sp, int i);
 int		treatment_of_new_word(t_token **tok_lst, int *sp, int i);

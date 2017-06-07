@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/04 13:39:46 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/04 15:23:42 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,6 @@ void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
 	int			tmp_in;
 
 	pipe(p);
-	// Le fork n'est pas neccesaire (A verifier)
 	line = here_doc(NULL, 0);
 	child = fork();
 	if (child == 0)

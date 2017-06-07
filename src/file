@@ -1,0 +1,8 @@
+total 88
+-rwxr-xr-x   1 lbopp  2016_paris  39100 Jun  7 13:50 a.out
+drwxr-xr-x   4 lbopp  2016_paris    136 Jun  4 15:23 execution
+drwxr-xr-x   4 lbopp  2016_paris    136 Jun  7 13:50 expand
+-rw-------   1 lbopp  2016_paris      0 Jun  7 13:50 file
+drwxr-xr-x  13 lbopp  2016_paris    442 Jun  5 17:04 lexer
+-rw-r--r--   1 lbopp  2016_paris   2398 Jun  5 10:01 main.c
+drwxr-xr-x   6 lbopp  2016_paris    204 Jun  4 13:39 parser

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/05 13:40:54 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/05 13:41:48 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/05 10:40:48 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,24 +25,24 @@ static void	pop_current_state(t_state **st_lst, t_state **first, t_state **tmp)
 	*tmp = NULL;
 }
 
-static void	create_new_state(t_state **st_lst, int i)
+static void	create_new_state(t_state **st_lst, char c)
 {
 	if (!(*st_lst = (t_state*)ft_memalloc(sizeof(t_state))))
 		return ;
-	if (g_line[i] == '"')
+	if (c == '"')
 		(*st_lst)->state = DQUOTE;
 	else
 		(*st_lst)->state = QUOTE;
 	(*st_lst)->next = NULL;
 }
 
-void		state_management(t_state **st_lst, int i)
+void		state_management(t_state **st_lst, char c)
 {
 	t_state	*tmp;
 	t_state	*first;
 
 	if (!*st_lst)
-		create_new_state(st_lst, i);
+		create_new_state(st_lst, c);
 	else
 	{
 		tmp = *st_lst;
@@ -51,11 +51,11 @@ void		state_management(t_state **st_lst, int i)
 			first = tmp;
 			tmp = tmp->next;
 		}
-		if (g_line[i] == '"' && tmp->state == DQUOTE)
+		if (c == '"' && tmp->state == DQUOTE)
 			pop_current_state(st_lst, &first, &tmp);
-		else if (g_line[i] == '\'' && tmp->state == QUOTE)
+		else if (c == '\'' && tmp->state == QUOTE)
 			pop_current_state(st_lst, &first, &tmp);
 		else
-			create_new_state(&tmp->next, i);
+			create_new_state(&tmp->next, c);
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/04 13:27:51 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/05 10:01:10 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ int		main(int ac, char **av, char **env)
 	int		nb_tok;
 
 	(void)ac;
+	g_env = env;
 	(void)av;
 	while (1)
 	{
@@ -80,6 +81,7 @@ int		main(int ac, char **av, char **env)
 			ft_putendl("Syntax error !\n");
 			exit(EXIT_FAILURE);
 		}
+		main_expand(&tuple_parse->ast_tree);
 		execution(tuple_parse->ast_tree, env);
 		free_ast_tree(&tuple_parse->ast_tree);
 		free(tuple_parse);
