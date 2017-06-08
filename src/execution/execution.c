@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/04 15:23:42 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/08 11:11:14 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -335,11 +335,21 @@ void	launch_pipe(t_ast_node *ast_tree)
 		run_pipe(ast_tree);
 }
 
+void	launch_builtin(char	**cmd)
+{
+	if (ft_strequ(cmd[0], "unsetenv"))
+		ft_unsetenv(cmd);
+	else if (ft_strequ(cmd[0], "setenv"))
+		ft_setenv(cmd);
+}
+
 int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
 {
 	char	**cmd;
 	char	*tmp;
 	pid_t	child;
+	char	*builtins[] =
+			{"cd", "echo", "exit"/*, "env"*/, "setenv", "unsetenv", NULL};
 
 	//Faire un tableau de pointeur sur fonction ou autre + leaks.
 	if (ast_tree->type == PIPE)
@@ -362,26 +372,29 @@ int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
 	{
 		cmd = ft_strsplit(ast_tree->content, ' ');
 		tmp = ft_strdup(cmd[0]);
-		if (!ft_strcmp(cmd[0], "wc") || !ft_strcmp(cmd[0], "sort") || !ft_strcmp(cmd[0], "less"))
+		if (!ft_strcmp(cmd[0], "wc") || !ft_strcmp(cmd[0], "sort") ||
+				!ft_strcmp(cmd[0], "less") || !ft_strcmp(cmd[0], "env"))
 		{	
 			free(cmd[0]);
 			cmd[0] = ft_strjoin("/usr/bin/", tmp);
 		}
-		else
+		else if (!ft_isinarray(cmd[0], builtins))
 		{
 			free(cmd[0]);
 			cmd[0] = ft_strjoin("/bin/", tmp);
 		}
-		if (in_fork)
+		if (in_fork && !ft_isinarray(cmd[0], builtins))
 			execve(cmd[0], cmd, NULL);
-		else
+		else if (!ft_isinarray(cmd[0], builtins))
 		{
 			child = fork();
 			if (child == 0)
-				execve(cmd[0], cmd, NULL);
+				execve(cmd[0], cmd, g_env);
 			else
 				wait(NULL);
 		}
+		else
+			launch_builtin(cmd);
 	}
 	return (0);
 }
