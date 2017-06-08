@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/05 13:40:54 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/05 10:40:48 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/08 14:14:40 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void		state_management(t_state **st_lst, char c)
 			pop_current_state(st_lst, &first, &tmp);
 		else if (c == '\'' && tmp->state == QUOTE)
 			pop_current_state(st_lst, &first, &tmp);
-		else
-			create_new_state(&tmp->next, c);
+		/*else
+			create_new_state(&tmp->next, c);*/
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/05 09:37:02 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 14:01:54 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/08 14:15:04 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ void	expand_var_env(char **content, char ***array_env, int *curs)
 	{
 		size_var = 0;
 		if ((*content)[i] == '\'' || (*content)[i] == '"')
-		state_management(&st_lst, (*content)[i]);
+			state_management(&st_lst, (*content)[i]);
 		if ((*content)[i] == '$')
 		{
 			i += 1;
