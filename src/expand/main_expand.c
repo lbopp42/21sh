@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/05 09:37:02 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/07 17:27:38 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/08 13:30:09 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,7 +216,8 @@ void	remove_quote_array_env(char ***array_env, int max)
 	i = 0;
 	while (i < max)
 	{
-		if ((*array_env)[i] && (*array_env)[i][0] && ((*array_env[i])[0] == '"' || (*array_env[i])[0] == '\''))
+		if ((*array_env)[i] && (*array_env)[i][0] && ((*array_env[i])[0] == '"' ||
+					(*array_env[i])[0] == '\''))
 		{
 			new = ft_strsub((*array_env)[i], 1, ft_strlen((*array_env[i])) - 2);
 			free((*array_env[i]));
@@ -226,24 +227,32 @@ void	remove_quote_array_env(char ***array_env, int max)
 	}
 }
 
-void	launch_expand(t_ast_node **ast_tree)
+void	launch_expand(t_list **list)
 {
 	static char	**array_env = NULL;
 	static int	curs = 0;
+	t_list		*origin;
 	int			i;
 
-	i = 0;
-	expand_var_env(&(*ast_tree)->content, &array_env, &curs);
-	(*ast_tree)->content = expand_quote_remove(&(*ast_tree)->content);
-	while (i < curs)
-		i += 1;
-	remove_quote_array_env(&array_env, curs);
-	i = 0;
-	while (i < curs)
-		i += 1;
-	(*ast_tree)->content = expand_replace_var(&(*ast_tree)->content, array_env, 0);
-	curs = 0;
-	array_env = NULL;
+	origin = *list;
+	while (origin)
+	{
+		i = 0;
+		expand_var_env((char**)&origin->content, &array_env, &curs);
+		origin->content =
+			expand_quote_remove((char**)&origin->content);
+		while (i < curs)
+			i += 1;
+		remove_quote_array_env(&array_env, curs);
+		i = 0;
+		while (i < curs)
+			i += 1;
+		origin->content =
+			expand_replace_var((char**)&origin->content, array_env, 0);
+		curs = 0;
+		array_env = NULL;
+		origin = origin->next;
+	}
 }
 
 void	main_expand(t_ast_node **ast_tree)
@@ -254,5 +263,5 @@ void	main_expand(t_ast_node **ast_tree)
 		main_expand(&(*ast_tree)->left);
 	if ((*ast_tree)->right)
 		main_expand(&(*ast_tree)->right);
-	launch_expand(ast_tree);
+	launch_expand(&(*ast_tree)->content);
 }

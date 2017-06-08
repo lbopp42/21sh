@@ -1,39 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   list_to_tab.c                                      :+:      :+:    :+:   */
+/*   list_to_array.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
+/*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/01/25 13:45:55 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 13:29:03 by lbopp            ###   ########.fr       */
+/*   Created: 2017/06/08 13:08:36 by lbopp             #+#    #+#             */
+/*   Updated: 2017/06/08 13:37:39 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
 
-static void	fill_lst(t_lst *lst, char ***array)
+static void	fill_lst(t_list *lst, char ***array)
 {
 	int		i;
-	int		j;
 	int		k;
-	t_lst	*origin;
+	t_list	*origin;
 
 	origin = lst;
 	i = 0;
 	while (origin)
 	{
-		j = 0;
 		k = 0;
-		while (origin->name[j])
+		while (((char*)origin->content)[k])
 		{
-			(*array)[i][j] = origin->name[j];
-			j++;
-		}
-		(*array)[i][j] = '=';
-		while (origin->content[k])
-		{
-			(*array)[i][j + 1 + k] = origin->content[k];
+			(*array)[i][k] = ((char*)origin->content)[k];
 			k++;
 		}
 		i++;
@@ -41,17 +33,17 @@ static void	fill_lst(t_lst *lst, char ***array)
 	}
 }
 
-static void	create_line(t_lst *lst, char ***array)
+static void	create_line(t_list *lst, char ***array)
 {
 	int		size;
 	int		i;
-	t_lst	*origin;
+	t_list	*origin;
 
 	i = 0;
 	origin = lst;
 	while (lst != NULL)
 	{
-		size = ft_strlen(lst->name) + ft_strlen(lst->content) + 1;
+		size = ft_strlen(lst->content) + 1;
 		if (!((*array)[i] = (char*)ft_memalloc(size + 1)))
 			return ;
 		i++;
@@ -60,10 +52,10 @@ static void	create_line(t_lst *lst, char ***array)
 	lst = origin;
 }
 
-static int	lst_size(t_lst *lst)
+static int	lst_size(t_list *lst)
 {
 	int		size;
-	t_lst	*origin;
+	t_list	*origin;
 
 	origin = lst;
 	size = 0;
@@ -76,11 +68,11 @@ static int	lst_size(t_lst *lst)
 	return (size);
 }
 
-char	**list_to_tab(t_lst *lst)
+char	**list_to_array(t_list *lst)
 {
 	char	**array;
 	int		size;
-	t_lst	*origin;
+	t_list	*origin;
 
 	origin = lst;
 	array = NULL;
@@ -91,20 +83,4 @@ char	**list_to_tab(t_lst *lst)
 	lst = origin;
 	fill_lst(lst, &array);
 	return (array);
-}
-
-void	del_array(char *array[])
-{
-	int i;
-
-	i = 0;
-	if (!array || !array[0])
-		return ;
-	while (array[i])
-	{
-		free(array[i]);
-		i++;
-	}
-	free(array[i]);
-	free(array);
 }

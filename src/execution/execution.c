@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 11:11:14 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/08 13:44:16 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,10 @@ void	run_redir_great(t_ast_node *ast_tree, int in_fork)
 	int		fd_default;
 
 	fd_default = 1;
-	new_fd = open(ast_tree->right->content, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR);
+	new_fd = open(ast_tree->right->content->content,
+			O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR);
 	if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
-		fd_default = ft_atoi(ast_tree->left->content);
+		fd_default = ft_atoi(ast_tree->left->content->content);
 	tmp_out = dup(fd_default);
 	if (first == 0)
 	{
@@ -93,9 +94,10 @@ void	run_redir_dgreat(t_ast_node *ast_tree, int in_fork)
 	int		fd_default;
 
 	fd_default = 1;
-	new_fd = open(ast_tree->right->content, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
+	new_fd = open(ast_tree->right->content->content,
+			O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
 	if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
-		fd_default = ft_atoi(ast_tree->left->content);
+		fd_default = ft_atoi(ast_tree->left->content->content);
 	tmp_out = dup(fd_default);
 	if (first == 0)
 	{
@@ -121,13 +123,13 @@ void	run_redir_less(t_ast_node *ast_tree, int in_fork)
 
 	fd_default = 0;
 	if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
-		fd_default = ft_atoi(ast_tree->left->content);
-	new_fd = open(ast_tree->right->content, O_RDONLY, S_IRUSR | S_IWUSR);
+		fd_default = ft_atoi(ast_tree->left->content->content);
+	new_fd = open(ast_tree->right->content->content, O_RDONLY, S_IRUSR | S_IWUSR);
 	tmp_in = dup(fd_default);
 	if (new_fd == -1)
 	{
 		ft_putstr_fd("lsh: ", 2);
-		ft_putstr_fd(ast_tree->right->content, 2);
+		ft_putstr_fd(ast_tree->right->content->content, 2);
 		ft_putstr_fd(": No such file or directory\n", 2);
 		if (in_fork)
 			exit(1);
@@ -157,7 +159,7 @@ void	run_semicolon(t_ast_node *ast_tree)
 
 void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
 {
-	char		*line;
+	t_list		*line;
 	pid_t		child;
 	int			p[2];
 	int			tmp_in;
@@ -169,7 +171,11 @@ void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
 	{
 		dup2(p[WRITE_END], 1);
 		close(READ_END);
-		ft_putstr(line);
+		while (line)
+		{
+			ft_putstr(line->content);
+			line = line->next;
+		}
 		exit(0);
 	}
 	else
@@ -177,8 +183,8 @@ void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
 		wait(NULL);
 		if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
 		{
-			tmp_in = dup(ft_atoi(ast_tree->left->content));
-			dup2(p[READ_END], ft_atoi(ast_tree->left->content));
+			tmp_in = dup(ft_atoi(ast_tree->left->content->content));
+			dup2(p[READ_END], ft_atoi(ast_tree->left->content->content));
 			close(p[WRITE_END]);
 			main_exec(ast_tree->left->left, in_fork, 10);
 		}
@@ -190,7 +196,7 @@ void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
 			main_exec(ast_tree->left, in_fork, 10);
 		}
 		if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
-			dup2(tmp_in, ft_atoi(ast_tree->left->content));
+			dup2(tmp_in, ft_atoi(ast_tree->left->content->content));
 		else
 			dup2(tmp_in, 0);
 	}
@@ -218,34 +224,37 @@ void	run_greatand(t_ast_node *ast_tree, int in_fork, int fd_min)
 	fd_default = 1;
 	fd_new = -1;
 	if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
-		fd_default = ft_atoi(ast_tree->left->content);
+		fd_default = ft_atoi(ast_tree->left->content->content);
 	dup2(fd_default, fd_min);
-	if (ft_strequ(ast_tree->right->content, "-"))
+	if (ft_strequ(ast_tree->right->content->content, "-"))
 		close(fd_default);
 	else
 	{
-		if (ft_isnumber(ast_tree->right->content) && ft_atoi(ast_tree->right->content) > 9)
+		if (ft_isnumber(ast_tree->right->content->content) &&
+				ft_atoi(ast_tree->right->content->content) > 9)
 		{
 			ft_putstr_fd("lsh: ", 2);
-			ft_putstr_fd(ast_tree->right->content, 2);
+			ft_putstr_fd(ast_tree->right->content->content, 2);
 			ft_putendl_fd(": illegal file descriptor name", 2);
 			if (in_fork)
 				exit(1);
 			else
 				return ;
 		}
-		else if (ft_isnumber(ast_tree->right->content) && (fd_new = dup(ft_atoi(ast_tree->right->content))) == -1)
+		else if (ft_isnumber(ast_tree->right->content->content)
+				&& (fd_new = dup(ft_atoi(ast_tree->right->content->content))) == -1)
 		{
 			ft_putstr_fd("lsh: ", 2);
-			ft_putstr_fd(ast_tree->right->content, 2);
+			ft_putstr_fd(ast_tree->right->content->content, 2);
 			ft_putendl_fd(": Bad file descriptor", 2);
 			if (in_fork)
 				exit(1);
 			else
 				return ;
 		}
-		else if (!ft_isnumber(ast_tree->right->content))
-			fd_new = open(ast_tree->right->content, O_RDWR | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR);
+		else if (!ft_isnumber(ast_tree->right->content->content))
+			fd_new = open(ast_tree->right->content->content,
+					O_RDWR | O_TRUNC | O_CREAT, S_IRUSR | S_IWUSR);
 		dup2(fd_default, fd_new);
 		close(fd_default);
 	}
@@ -265,36 +274,38 @@ void	run_lessand(t_ast_node *ast_tree, int in_fork, int fd_min)
 	fd_default = 0;
 	fd_new = -1;
 	if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
-		fd_default = ft_atoi(ast_tree->left->content);
+		fd_default = ft_atoi(ast_tree->left->content->content);
 	dup2(fd_default, fd_min);
-	if (ft_strequ(ast_tree->right->content, "-"))
+	if (ft_strequ(ast_tree->right->content->content, "-"))
 		close(fd_default);
 	else
 	{
-		if (ft_isnumber(ast_tree->right->content) && ft_atoi(ast_tree->right->content) > 9)
+		if (ft_isnumber(ast_tree->right->content->content)
+				&& ft_atoi(ast_tree->right->content->content) > 9)
 		{
 			ft_putstr_fd("lsh: ", 2);
-			ft_putstr_fd(ast_tree->right->content, 2);
+			ft_putstr_fd(ast_tree->right->content->content, 2);
 			ft_putendl_fd(": illegal file descriptor name", 2);
 			if (in_fork)
 				exit(1);
 			else
 				return ;
 		}
-		else if (ft_isnumber(ast_tree->right->content) && (fd_new = dup(ft_atoi(ast_tree->right->content))) == -1)
+		else if (ft_isnumber(ast_tree->right->content->content) &&
+				(fd_new = dup(ft_atoi(ast_tree->right->content->content))) == -1)
 		{
 			ft_putstr_fd("lsh: ", 2);
-			ft_putstr_fd(ast_tree->right->content, 2);
+			ft_putstr_fd(ast_tree->right->content->content, 2);
 			ft_putendl_fd(": Bad file descriptor", 2);
 			if (in_fork)
 				exit(1);
 			else
 				return ;
 		}
-		else if (!ft_isnumber(ast_tree->right->content))
+		else if (!ft_isnumber(ast_tree->right->content->content))
 		{
 			ft_putstr_fd("lsh: ", 2);
-			ft_putstr_fd(ast_tree->right->content, 2);
+			ft_putstr_fd(ast_tree->right->content->content, 2);
 			ft_putendl_fd(": ambiguous redirect", 2);
 			if (in_fork)
 				exit(1);
@@ -349,7 +360,7 @@ int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
 	char	*tmp;
 	pid_t	child;
 	char	*builtins[] =
-			{"cd", "echo", "exit"/*, "env"*/, "setenv", "unsetenv", NULL};
+			{/*"cd", "echo", "exit", "env", */"setenv", "unsetenv", NULL};
 
 	//Faire un tableau de pointeur sur fonction ou autre + leaks.
 	if (ast_tree->type == PIPE)
@@ -370,7 +381,7 @@ int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
 		run_lessand(ast_tree, in_fork, fd_min);
 	else
 	{
-		cmd = ft_strsplit(ast_tree->content, ' ');
+		cmd = list_to_array(ast_tree->content);
 		tmp = ft_strdup(cmd[0]);
 		if (!ft_strcmp(cmd[0], "wc") || !ft_strcmp(cmd[0], "sort") ||
 				!ft_strcmp(cmd[0], "less") || !ft_strcmp(cmd[0], "env"))

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 11:11:06 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/08 13:24:01 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,15 @@ enum {
 	BLANK,
 };
 
+typedef struct	s_heredoc
+{
+	t_list				*content;
+	struct s_heredoc	*next;
+}				t_heredoc;
 typedef struct	s_ast_node
 {
 	int					type;
-	char				*content;
+	t_list				*content;
 	struct s_ast_node	*right;
 	struct s_ast_node	*left;
 }				t_ast_node;
@@ -66,7 +71,7 @@ typedef struct	s_token
 }				t_token;
 
 int		execution(t_ast_node *ast_tree, char **env);
-char	*here_doc(char *delimiter, int option);
+t_list	*here_doc(char *delimiter, int option);
 void	main_expand(t_ast_node **ast_tree);
 
 /* ************************ */
@@ -75,6 +80,7 @@ void	main_expand(t_ast_node **ast_tree);
 
 void	ft_setenv(char **cmd);
 void	ft_unsetenv(char **cmd);
+char	**list_to_array(t_list *lst);
 char	**list_to_tab(t_lst *lst);
 t_lst	*tab_to_list(char *array[]);
 
