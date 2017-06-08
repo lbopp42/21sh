@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 13:24:01 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/08 14:01:53 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,11 @@ char	**list_to_array(t_list *lst);
 char	**list_to_tab(t_lst *lst);
 t_lst	*tab_to_list(char *array[]);
 
+/* ************************ */
+/*  		 EXPAND			*/
+/* ************************ */
+
+void	launch_expand(t_list **list);
 
 void	add_to_current_tok(t_token **tok_lst, int i, int type);
 int		big_op(char *content, int i);

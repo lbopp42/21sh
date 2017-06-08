@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 13:44:16 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/08 14:01:50 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,22 +159,23 @@ void	run_semicolon(t_ast_node *ast_tree)
 
 void	run_redir_dless(t_ast_node *ast_tree, int in_fork)
 {
-	t_list		*line;
+	t_list		*list;
 	pid_t		child;
 	int			p[2];
 	int			tmp_in;
 
 	pipe(p);
-	line = here_doc(NULL, 0);
+	list = here_doc(NULL, 0);
+	launch_expand(&list);
 	child = fork();
 	if (child == 0)
 	{
 		dup2(p[WRITE_END], 1);
 		close(READ_END);
-		while (line)
+		while (list)
 		{
-			ft_putstr(line->content);
-			line = line->next;
+			ft_putstr(list->content);
+			list = list->next;
 		}
 		exit(0);
 	}
