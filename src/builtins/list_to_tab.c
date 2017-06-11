@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/01/25 13:45:55 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 13:29:03 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/11 13:14:00 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,13 @@ static void	fill_lst(t_lst *lst, char ***array)
 	{
 		j = 0;
 		k = 0;
-		while (origin->name[j])
+		while (origin->name && origin->name[j])
 		{
 			(*array)[i][j] = origin->name[j];
 			j++;
 		}
 		(*array)[i][j] = '=';
-		while (origin->content[k])
+		while (origin->content && origin->content[k])
 		{
 			(*array)[i][j + 1 + k] = origin->content[k];
 			k++;
@@ -49,9 +49,11 @@ static void	create_line(t_lst *lst, char ***array)
 
 	i = 0;
 	origin = lst;
+	size = 0;
 	while (lst != NULL)
 	{
-		size = ft_strlen(lst->name) + ft_strlen(lst->content) + 1;
+		size = lst->name ? ft_strlen(lst->name) : size;
+		size = lst->content ? size += ft_strlen(lst->content) + 1 : size + 1;
 		if (!((*array)[i] = (char*)ft_memalloc(size + 1)))
 			return ;
 		i++;

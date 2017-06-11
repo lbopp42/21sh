@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/07 17:05:29 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 11:07:01 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/09 12:54:23 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,19 +40,13 @@ void	remove_var(t_lst *env, char *var)
 void	ft_unsetenv(char **cmd)
 {
 	t_lst	*lst;
-	int		i;
 
-	i = 1;
 	lst = tab_to_list(g_env);
-	if (!cmd[1])
+	if (!cmd[0])
 	{
 		ft_putendl_fd("lsh: unsetenv: Too few arguments.", 2);
 		return ;
 	}
-	while (cmd[i])
-	{
-		remove_var(lst, cmd[i]);
-		i += 1;
-	}
+	remove_var(lst, cmd[0]);
 	g_env = list_to_tab(lst);
 }

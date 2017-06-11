@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/05 09:37:02 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 14:15:04 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/09 12:34:04 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,10 @@ char	*get_var_content(char *var_env)
 				(long)ft_strlen(var_env) == ft_strchr(g_env[i], '=')
 				- g_env[i])
 		{
-			free(var_env);
 			return (ft_strchr(g_env[i], '=') + 1);
 		}
 		i += 1;
 	}
-	free(var_env);
 	return (NULL);
 }
 

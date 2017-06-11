@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 14:01:53 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/11 13:14:01 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,16 +78,19 @@ void	main_expand(t_ast_node **ast_tree);
 /*			BUILTINS		*/
 /* ************************ */
 
+int		ft_cd(char **cmd);
 void	ft_setenv(char **cmd);
 void	ft_unsetenv(char **cmd);
 char	**list_to_array(t_list *lst);
 char	**list_to_tab(t_lst *lst);
+void	put_in_env(t_lst **env, char *var, char *valeur);
 t_lst	*tab_to_list(char *array[]);
 
 /* ************************ */
 /*  		 EXPAND			*/
 /* ************************ */
 
+char	*get_var_content(char *var_env);
 void	launch_expand(t_list **list);
 
 void	add_to_current_tok(t_token **tok_lst, int i, int type);
