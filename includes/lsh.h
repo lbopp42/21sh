@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/12 12:51:12 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/12 14:14:44 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,7 @@ void	main_expand(t_ast_node **ast_tree);
 void	del_array(char *array[]);
 void	del_lst(t_lst *lst);
 int		ft_cd(char **cmd);
+void	ft_echo(char **cmd);
 void	ft_setenv(char **cmd);
 void	ft_unsetenv(char **cmd);
 char	**list_to_array(t_list *lst);

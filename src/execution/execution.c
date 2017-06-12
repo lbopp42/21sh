@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/09 16:14:29 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/12 14:59:20 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -355,6 +355,8 @@ void	launch_builtin(char	**cmd)
 		ft_setenv(cmd + 1);
 	else if (ft_strequ(cmd[0], "cd"))
 		ft_cd(cmd);
+	else if (ft_strequ(cmd[0], "echo"))
+		ft_echo(cmd);
 }
 
 int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
@@ -363,7 +365,7 @@ int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
 	char	*tmp;
 	pid_t	child;
 	char	*builtins[] =
-			{"cd", /*"echo", "exit", "env", */"setenv", "unsetenv", NULL};
+			{"cd", "echo", /*"exit", "env", */"setenv", "unsetenv", NULL};
 
 	//Faire un tableau de pointeur sur fonction ou autre + leaks.
 	if (ast_tree->type == PIPE)
