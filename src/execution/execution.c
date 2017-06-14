@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/14 15:19:53 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/14 17:21:36 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -359,39 +359,82 @@ void	launch_builtin(char	**cmd, int in_fork)
 		g_last_status = ft_env(cmd, in_fork);
 }
 
+int		verif_path(char *path, char *perm, char **cmd)
+{
+	if (!path && perm)
+	{
+		ft_putstr_fd("lsh: ", 2);
+		ft_putstr_fd(perm, 2);
+		ft_putendl_fd(": Permission denied", 2);
+	}
+	else if (!path && !perm)
+	{
+		ft_putstr_fd("lsh: ", 2);
+		ft_putstr_fd(*cmd, 2);
+		ft_putendl_fd(": command not found", 2);
+	}
+	else if (path)
+	{
+		ft_strdel(cmd);
+		*cmd = ft_strdup(path);
+		return (1);
+	}
+	return (0);
+}
+
+int		find_abs_path(char **cmd)
+{
+	char	**paths;
+	char	*perm;
+	int		i;
+
+	perm = NULL;
+	if ((*cmd)[0] != '/')
+	{
+		i = 0;
+		paths = ft_strsplit(get_var_content("PATH"), ':');
+		while (paths[i])
+		{
+			paths[i] = ft_addslash(paths[i], *cmd);
+			if (!access(paths[i], F_OK))
+			{
+				if (!access(paths[i], X_OK))
+					break ;
+				else
+					perm = perm ? perm : paths[i];
+			}
+			i += 1;
+		}
+		if (!verif_path(paths[i], perm, cmd))
+			return (0);
+	}
+	return (1);
+}
+
 void	execution_cmd(t_list *content, int in_fork)
 {
 	char	**cmd;
-	char	*tmp;
 	pid_t	child;
 	char	*builtins[] =
 			{"cd", "echo", "exit", "env", "setenv", "unsetenv", NULL};
 
 	cmd = list_to_array(content);
-	tmp = ft_strdup(cmd[0]);
-	if (!ft_strcmp(cmd[0], "wc") || !ft_strcmp(cmd[0], "sort") ||
-			!ft_strcmp(cmd[0], "less"))
-	{	
-		free(cmd[0]);
-		cmd[0] = ft_strjoin("/usr/bin/", tmp);
-	}
-	else if (!ft_isinarray(cmd[0], builtins))
-	{
-		free(cmd[0]);
-		cmd[0] = ft_strjoin("/bin/", tmp);
-	}
-	if (in_fork && !ft_isinarray(cmd[0], builtins))
-		execve(cmd[0], cmd, NULL);
-	else if (!ft_isinarray(cmd[0], builtins))
-	{
-		child = fork();
-		if (child == 0)
-			execve(cmd[0], cmd, g_env);
-		else
-			wait(NULL);
-	}
-	else
+	if (ft_isinarray(cmd[0], builtins))
 		launch_builtin(cmd, in_fork);
+	else
+	{
+		find_abs_path(&cmd[0]);
+		if (in_fork)
+			execve(cmd[0], cmd, NULL);
+		else
+		{
+			child = fork();
+			if (child == 0)
+				execve(cmd[0], cmd, g_env);
+			else
+				wait(NULL);
+		}
+	}
 }
 
 int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)

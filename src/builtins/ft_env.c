@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/14 10:42:02 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/14 15:19:51 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/14 16:15:59 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,7 @@ int		ft_env(char **cmd, int in_fork)
 		{
 			cmd_list = array_to_list(&cmd[i]);
 			//Completer de PATH (ls -> /bin/ls) avant d'envoyer
+			//Attention si on a un PATH=... il faut use ce nouveau path
 			g_env = list_to_tab(env);
 			del_lst(env);
 			execution_cmd(cmd_list, 1);
