@@ -1,39 +1,13 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_exit.c                                          :+:      :+:    :+:   */
+/*   array_to_list.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/14 10:07:15 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/14 11:04:23 by lbopp            ###   ########.fr       */
+/*   Created: 2017/06/14 13:23:29 by lbopp             #+#    #+#             */
+/*   Updated: 2017/06/14 13:23:40 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
-
-int		ft_exit(char **cmd)
-{
-	int	i;
-
-	ft_putendl_fd("exit", 2);
-	if (cmd[1])
-	{
-		i = 0;
-		while (cmd[1][i])
-		{
-			if (!ft_isdigit(cmd[1][i]))
-			{
-				ft_putstr_fd("lsh: exit: ", 2);
-				ft_putstr_fd(cmd[1], 2);
-				ft_putendl_fd(": numeric argument required", 2);
-				exit(255);
-			}
-			i += 1;
-		}
-		exit(ft_atoi(cmd[1]));
-	}
-	else
-		exit(g_last_status);
-	return (1);
-}

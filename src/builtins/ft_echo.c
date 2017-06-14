@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/12 13:01:19 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/12 15:44:46 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/14 11:03:48 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ int		isother(char *c)
 	return (0);
 }
 
-void	ft_echo(char **cmd)
+int		ft_echo(char **cmd)
 {
 	int				i;
 	int				j;
@@ -105,7 +105,7 @@ void	ft_echo(char **cmd)
 		{
 			k = 0;
 			if (cmd[i][j] == '\\' && cmd[i][j + 1] && cmd[i][j + 1] == 'c')
-				return ;
+				return (0);
 			while (k < 8 && cmd[i][j])
 				if (back_func[k++](&cmd[i][j]))
 				{
@@ -115,4 +115,5 @@ void	ft_echo(char **cmd)
 		}
 	}
 	ft_putchar('\n');
+	return (0);
 }

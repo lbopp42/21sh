@@ -6,16 +6,12 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/14 10:34:50 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/14 15:19:53 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
 #include <fcntl.h>
-
-#define READ_END 0
-#define WRITE_END 1
-#define ERROR_NO_FILE 1
 
 /*static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
 {
@@ -347,28 +343,59 @@ void	launch_pipe(t_ast_node *ast_tree)
 		run_pipe(ast_tree);
 }
 
-void	launch_builtin(char	**cmd)
+void	launch_builtin(char	**cmd, int in_fork)
 {
 	if (ft_strequ(cmd[0], "unsetenv"))
-		ft_unsetenv(cmd + 1);
+		g_last_status = ft_unsetenv(cmd + 1);
 	else if (ft_strequ(cmd[0], "setenv"))
-		ft_setenv(cmd + 1);
+		g_last_status = ft_setenv(cmd + 1);
 	else if (ft_strequ(cmd[0], "cd"))
-		ft_cd(cmd);
+		g_last_status = ft_cd(cmd);
 	else if (ft_strequ(cmd[0], "echo"))
-		ft_echo(cmd);
+		g_last_status = ft_echo(cmd);
 	else if (ft_strequ(cmd[0], "exit"))
-		ft_exit(cmd);
+		g_last_status = ft_exit(cmd);
+	else if (ft_strequ(cmd[0], "env"))
+		g_last_status = ft_env(cmd, in_fork);
 }
 
-int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
+void	execution_cmd(t_list *content, int in_fork)
 {
 	char	**cmd;
 	char	*tmp;
 	pid_t	child;
 	char	*builtins[] =
-			{"cd", "echo", "exit", /*"env", */"setenv", "unsetenv", NULL};
+			{"cd", "echo", "exit", "env", "setenv", "unsetenv", NULL};
 
+	cmd = list_to_array(content);
+	tmp = ft_strdup(cmd[0]);
+	if (!ft_strcmp(cmd[0], "wc") || !ft_strcmp(cmd[0], "sort") ||
+			!ft_strcmp(cmd[0], "less"))
+	{	
+		free(cmd[0]);
+		cmd[0] = ft_strjoin("/usr/bin/", tmp);
+	}
+	else if (!ft_isinarray(cmd[0], builtins))
+	{
+		free(cmd[0]);
+		cmd[0] = ft_strjoin("/bin/", tmp);
+	}
+	if (in_fork && !ft_isinarray(cmd[0], builtins))
+		execve(cmd[0], cmd, NULL);
+	else if (!ft_isinarray(cmd[0], builtins))
+	{
+		child = fork();
+		if (child == 0)
+			execve(cmd[0], cmd, g_env);
+		else
+			wait(NULL);
+	}
+	else
+		launch_builtin(cmd, in_fork);
+}
+
+int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
+{
 	//Faire un tableau de pointeur sur fonction ou autre + leaks.
 	if (ast_tree->type == PIPE)
 		launch_pipe(ast_tree);
@@ -387,33 +414,7 @@ int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
 	else if (ast_tree->type == LESSAND)
 		run_lessand(ast_tree, in_fork, fd_min);
 	else
-	{
-		cmd = list_to_array(ast_tree->content);
-		tmp = ft_strdup(cmd[0]);
-		if (!ft_strcmp(cmd[0], "wc") || !ft_strcmp(cmd[0], "sort") ||
-				!ft_strcmp(cmd[0], "less") || !ft_strcmp(cmd[0], "env"))
-		{	
-			free(cmd[0]);
-			cmd[0] = ft_strjoin("/usr/bin/", tmp);
-		}
-		else if (!ft_isinarray(cmd[0], builtins))
-		{
-			free(cmd[0]);
-			cmd[0] = ft_strjoin("/bin/", tmp);
-		}
-		if (in_fork && !ft_isinarray(cmd[0], builtins))
-			execve(cmd[0], cmd, NULL);
-		else if (!ft_isinarray(cmd[0], builtins))
-		{
-			child = fork();
-			if (child == 0)
-				execve(cmd[0], cmd, g_env);
-			else
-				wait(NULL);
-		}
-		else
-			launch_builtin(cmd);
-	}
+		execution_cmd(ast_tree->content, in_fork);
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/08 11:01:13 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/11 13:14:01 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/14 11:02:38 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void	put_in_env(t_lst **env, char *var, char *valeur)
 	fill_env(env, var, valeur);
 }
 
-void	ft_setenv(char **cmd)
+int		ft_setenv(char **cmd)
 {
 	t_lst	*env;
 
@@ -69,8 +69,9 @@ void	ft_setenv(char **cmd)
 	if (!cmd[0] || !cmd[1])
 	{
 		ft_putstr_fd("lsh: setenv: Too few argument\n", 2);
-		return ;
+		return (1);
 	}
 	put_in_env(&env, cmd[0], cmd[1]);
 	g_env = list_to_tab(env);
+	return (0);
 }

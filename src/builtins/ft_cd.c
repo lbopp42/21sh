@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/09 10:50:30 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/12 12:57:50 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/14 13:17:45 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,6 +200,8 @@ int		ft_cd(char **cmd)
 	int		i;
 
 	i = parser_cd_opt(cmd);
+	if (i == -1)
+		return (1);
 	env = tab_to_list(g_env);
 	if (!exec_without_cdpath(cmd[i], &env))
 	{

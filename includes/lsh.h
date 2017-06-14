@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/14 10:34:52 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/14 15:19:52 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ int		g_last_status;
 
 #include "libft.h"
 #include <stdio.h>
+#define READ_END 0
+#define WRITE_END 1
 
 enum {
 	SEMICOLON = 0,
@@ -82,11 +84,11 @@ void	main_expand(t_ast_node **ast_tree);
 void	del_array(char *array[]);
 void	del_lst(t_lst *lst);
 int		ft_cd(char **cmd);
-void	ft_echo(char **cmd);
-void	ft_exit(char **cmd);
-void	ft_setenv(char **cmd);
-void	ft_unsetenv(char **cmd);
-char	**list_to_array(t_list *lst);
+int		ft_echo(char **cmd);
+int		ft_env(char **cmd, int in_fork);
+int		ft_exit(char **cmd);
+int		ft_setenv(char **cmd);
+int		ft_unsetenv(char **cmd);
 char	**list_to_tab(t_lst *lst);
 void	put_in_env(t_lst **env, char *var, char *valeur);
 t_lst	*tab_to_list(char *array[]);
@@ -97,6 +99,18 @@ t_lst	*tab_to_list(char *array[]);
 
 char	*get_var_content(char *var_env);
 void	launch_expand(t_list **list);
+
+/* ************************ */
+/*			PARSER			*/
+/* ************************ */
+
+char	**list_to_array(t_list *lst);
+
+/* ************************ */
+/*		   EXECUTION	  	*/
+/* ************************ */
+
+void	execution_cmd(t_list *content, int in_fork);
 
 void	add_to_current_tok(t_token **tok_lst, int i, int type);
 int		big_op(char *content, int i);

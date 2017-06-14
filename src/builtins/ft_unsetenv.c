@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/07 17:05:29 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/09 12:54:23 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/14 11:01:59 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	remove_var(t_lst *env, char *var)
 	}
 }
 
-void	ft_unsetenv(char **cmd)
+int		ft_unsetenv(char **cmd)
 {
 	t_lst	*lst;
 
@@ -45,8 +45,9 @@ void	ft_unsetenv(char **cmd)
 	if (!cmd[0])
 	{
 		ft_putendl_fd("lsh: unsetenv: Too few arguments.", 2);
-		return ;
+		return (1);
 	}
 	remove_var(lst, cmd[0]);
 	g_env = list_to_tab(lst);
+	return (0);
 }
