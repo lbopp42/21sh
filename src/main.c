@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 10:57:44 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/14 10:34:54 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ int		main(int ac, char **av, char **env)
 	int		nb_tok;
 
 	(void)ac;
+	last_status = 
 	g_env = env;
 	(void)av;
 	while (1)

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/12 14:14:44 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/14 10:34:52 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 char	*g_line;
 char	**g_env;
+int		g_last_status;
 
 #include "libft.h"
 #include <stdio.h>
@@ -82,6 +83,7 @@ void	del_array(char *array[]);
 void	del_lst(t_lst *lst);
 int		ft_cd(char **cmd);
 void	ft_echo(char **cmd);
+void	ft_exit(char **cmd);
 void	ft_setenv(char **cmd);
 void	ft_unsetenv(char **cmd);
 char	**list_to_array(t_list *lst);
