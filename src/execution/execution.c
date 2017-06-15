@@ -6,12 +6,13 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/14 17:21:36 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/15 14:09:04 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
 #include <fcntl.h>
+#include <sys/stat.h>
 
 /*static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
 {
@@ -384,12 +385,13 @@ int		verif_path(char *path, char *perm, char **cmd)
 
 int		find_abs_path(char **cmd)
 {
-	char	**paths;
-	char	*perm;
-	int		i;
+	char		**paths;
+	char		*perm;
+	int			i;
+	struct stat	st;
 
 	perm = NULL;
-	if ((*cmd)[0] != '/')
+	if ((*cmd)[0] != '/' && (*cmd)[0] != '.')
 	{
 		i = 0;
 		paths = ft_strsplit(get_var_content("PATH"), ':');
@@ -408,6 +410,34 @@ int		find_abs_path(char **cmd)
 		if (!verif_path(paths[i], perm, cmd))
 			return (0);
 	}
+	else if ((*cmd)[0] == '.')
+	{
+		if (!access(*cmd, F_OK))
+		{
+			lstat(cmd[0], &st);
+			if (S_ISDIR(st.st_mode))
+			{
+				ft_putstr_fd("lsh: ", 2);
+				ft_putstr_fd(*cmd, 2);
+				ft_putendl_fd(": is a directory", 2);
+				return (0);
+			}
+			else if (access(*cmd, X_OK))
+			{
+				ft_putstr_fd("lsh: ", 2);
+				ft_putstr_fd(*cmd, 2);
+				ft_putendl_fd(": Permission denied", 2);
+				return (0);
+			}
+		}
+		else
+		{
+			ft_putstr_fd("lsh: ", 2);
+			ft_putstr_fd(*cmd, 2);
+			ft_putendl_fd(": No such file or directory", 2);
+			return (0);
+		}
+	}
 	return (1);
 }
 
@@ -423,7 +453,9 @@ void	execution_cmd(t_list *content, int in_fork)
 		launch_builtin(cmd, in_fork);
 	else
 	{
-		find_abs_path(&cmd[0]);
+		//check le retour de cette fonction !
+		if (!find_abs_path(&cmd[0]))
+			return ;
 		if (in_fork)
 			execve(cmd[0], cmd, NULL);
 		else
