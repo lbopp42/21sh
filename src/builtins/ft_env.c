@@ -6,11 +6,20 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/14 10:42:02 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/14 16:15:59 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/16 10:56:06 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
+
+int		error_env_opt(char option)
+{
+	ft_putstr_fd("env: illegal option -- ", 2);
+	ft_putchar_fd(option, 2);
+	ft_putstr_fd("\nusage: env [-i] ", 2);
+	ft_putendl_fd("[name=value ...] [utility [argument ...]]", 2);
+	return (-1);
+}
 
 int		check_opt_env(char **cmd, int *option)
 {
@@ -27,18 +36,12 @@ int		check_opt_env(char **cmd, int *option)
 			while (cmd[i][j])
 			{
 				if (cmd[i][j] != 'i')
-				{
-					ft_putstr_fd("env: illegal option -- ", 2);
-					ft_putchar_fd(cmd[i][j], 2);
-					ft_putstr_fd("\nusage: env [-i] ", 2);
-					ft_putendl_fd("[name=value ...] [utility [argument ...]]", 2);
-					return (-1);
-				}
+					return (error_env_opt(cmd[i][j]));
 				j += 1;
 			}
 		}
 		else
-			break;
+			break ;
 		i += 1;
 	}
 	return (i);
@@ -94,12 +97,57 @@ void	var_in_env(char *cmd, t_lst **env)
 	ft_strdel(&name);
 }
 
+void	exec_utility(t_lst **env, char **cmd, int ch_path)
+{
+	t_list	*cmd_list;
+
+	cmd_list = array_to_list(cmd);
+	if (ch_path)
+	{
+		g_env = list_to_tab(*env);
+		del_lst(*env);
+		execution_cmd(cmd_list, 1, get_var_content("PATH"));
+	}
+	else
+	{
+		del_lst(*env);
+		execution_cmd(cmd_list, 1, get_var_content("PATH"));
+	}
+}
+
+void	exec_ft_env(int option, int i, char **cmd)
+{
+	t_lst	*env;
+	int		ch_path;
+
+	ch_path = 0;
+	env = option ? NULL : tab_to_list(g_env);
+	while (cmd[i])
+	{
+		if (ft_strchr(cmd[i], '='))
+		{
+			if (ft_strnequ(cmd[i], "PATH", ft_strchr(cmd[i], '=') - cmd[i]) &&
+					ft_strchr(cmd[i], '=') - cmd[i] == 4)
+				ch_path = 1;
+			var_in_env(cmd[i], &env);
+		}
+		else
+			break ;
+		i += 1;
+	}
+	if (!cmd[i])
+	{
+		print_env(env);
+		exit(0);
+	}
+	else
+		exec_utility(&env, &cmd[i], ch_path);
+}
+
 int		ft_env(char **cmd, int in_fork)
 {
 	int		i;
 	int		option;
-	t_lst	*env;
-	t_list	*cmd_list;
 	pid_t	child;
 
 	option = 0;
@@ -108,31 +156,7 @@ int		ft_env(char **cmd, int in_fork)
 		return (1);
 	child = in_fork ? 0 : fork();
 	if (child == 0)
-	{
-		env = option ? NULL : tab_to_list(g_env);
-		while (cmd[i])
-		{
-			if (ft_strchr(cmd[i], '='))
-				var_in_env(cmd[i], &env);
-			else
-				break ;
-			i += 1;
-		}
-		if (!cmd[i])
-		{
-			print_env(env);
-			exit(0);
-		}
-		else
-		{
-			cmd_list = array_to_list(&cmd[i]);
-			//Completer de PATH (ls -> /bin/ls) avant d'envoyer
-			//Attention si on a un PATH=... il faut use ce nouveau path
-			g_env = list_to_tab(env);
-			del_lst(env);
-			execution_cmd(cmd_list, 1);
-		}
-	}
+		exec_ft_env(option, i, cmd);
 	else
 		wait(NULL);
 	return (0);

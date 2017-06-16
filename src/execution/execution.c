@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/15 14:09:04 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/16 10:59:26 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -383,7 +383,7 @@ int		verif_path(char *path, char *perm, char **cmd)
 	return (0);
 }
 
-int		find_abs_path(char **cmd)
+int		find_abs_path(char **cmd, char *path)
 {
 	char		**paths;
 	char		*perm;
@@ -391,10 +391,10 @@ int		find_abs_path(char **cmd)
 	struct stat	st;
 
 	perm = NULL;
-	if ((*cmd)[0] != '/' && (*cmd)[0] != '.')
+	if ((*cmd)[0] != '/' && (*cmd)[0] != '.' && path && ft_strlen(path))
 	{
 		i = 0;
-		paths = ft_strsplit(get_var_content("PATH"), ':');
+		paths = ft_strsplit(path, ':');
 		while (paths[i])
 		{
 			paths[i] = ft_addslash(paths[i], *cmd);
@@ -410,7 +410,7 @@ int		find_abs_path(char **cmd)
 		if (!verif_path(paths[i], perm, cmd))
 			return (0);
 	}
-	else if ((*cmd)[0] == '.')
+	else if ((*cmd)[0] == '.' || !path || !ft_strlen(path))
 	{
 		if (!access(*cmd, F_OK))
 		{
@@ -441,7 +441,7 @@ int		find_abs_path(char **cmd)
 	return (1);
 }
 
-void	execution_cmd(t_list *content, int in_fork)
+void	execution_cmd(t_list *content, int in_fork, char *path)
 {
 	char	**cmd;
 	pid_t	child;
@@ -453,11 +453,10 @@ void	execution_cmd(t_list *content, int in_fork)
 		launch_builtin(cmd, in_fork);
 	else
 	{
-		//check le retour de cette fonction !
-		if (!find_abs_path(&cmd[0]))
+		if (!find_abs_path(&cmd[0], path))
 			return ;
 		if (in_fork)
-			execve(cmd[0], cmd, NULL);
+			execve(cmd[0], cmd, g_env);
 		else
 		{
 			child = fork();
@@ -489,7 +488,7 @@ int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
 	else if (ast_tree->type == LESSAND)
 		run_lessand(ast_tree, in_fork, fd_min);
 	else
-		execution_cmd(ast_tree->content, in_fork);
+		execution_cmd(ast_tree->content, in_fork, get_var_content("PATH"));
 	return (0);
 }
 

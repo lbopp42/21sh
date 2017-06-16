@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/14 15:19:52 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/16 10:04:20 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ char	**list_to_array(t_list *lst);
 /*		   EXECUTION	  	*/
 /* ************************ */
 
-void	execution_cmd(t_list *content, int in_fork);
+void	execution_cmd(t_list *content, int in_fork, char *path);
 
 void	add_to_current_tok(t_token **tok_lst, int i, int type);
 int		big_op(char *content, int i);
