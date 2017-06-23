@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/16 10:59:26 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/18 10:01:16 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,13 @@ void	run_pipe(t_ast_node *ast_tree)
 		close(p[WRITE_END]);
 		main_exec(ast_tree->left, 1, 10);
 	}
-	if (child > 0)
-		wait(NULL);
+	else if (child > 0)
+	{
 		dup2(p[READ_END], STDIN_FILENO);
 		close(p[WRITE_END]);
 		close(p[READ_END]);
 		main_exec(ast_tree->right, 1, 10);
+	}
 }
 
 void	run_redir_great(t_ast_node *ast_tree, int in_fork)
@@ -331,12 +332,11 @@ void	launch_pipe(t_ast_node *ast_tree)
 		fork_nb = 1;
 		child = fork();
 		if (child == 0)
-		{
 			run_pipe(ast_tree);
-		}
 		if (child > 0)
 		{
-			wait(NULL);
+			while (wait(NULL) > 0);
+			ft_putendl_fd("PIPE FINI\n", 2);
 			fork_nb = 0;
 		}
 	}

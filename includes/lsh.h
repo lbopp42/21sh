@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/16 10:04:20 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/19 10:21:35 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ int		g_last_status;
 #define READ_END 0
 #define WRITE_END 1
 
-enum {
+enum
+{
 	SEMICOLON = 0,
 	PIPE,
 	LESS,
@@ -40,7 +41,15 @@ enum {
 	IO_NUMBER,
 	BLANK,
 };
-
+enum
+{
+	KEY_ENTER,
+	KEY_LEFT,
+	KEY_RIGHT,
+	KEY_UP,
+	KEY_DOWN,
+	KEY_DEL,
+};
 typedef struct	s_heredoc
 {
 	t_list				*content;
