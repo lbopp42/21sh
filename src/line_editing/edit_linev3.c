@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/26 16:11:59 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/26 16:47:48 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 #include <sys/ioctl.h>
 
 struct termios		g_origin_term;
-void	default_term(void);
 typedef struct	s_pos
 {
 	int	x;
@@ -34,6 +33,8 @@ typedef struct	s_lineinfo
 	int		len_max;
 }				t_lineinfo;
 t_lineinfo	*g_linei;
+void	default_term(void);
+void	save_reset_pos(t_pos pos, int mode);
 
 void	init_term()
 {
@@ -86,6 +87,15 @@ int	key_is_arrow_left(const char *buff)
 	return (0);
 }
 
+int	key_is_home(const char *buff)
+{
+	static char	enter_key[] = {91, 72, 0, 0, 0};
+
+	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
 void	key_left_funct(void)
 {
 	struct winsize	ws;
@@ -132,6 +142,16 @@ void	key_right_funct(void)
 	}
 }
 
+void	key_home_funct(void)
+{
+	t_pos	tmp_pos;
+
+	tmp_pos.x = 0;
+	tmp_pos.y = 0;
+	save_reset_pos(tmp_pos, 1);
+	save_reset_pos(g_linei->pos, 2);
+}
+
 void	is_arrow(void)
 {
 	char	buff[6];
@@ -142,6 +162,8 @@ void	is_arrow(void)
 		key_left_funct();
 	if (key_is_arrow_right(buff))
 		key_right_funct();
+	if (key_is_home(buff))
+		key_home_funct();
 }
 
 void	save_reset_pos(t_pos pos, int mode)
@@ -152,7 +174,7 @@ void	save_reset_pos(t_pos pos, int mode)
 	ioctl(1, TIOCGWINSZ, &ws);
 	if (mode == 1)
 		tmp_pos = pos;
-	else if (tmp_pos.x || tmp_pos.y)
+	else
 	{
 		while (g_linei->pos.y > tmp_pos.y)
 		{
