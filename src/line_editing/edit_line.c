@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/16 14:17:58 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/23 11:06:51 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/23 15:51:32 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void	add_char_to_line(char c)
 {
 	struct winsize	ws;
 
+	ioctl(1, TIOCGWINSZ, &ws);
 	if (g_linei->len == g_linei->len)
 	{
 		g_linei->content = realloc_char(&g_linei->content, g_linei->max_len + 20);
@@ -94,7 +95,6 @@ void	add_char_to_line(char c)
 	}
 	else
 	{
-		ioctl(1, TIOCGWINSZ, &ws);
 		ft_memmove(&g_linei->content[g_linei->curs + 1], &g_linei->content[g_linei->curs], ft_strlen(&g_linei->content[g_linei->curs]));
 		g_linei->content[g_linei->curs] = c;
 		ft_putchar(c);
@@ -102,14 +102,15 @@ void	add_char_to_line(char c)
 		ft_putstr(&g_linei->content[g_linei->curs + 1]);
 		tputs(tgetstr("rc", NULL), 1, &put_my_char);
 	}
-	if (g_linei->pos == ws.ws_col)
+	if (g_linei->curs != g_linei->len && g_linei->pos == ws.ws_col)
 	{
 		tputs(tgetstr("up", NULL), 1, &put_my_char);
 		g_linei->pos = 0;
 	}
-	if (g_linei->curs + 1 == ws.ws_col)
+	if (g_linei->col + 1 == ws.ws_col)
 	{
 		tputs(tgetstr("do", NULL), 1, &put_my_char);
+		g_linei->col = 0;
 	}
 	g_linei->curs += 1;
 	g_linei->col += 1;
@@ -171,7 +172,7 @@ void	key_left_funct(void)
 	if (g_linei->curs)
 	{
 		if (g_linei->col == 0)
-			g_linei->col = ws.ws_col;
+			g_linei->col = ws.ws_col + 1;
 		g_linei->curs -= 1;
 		g_linei->col -= 1;
 	}
@@ -256,6 +257,7 @@ int main(void)
 			printf("\nLine = [%s]\n", g_linei->content);
 			printf("Cursor = [%d]\n", g_linei->curs);
 			printf("Len = [%d]\n", g_linei->len);
+			printf("Pos = [%d]\n", g_linei->pos);
 			printf("Winsize = [%d]\n", ws.ws_col);
 			//printf("col = %d et line = %d", getColumnPosition(0, 1), getLinePosition(0, 1));
 			exit(0);
