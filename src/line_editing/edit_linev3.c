@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/26 14:19:01 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/26 16:11:59 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,31 +152,25 @@ void	save_reset_pos(t_pos pos, int mode)
 	ioctl(1, TIOCGWINSZ, &ws);
 	if (mode == 1)
 		tmp_pos = pos;
-	else
+	else if (tmp_pos.x || tmp_pos.y)
 	{
-		if (tmp_pos.x || tmp_pos.y)
+		while (g_linei->pos.y > tmp_pos.y)
 		{
-			while (pos.y > tmp_pos.y)
-			{
-				pos.y -= 1;
-				g_linei->pos.y -= 1;
-				g_linei->curs -= ws.ws_col;
-				tputs(tgetstr("up", NULL), 1, &put_my_char);
-			}
-			while (pos.x > tmp_pos.x)
-			{
-				pos.x -= 1;
-				g_linei->pos.x -= 1;
-				g_linei->curs -= 1;
-				tputs(tgetstr("le", NULL), 1, &put_my_char);
-			}
-			while (pos.x < tmp_pos.x)
-			{
-				pos.x += 1;
-				g_linei->pos.x += 1;
-				g_linei->curs += 1;
-				tputs(tgetstr("nd", NULL), 1, &put_my_char);
-			}
+			g_linei->pos.y -= 1;
+			g_linei->curs -= ws.ws_col;
+			tputs(tgetstr("up", NULL), 1, &put_my_char);
+		}
+		while (g_linei->pos.x > tmp_pos.x)
+		{
+			g_linei->pos.x -= 1;
+			g_linei->curs -= 1;
+			tputs(tgetstr("le", NULL), 1, &put_my_char);
+		}
+		while (g_linei->pos.x < tmp_pos.x)
+		{
+			g_linei->pos.x += 1;
+			g_linei->curs += 1;
+			tputs(tgetstr("nd", NULL), 1, &put_my_char);
 		}
 	}
 }
@@ -201,7 +195,6 @@ void	put_my_str_edit(char *content)
 		}
 		i += 1;
 	}
-	//printf("On sortant pos.x = [%d] et pos.y = [%d]\n", g_linei->pos.x, g_linei->pos.y);
 }
 
 char	*realloc_char(char **ptr, size_t size)
@@ -214,54 +207,76 @@ char	*realloc_char(char **ptr, size_t size)
 	return (new_ptr);
 }
 
-void	add_char_to_line(char c)
+void	add_char_enter_char(char c)
 {
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
-	/*if (g_linei->len == g_linei->len_max)
+	ft_memmove(&g_linei->content[g_linei->curs + 1],
+			&g_linei->content[g_linei->curs],
+			ft_strlen(&g_linei->content[g_linei->curs]));
+	g_linei->content[g_linei->curs] = c;
+	ft_putchar(c);
+	g_linei->curs += 1;
+	g_linei->pos.x += 1;
+	if (g_linei->pos.x == ws.ws_col)
+	{
+		g_linei->pos.x = 0;
+		tputs(tgetstr("do", NULL), 1, &put_my_char);
+		g_linei->pos.y += 1;
+	}
+	save_reset_pos(g_linei->pos, 1);
+	put_my_str_edit(&g_linei->content[g_linei->curs]);
+	save_reset_pos(g_linei->pos, 2);
+	g_linei->len += 1;
+}
+
+void	add_char_at_end(char c)
+{
+	struct winsize	ws;
+
+	ioctl(1, TIOCGWINSZ, &ws);
+	g_linei->content[g_linei->curs] = c;
+	ft_putchar(c);
+	g_linei->curs += 1;
+	g_linei->pos.x += 1;
+		g_linei->len += 1;
+	if (g_linei->pos.x == ws.ws_col)
+	{
+		tputs(tgetstr("do", NULL), 1, &put_my_char);
+		g_linei->pos.y += 1;
+		g_linei->pos.x = 0;
+	}
+}
+
+void	add_char_to_line(char c)
+{
+	if (g_linei->len == g_linei->len_max)
 	{
 		g_linei->content =
 			realloc_char(&g_linei->content, g_linei->len_max + 20);
 		g_linei->len_max += 20;
-	}*/
-	if (g_linei->curs == g_linei->len) //Si on est au bout de la ligne
-	{
-		g_linei->content[g_linei->curs] = c;
-		ft_putchar(c);
-		g_linei->curs += 1;
-		g_linei->pos.x += 1;
-		g_linei->len += 1;
-		if (g_linei->pos.x == ws.ws_col)
-		{
-			tputs(tgetstr("do", NULL), 1, &put_my_char);
-			g_linei->pos.y += 1;
-			g_linei->pos.x = 0;
-		}
 	}
+	if (g_linei->curs == g_linei->len)
+		add_char_at_end(c);
 	else
+		add_char_enter_char(c);
+}
+
+void	del_char(void)
+{
+	if (g_linei->len)
 	{
-		ft_memmove(&g_linei->content[g_linei->curs + 1],
-				&g_linei->content[g_linei->curs],
-				ft_strlen(&g_linei->content[g_linei->curs]));
-		g_linei->content[g_linei->curs] = c;
-		ft_putchar(c);
-		g_linei->curs += 1;
-		g_linei->pos.x += 1;
-		if (g_linei->pos.x == ws.ws_col)
-		{
-			g_linei->pos.x = 0;
-			tputs(tgetstr("do", NULL), 1, &put_my_char);
-			g_linei->pos.y += 1;
-		}
-		save_reset_pos(g_linei->pos, 1);
-		put_my_str_edit(&g_linei->content[g_linei->curs]);
-		save_reset_pos(g_linei->pos, 2);
-		g_linei->len += 1;
+		key_left_funct();
+		tputs(tgetstr("dc", NULL), 1, &put_my_char);
+		ft_memmove(&g_linei->content[g_linei->curs], &g_linei->content[g_linei->curs + 1],
+				ft_strlen(&g_linei->content[g_linei->curs + 1]));
+		g_linei->content[ft_strlen(g_linei->content) - 1] = '\0';
+		g_linei->len -= 1;
 	}
 }
 
-int	main()
+int	main(void)
 {
 	char		buf[1];
 	struct winsize	ws;
@@ -281,6 +296,8 @@ int	main()
 		read(0, buf, 1);
 		if (buf[0] == 27)
 			is_arrow();
+		else if (buf[0] == 127) // Backspace
+			del_char();
 		else if (ft_isprint(buf[0]))
 			add_char_to_line(buf[0]);
 		else if (buf[0] == 10)
