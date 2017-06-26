@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/26 13:14:40 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/26 14:19:01 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,7 @@ void	save_reset_pos(t_pos pos, int mode)
 		tmp_pos = pos;
 	else
 	{
-		if (tmp_pos.x)
+		if (tmp_pos.x || tmp_pos.y)
 		{
 			while (pos.y > tmp_pos.y)
 			{
@@ -201,6 +201,17 @@ void	put_my_str_edit(char *content)
 		}
 		i += 1;
 	}
+	//printf("On sortant pos.x = [%d] et pos.y = [%d]\n", g_linei->pos.x, g_linei->pos.y);
+}
+
+char	*realloc_char(char **ptr, size_t size)
+{
+	char	*new_ptr;
+
+	new_ptr = (char*)ft_memalloc(sizeof(char) * size);
+	ft_memmove(new_ptr, *ptr, ft_strlen(*ptr));
+	//ft_strdel(ptr);
+	return (new_ptr);
 }
 
 void	add_char_to_line(char c)
@@ -208,7 +219,12 @@ void	add_char_to_line(char c)
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
-	//TODO Si plus de 20 char faut rallouer
+	/*if (g_linei->len == g_linei->len_max)
+	{
+		g_linei->content =
+			realloc_char(&g_linei->content, g_linei->len_max + 20);
+		g_linei->len_max += 20;
+	}*/
 	if (g_linei->curs == g_linei->len) //Si on est au bout de la ligne
 	{
 		g_linei->content[g_linei->curs] = c;
@@ -232,6 +248,12 @@ void	add_char_to_line(char c)
 		ft_putchar(c);
 		g_linei->curs += 1;
 		g_linei->pos.x += 1;
+		if (g_linei->pos.x == ws.ws_col)
+		{
+			g_linei->pos.x = 0;
+			tputs(tgetstr("do", NULL), 1, &put_my_char);
+			g_linei->pos.y += 1;
+		}
 		save_reset_pos(g_linei->pos, 1);
 		put_my_str_edit(&g_linei->content[g_linei->curs]);
 		save_reset_pos(g_linei->pos, 2);
