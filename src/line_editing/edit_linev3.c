@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/26 16:47:48 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/26 16:59:11 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,15 @@ int	key_is_home(const char *buff)
 	return (0);
 }
 
+int	key_is_end(const char *buff)
+{
+	static char	enter_key[] = {91, 70, 0, 0, 0};
+
+	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
 void	key_left_funct(void)
 {
 	struct winsize	ws;
@@ -152,6 +161,18 @@ void	key_home_funct(void)
 	save_reset_pos(g_linei->pos, 2);
 }
 
+void	key_end_funct(void)
+{
+	t_pos			tmp_pos;
+	struct winsize	ws;
+
+	ioctl(1, TIOCGWINSZ, &ws);
+	tmp_pos.x = g_linei->len % ws.ws_col;
+	tmp_pos.y = g_linei->len / ws.ws_col;
+	save_reset_pos(tmp_pos, 1);
+	save_reset_pos(g_linei->pos, 2);
+}
+
 void	is_arrow(void)
 {
 	char	buff[6];
@@ -164,6 +185,8 @@ void	is_arrow(void)
 		key_right_funct();
 	if (key_is_home(buff))
 		key_home_funct();
+	if (key_is_end(buff))
+		key_end_funct();
 }
 
 void	save_reset_pos(t_pos pos, int mode)
@@ -181,6 +204,12 @@ void	save_reset_pos(t_pos pos, int mode)
 			g_linei->pos.y -= 1;
 			g_linei->curs -= ws.ws_col;
 			tputs(tgetstr("up", NULL), 1, &put_my_char);
+		}
+		while (g_linei->pos.y < tmp_pos.y)
+		{
+			g_linei->pos.y += 1;
+			g_linei->curs += ws.ws_col;
+			tputs(tgetstr("do", NULL), 1, &put_my_char);
 		}
 		while (g_linei->pos.x > tmp_pos.x)
 		{
