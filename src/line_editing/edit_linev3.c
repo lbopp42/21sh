@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/27 13:16:46 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/27 16:02:56 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -262,7 +262,10 @@ void	key_shift_down_funct()
 	ioctl(1, TIOCGWINSZ, &ws);
 	if (g_linei->pos.y + 1 <= g_linei->len / ws.ws_col)
 	{
-		tmp_pos.x = g_linei->pos.x;
+		if (g_linei->pos.x * (g_linei->pos.y + 1) + ws.ws_col <= g_linei->len)
+			tmp_pos.x = g_linei->pos.x;
+		else
+			tmp_pos.x = g_linei->len - (g_linei->pos.y + 1) * ws.ws_col;
 		tmp_pos.y = g_linei->pos.y + 1;
 		save_reset_pos(tmp_pos, 1);
 		save_reset_pos(g_linei->pos, 2);
@@ -312,6 +315,7 @@ void	save_reset_pos(t_pos pos, int mode)
 		while (g_linei->pos.y < tmp_pos.y)
 		{
 			g_linei->pos.y += 1;
+			g_linei->curs -= g_linei->pos.x;
 			g_linei->pos.x = 0;
 			g_linei->curs += ws.ws_col;
 			tputs(tgetstr("do", NULL), 1, &put_my_char);
