@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/27 16:02:56 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/27 16:23:00 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -262,7 +262,7 @@ void	key_shift_down_funct()
 	ioctl(1, TIOCGWINSZ, &ws);
 	if (g_linei->pos.y + 1 <= g_linei->len / ws.ws_col)
 	{
-		if (g_linei->pos.x * (g_linei->pos.y + 1) + ws.ws_col <= g_linei->len)
+		if (ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col <= g_linei->len)
 			tmp_pos.x = g_linei->pos.x;
 		else
 			tmp_pos.x = g_linei->len - (g_linei->pos.y + 1) * ws.ws_col;
