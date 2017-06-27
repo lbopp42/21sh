@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/26 16:59:11 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/27 10:53:35 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -252,8 +252,10 @@ char	*realloc_char(char **ptr, size_t size)
 {
 	char	*new_ptr;
 
+	new_ptr = NULL;
 	new_ptr = (char*)ft_memalloc(sizeof(char) * size);
-	ft_memmove(new_ptr, *ptr, ft_strlen(*ptr));
+	if (*ptr && new_ptr)
+		ft_memmove(new_ptr, *ptr, ft_strlen(*ptr));
 	//ft_strdel(ptr);
 	return (new_ptr);
 }
@@ -287,11 +289,18 @@ void	add_char_at_end(char c)
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
+	if (g_linei->len == g_linei->len_max)
+	{
+		g_linei->content =
+			realloc(g_linei->content, g_linei->len_max + 21);
+		ft_bzero(&g_linei->content[g_linei->len_max], 21);
+		g_linei->len_max += 20;
+	}
 	g_linei->content[g_linei->curs] = c;
 	ft_putchar(c);
 	g_linei->curs += 1;
 	g_linei->pos.x += 1;
-		g_linei->len += 1;
+	g_linei->len += 1;
 	if (g_linei->pos.x == ws.ws_col)
 	{
 		tputs(tgetstr("do", NULL), 1, &put_my_char);
@@ -305,7 +314,8 @@ void	add_char_to_line(char c)
 	if (g_linei->len == g_linei->len_max)
 	{
 		g_linei->content =
-			realloc_char(&g_linei->content, g_linei->len_max + 20);
+			realloc(g_linei->content, g_linei->len_max + 21);
+		ft_bzero(&g_linei->content[g_linei->len_max], 21);
 		g_linei->len_max += 20;
 	}
 	if (g_linei->curs == g_linei->len)
@@ -353,12 +363,13 @@ int	main(void)
 			add_char_to_line(buf[0]);
 		else if (buf[0] == 10)
 		{
-			printf("\nCURS = [%d]\n", g_linei->curs);
-			printf("LINE = [%s]\n", g_linei->content);
-			printf("LEN = [%d]\n", g_linei->len);
+			/*printf("\nCURS = [%d]\n", g_linei->curs);
+			*/printf("LINE = [%s]\n", g_linei->content);
+			/*printf("LEN = [%d]\n", g_linei->len);
 			printf("COL = [%d]\n", g_linei->pos.x);
-			printf("SIZE = [%d]\n", ws.ws_col);
+			printf("SIZE = [%d]\n", ws.ws_col);*/
 			g_linei->curs = 0;
+			exit(0);
 		}
 	}
 	default_term();
