@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/27 16:23:00 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/27 16:37:58 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -442,6 +442,12 @@ void	del_char(void)
 		ft_memmove(&g_linei->content[g_linei->curs], &g_linei->content[g_linei->curs + 1],
 				ft_strlen(&g_linei->content[g_linei->curs + 1]));
 		g_linei->content[ft_strlen(g_linei->content) - 1] = '\0';
+		save_reset_pos(g_linei->pos, 1);
+		//printf("x = %d, y = %d\n", g_linei->pos.x, g_linei->pos.y);
+		tputs(tgetstr("cd", NULL), 1, &put_my_char);
+		put_my_str_edit(&g_linei->content[g_linei->curs]);
+		save_reset_pos(g_linei->pos, 2);
+		//printf("x = %d, y = %d\n", g_linei->pos.x, g_linei->pos.y);
 		g_linei->len -= 1;
 	}
 }
