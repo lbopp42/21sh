@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/27 16:37:58 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/28 10:31:53 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct	s_lineinfo
 	int		curs;	//index du contenu
 	char	*content;
 	t_pos	pos;
+	int		p_len;	//taille du prompt
 	int		len;
 	int		len_max;
 }				t_lineinfo;
@@ -159,7 +160,9 @@ void	key_left_funct(void)
 			}
 		}
 		else
+		{
 			tputs(tgetstr("le", NULL), 1, &put_my_char);
+		}
 		g_linei->pos.x -= 1;
 		g_linei->curs -= 1;
 	}
@@ -191,7 +194,7 @@ void	key_home_funct(void)
 {
 	t_pos	tmp_pos;
 
-	tmp_pos.x = 0;
+	tmp_pos.x = g_linei->p_len;
 	tmp_pos.y = 0;
 	save_reset_pos(tmp_pos, 1);
 	save_reset_pos(g_linei->pos, 2);
@@ -203,7 +206,7 @@ void	key_end_funct(void)
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
-	tmp_pos.x = g_linei->len % ws.ws_col;
+	tmp_pos.x = g_linei->len % ws.ws_col + g_linei->p_len;
 	tmp_pos.y = g_linei->len / ws.ws_col;
 	save_reset_pos(tmp_pos, 1);
 	save_reset_pos(g_linei->pos, 2);
@@ -247,10 +250,20 @@ void	key_shift_up_funct()
 
 	if (g_linei->pos.y - 1 >= 0)
 	{
-		tmp_pos.x = g_linei->pos.x;
-		tmp_pos.y = g_linei->pos.y - 1;
-		save_reset_pos(tmp_pos, 1);
-		save_reset_pos(g_linei->pos, 2);
+		if (g_linei->pos.x >= g_linei->p_len || g_linei->pos.y - 1 > 0)
+		{
+			tmp_pos.x = g_linei->pos.x;
+			tmp_pos.y = g_linei->pos.y - 1;
+			save_reset_pos(tmp_pos, 1);
+			save_reset_pos(g_linei->pos, 2);
+		}
+		else
+		{
+			tmp_pos.x = g_linei->p_len;
+			tmp_pos.y = g_linei->pos.y - 1;
+			save_reset_pos(tmp_pos, 1);
+			save_reset_pos(g_linei->pos, 2);
+		}
 	}
 }
 
@@ -262,10 +275,11 @@ void	key_shift_down_funct()
 	ioctl(1, TIOCGWINSZ, &ws);
 	if (g_linei->pos.y + 1 <= g_linei->len / ws.ws_col)
 	{
-		if (ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col <= g_linei->len)
+		//printf("test = [%d]\n", ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col);
+		if (ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col <= g_linei->len + g_linei->p_len)
 			tmp_pos.x = g_linei->pos.x;
 		else
-			tmp_pos.x = g_linei->len - (g_linei->pos.y + 1) * ws.ws_col;
+			tmp_pos.x = g_linei->len + g_linei->p_len - (g_linei->pos.y + 1) * ws.ws_col;
 		tmp_pos.y = g_linei->pos.y + 1;
 		save_reset_pos(tmp_pos, 1);
 		save_reset_pos(g_linei->pos, 2);
@@ -365,7 +379,7 @@ char	*realloc_char(char **ptr, size_t size)
 	new_ptr = (char*)ft_memalloc(sizeof(char) * size);
 	if (*ptr && new_ptr)
 		ft_memmove(new_ptr, *ptr, ft_strlen(*ptr));
-	//ft_strdel(ptr);
+	ft_strdel(ptr);
 	return (new_ptr);
 }
 
@@ -435,7 +449,7 @@ void	add_char_to_line(char c)
 
 void	del_char(void)
 {
-	if (g_linei->len)
+	if (g_linei->len && g_linei->curs)
 	{
 		key_left_funct();
 		tputs(tgetstr("dc", NULL), 1, &put_my_char);
@@ -443,11 +457,9 @@ void	del_char(void)
 				ft_strlen(&g_linei->content[g_linei->curs + 1]));
 		g_linei->content[ft_strlen(g_linei->content) - 1] = '\0';
 		save_reset_pos(g_linei->pos, 1);
-		//printf("x = %d, y = %d\n", g_linei->pos.x, g_linei->pos.y);
 		tputs(tgetstr("cd", NULL), 1, &put_my_char);
 		put_my_str_edit(&g_linei->content[g_linei->curs]);
 		save_reset_pos(g_linei->pos, 2);
-		//printf("x = %d, y = %d\n", g_linei->pos.x, g_linei->pos.y);
 		g_linei->len -= 1;
 	}
 }
@@ -456,16 +468,20 @@ int	main(void)
 {
 	char		buf[1];
 	struct winsize	ws;
+	char		*prompt;
 
+	prompt = "Hello > ";
 	ioctl(1, TIOCGWINSZ, &ws);
 	init_term();
 	g_linei = ft_memalloc(sizeof(t_lineinfo));
 	g_linei->content = ft_strnew(20);
+	g_linei->p_len = ft_strlen(prompt);
 	g_linei->len = 0;
 	g_linei->len_max = 20;
-	g_linei->pos.x = 0;
+	g_linei->pos.x = g_linei->p_len;
 	g_linei->pos.y = 0;
 	g_linei->curs = 0;
+	ft_putstr(prompt);
 	while (1)
 	{
 		ft_bzero(buf, 1);
@@ -487,5 +503,7 @@ int	main(void)
 			exit(0);
 		}
 	}
+	ft_strdel(&g_linei->content);
+	free(g_linei);
 	default_term();
 }
