@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/28 10:31:53 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/06/28 16:56:13 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ typedef struct	s_lineinfo
 	int		p_len;	//taille du prompt
 	int		len;
 	int		len_max;
+	char	*select;
 }				t_lineinfo;
 t_lineinfo	*g_linei;
 void	default_term(void);
@@ -48,14 +49,12 @@ void	init_term()
 	attr.c_cc[VMIN] = 1;
 	attr.c_cc[VTIME] = 0;
 	tcsetattr(0, TCSADRAIN, &attr);
-	if (!(term = getenv("TERM")))
+	if (!(term = getenv("TERM")) || tgetent(NULL, term) == -1)
 	{
 		ft_putendl_fd("lsh: environment not found", 2);
 		default_term();
 		exit(0);
 	}
-	else
-		tgetent(NULL, term);
 }
 
 void	default_term(void)
@@ -139,6 +138,39 @@ int	key_is_shift_right(const char *buff)
 
 	if (!ft_strcmp(buff, enter_key))
 		return (1);
+	return (0);
+}
+
+int	key_is_alt_right(const char *buff)
+{
+	static char	enter_key[] = {27, 91, 67, 0, 0, 0};
+
+	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
+int	key_is_alt_left(const char *buff)
+{
+	static char	enter_key[] = {27, 91, 68, 0, 0, 0};
+
+	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
+int	key_is_alt_v(const char *buff)
+{
+	static char	enter_key[] = {-120, -102, 0, 0, 0, 0};
+	char	buff2[6];
+
+	if (buff[0] == -30)
+	{
+		ft_bzero(buff2, 6);
+		read(0, buff2, 5);
+		if (!ft_strcmp(buff2, enter_key))
+			return (1);
+	}
 	return (0);
 }
 
@@ -275,7 +307,24 @@ void	key_shift_down_funct()
 	ioctl(1, TIOCGWINSZ, &ws);
 	if (g_linei->pos.y + 1 <= g_linei->len / ws.ws_col)
 	{
-		//printf("test = [%d]\n", ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col);
+		if (ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col <= g_linei->len + g_linei->p_len)
+			tmp_pos.x = g_linei->pos.x;
+		else
+			tmp_pos.x = g_linei->len + g_linei->p_len - (g_linei->pos.y + 1) * ws.ws_col;
+		tmp_pos.y = g_linei->pos.y + 1;
+		save_reset_pos(tmp_pos, 1);
+		save_reset_pos(g_linei->pos, 2);
+	}
+}
+
+void	key_alt_left_funct()
+{
+	t_pos	tmp_pos;
+	struct winsize	ws;
+
+	ioctl(1, TIOCGWINSZ, &ws);
+	if (g_linei->pos.y + 1 <= g_linei->len / ws.ws_col)
+	{
 		if (ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col <= g_linei->len + g_linei->p_len)
 			tmp_pos.x = g_linei->pos.x;
 		else
@@ -369,6 +418,72 @@ void	put_my_str_edit(char *content)
 		}
 		i += 1;
 	}
+}
+
+char	*line_editing_select(int mode)
+{
+	static char	*selected = NULL;
+	char		tmp[2];
+	char		buff[6];
+	int			i;
+
+	if (mode == 1)
+	{
+		/*save_reset_pos(g_linei->pos, 1);
+		selected = ft_strnew(1);
+		selected[0] = g_linei->content[g_linei->curs];
+		key_left_funct();
+		ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1
+		ft_putchar(g_linei->content[g_linei->curs]);
+		save_reset_pos(g_linei->pos, 2);
+		ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
+		ft_bzero(buff, 6);
+		read(0, buff, 5);
+		while (buff[0] == 27 && key_is_arrow_left(buff + 1))
+		{
+			save_reset_pos(g_linei->pos, 1);
+			if (selected)
+				tmp = selected;
+			selected = ft_strnew(1);
+			selected[0] = g_linei->content[g_linei->curs];
+			selected = ft_stradd(selected, tmp);
+			ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1
+			ft_putchar(g_linei->content[g_linei->curs]);
+			save_reset_pos(g_linei->pos, 2);
+			ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
+			ft_bzero(buff, 6);
+			read(0, buff, 5);
+			key_left_funct();
+		}*/
+		i = 1;
+		selected = ft_strnew(1);
+		selected[0] = g_linei->content[g_linei->curs];
+		save_reset_pos(g_linei->pos, 1);
+		ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1
+		put_my_str_edit(selected);
+		save_reset_pos(g_linei->pos, 2);
+		ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
+		ft_bzero(buff, 6);
+		read(0, buff, 5);
+		while (buff[0] == 27 && key_is_arrow_right(buff + 1))
+		{
+			tmp[1] = '\0';
+			key_right_funct();
+			save_reset_pos(g_linei->pos, 1);
+			tmp[0] = g_linei->content[g_linei->curs];
+			selected = ft_stradd(selected, tmp);
+			ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1
+			put_my_str_edit(&selected[i]);
+			save_reset_pos(g_linei->pos, 2);
+			ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
+			i += 1;
+			ft_bzero(buff, 6);
+			read(0, buff, 5);
+		}
+	}
+	else if (mode == 2)
+		printf("TEST = [%s]\n", selected);
+	return (NULL);
 }
 
 char	*realloc_char(char **ptr, size_t size)
@@ -490,16 +605,20 @@ int	main(void)
 			is_arrow();
 		else if (buf[0] == 127) // Backspace
 			del_char();
+		else if (key_is_alt_v(buf))
+			line_editing_select(1);
 		else if (ft_isprint(buf[0]))
 			add_char_to_line(buf[0]);
 		else if (buf[0] == 10)
 		{
+			line_editing_select(2);
 			printf("\nCURS = [%d]\n", g_linei->curs);
 			printf("LINE = [%s]\n", g_linei->content);
 			printf("LEN = [%d]\n", g_linei->len);
 			printf("COL = [%d]\n", g_linei->pos.x);
 			printf("SIZE = [%d]\n", ws.ws_col);
 			g_linei->curs = 0;
+			default_term();
 			exit(0);
 		}
 	}
