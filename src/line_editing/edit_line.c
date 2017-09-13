@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/13 14:59:06 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/13 16:22:19 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -426,9 +426,19 @@ void	put_my_str_edit(char *content)
 	}
 }
 
+int		key_is_alt_c(char *buff)
+{
+	static char	alt_c_key[] = {-61, -89, 0, 0, 0, 0};
+
+	if (!ft_strcmp(buff, alt_c_key))
+		return (1);
+	return (0);
+}
+
 char	*line_editing_select(int mode)
 {
-	static char	*selected = NULL;
+	char		*selected;
+	static char	*copy = NULL;
 	char		*tmp_select;
 	char		tmp[2];
 	char		buff[6];
@@ -478,8 +488,7 @@ char	*line_editing_select(int mode)
 			}
 			else if (key_is_arrow_left(buff + 1) && g_linei->curs > 0)
 			{
-				//On a quelque chose de selectionne
-				if (i - 1 > 0)//Pas sur
+				if (i - 1 > 0)
 				{
 					tmp[0] = g_linei->content[g_linei->curs];
 					save_reset_pos(g_linei->pos, 1);
@@ -510,14 +519,15 @@ char	*line_editing_select(int mode)
 			ft_bzero(buff, 6);
 			read(0, buff, 5);
 		}
-		printf("i = %d\n", i);
+		if (key_is_alt_c(buff))
+			copy = ft_strdup(selected);
 		save_reset_pos(g_linei->pos, 1);
 		move_to(g_linei->select_start);
 		put_my_str_edit(&selected[0]);
 		save_reset_pos(g_linei->pos, 2);
 	}
 	else if (mode == 2)
-		printf("TEST = [%s]\n", selected);
+		printf("TEST = [%s]\n", copy);
 	return (NULL);
 }
 
