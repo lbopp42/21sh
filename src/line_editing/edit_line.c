@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/13 12:34:55 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/13 14:59:06 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -429,6 +429,7 @@ void	put_my_str_edit(char *content)
 char	*line_editing_select(int mode)
 {
 	static char	*selected = NULL;
+	char		*tmp_select;
 	char		tmp[2];
 	char		buff[6];
 	int			i;
@@ -446,21 +447,70 @@ char	*line_editing_select(int mode)
 		ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
 		ft_bzero(buff, 6);
 		read(0, buff, 5);
-		while (buff[0] == 27 && key_is_arrow_right(buff + 1))
+		while (buff[0] == 27 && (key_is_arrow_right(buff + 1) || key_is_arrow_left(buff + 1)))
 		{
 			tmp[1] = '\0';
-			key_right_funct();
-			save_reset_pos(g_linei->pos, 1);
-			tmp[0] = g_linei->content[g_linei->curs];
-			selected = ft_stradd(selected, tmp);
-			ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1 (probleme du ls)
-			put_my_str_edit(&selected[i]);
-			save_reset_pos(g_linei->pos, 2);
-			ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
-			i += 1;
+ 			if (key_is_arrow_right(buff + 1) && i > 0 && g_linei->curs < g_linei->len)
+			{
+				key_right_funct();
+				save_reset_pos(g_linei->pos, 1);
+				tmp[0] = g_linei->content[g_linei->curs];
+				selected = ft_stradd(selected, tmp);
+				ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1 (probleme du ls)
+				put_my_str_edit(&selected[i]);
+				save_reset_pos(g_linei->pos, 2);
+				ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
+				i++;
+			}
+			else if (key_is_arrow_right(buff + 1) && g_linei->curs < g_linei->len)
+			{
+				tmp[0] = g_linei->content[g_linei->curs];
+				save_reset_pos(g_linei->pos, 1);
+				tmp_select = ft_strdup(selected + 1);
+				free(selected);
+				selected = ft_strdup(tmp_select);
+				free(tmp_select);
+				put_my_str_edit(tmp);
+				save_reset_pos(g_linei->pos, 2);
+				key_right_funct();
+				g_linei->select_start = g_linei->pos;
+				i++;
+			}
+			else if (key_is_arrow_left(buff + 1) && g_linei->curs > 0)
+			{
+				//On a quelque chose de selectionne
+				if (i - 1 > 0)//Pas sur
+				{
+					tmp[0] = g_linei->content[g_linei->curs];
+					save_reset_pos(g_linei->pos, 1);
+					put_my_str_edit(tmp);
+					save_reset_pos(g_linei->pos, 2);
+					selected[i - 1] = '\0';
+					i--;
+					key_left_funct();
+				}
+				else
+				{
+					g_linei->select_start = g_linei->pos;
+					tmp_select = ft_strdup(selected);
+					free(selected);
+					key_left_funct();
+					tmp[0] = g_linei->content[g_linei->curs];
+					selected = ft_strdup(tmp);
+					selected = ft_stradd(selected, tmp_select);
+					free(tmp_select);
+					save_reset_pos(g_linei->pos, 1);
+					ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1
+					put_my_str_edit(selected);
+					save_reset_pos(g_linei->pos, 2);
+					ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
+					i--;
+				}
+			}
 			ft_bzero(buff, 6);
 			read(0, buff, 5);
 		}
+		printf("i = %d\n", i);
 		save_reset_pos(g_linei->pos, 1);
 		move_to(g_linei->select_start);
 		put_my_str_edit(&selected[0]);
