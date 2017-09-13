@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/13 16:22:19 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/13 17:32:12 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,39 @@ int	key_is_alt_v(const char *buff)
 		if (!ft_strcmp(buff2, enter_key))
 			return (1);
 	}
+	return (0);
+}
+
+int		key_is_alt_c(char *buff)
+{
+	static char	alt_c_key[] = {-61, -89, 0, 0, 0, 0};
+
+	if (!ft_strcmp(buff, alt_c_key))
+		return (1);
+	return (0);
+}
+
+int		key_is_alt_p(char *buff)
+{
+	static char	alt_p_key[] = {-128, 0, 0, 0, 0};
+	char	buff2[6];
+
+	ft_bzero(buff2, 5);
+	read(0, buff2, 5);
+	if (buff[0] == -49)
+	{
+		if (!ft_strcmp(buff2, alt_p_key))
+			return (1);
+	}
+	return (0);
+}
+
+int		key_is_alt_x(char *buff)
+{
+	static char	alt_x_key[] = {-30, -119, -120, 0, 0, 0};
+
+	if (!ft_strcmp(buff, alt_x_key))
+		return (1);
 	return (0);
 }
 
@@ -426,15 +459,6 @@ void	put_my_str_edit(char *content)
 	}
 }
 
-int		key_is_alt_c(char *buff)
-{
-	static char	alt_c_key[] = {-61, -89, 0, 0, 0, 0};
-
-	if (!ft_strcmp(buff, alt_c_key))
-		return (1);
-	return (0);
-}
-
 char	*line_editing_select(int mode)
 {
 	char		*selected;
@@ -490,20 +514,21 @@ char	*line_editing_select(int mode)
 			{
 				if (i - 1 > 0)
 				{
+					printf("i = %d\n", i);
 					tmp[0] = g_linei->content[g_linei->curs];
-					save_reset_pos(g_linei->pos, 1);
 					put_my_str_edit(tmp);
 					save_reset_pos(g_linei->pos, 2);
 					selected[i - 1] = '\0';
 					i--;
 					key_left_funct();
+					save_reset_pos(g_linei->pos, 1);
 				}
 				else
 				{
-					g_linei->select_start = g_linei->pos;
 					tmp_select = ft_strdup(selected);
 					free(selected);
 					key_left_funct();
+					g_linei->select_start = g_linei->pos;
 					tmp[0] = g_linei->content[g_linei->curs];
 					selected = ft_strdup(tmp);
 					selected = ft_stradd(selected, tmp_select);
@@ -624,6 +649,16 @@ void	del_char(void)
 	}
 }
 
+void	paste_select(void)
+{
+	char	*result;
+
+	if (line_editing_select(2) == NULL)
+		return ;
+	result = ft_strsub(g_linei->content, 0, g_linei->curs);
+	printf("paste = %s\n", result);
+}
+
 int	main(void)
 {
 	char		buf[1];
@@ -654,6 +689,8 @@ int	main(void)
 			line_editing_select(1);
 		else if (ft_isprint(buf[0]))
 			add_char_to_line(buf[0]);
+		else if (key_is_alt_p(buf))
+			paste_select();
 		else if (buf[0] == 10)
 		{
 			line_editing_select(2);
