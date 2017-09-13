@@ -1,39 +1,44 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   edit_line.c                                        :+:      :+:    :+:   */
+/*   edit_linev3.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/06/16 14:17:58 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/26 13:57:10 by lbopp            ###   ########.fr       */
+/*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
+/*   Updated: 2017/09/13 12:34:55 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "lsh.h"
 #include <stdio.h>
 #include <term.h>
 #include <termios.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "lsh.h"
 #include <sys/ioctl.h>
 
-/*
-**	pos is used to know the position of the column at the end of the line.
-**	col is used to know the postion of the cursor column.
-*/
-typedef struct	s_linfo
-{
-	char	*content;
-	int		curs;
-	int		len;
-	int		pos;
-	int		col;
-	int		max_len;
-}				t_linfo;
-struct s_linfo	*g_linei;
 struct termios		g_origin_term;
+typedef struct	s_pos
+{
+	int	x;
+	int	y;
+}				t_pos;
+typedef struct	s_lineinfo
+{
+	int		curs;	//index du contenu
+	char	*content;
+	t_pos	pos;
+	int		p_len;	//taille du prompt
+	int		len;
+	int		len_max;
+	t_pos	select_start;
+	int		select_len;
+	char	*select;
+}				t_lineinfo;
+t_lineinfo	*g_linei;
 void	default_term(void);
+void	save_reset_pos(t_pos pos, int mode);
 
 void	init_term()
 {
@@ -46,14 +51,12 @@ void	init_term()
 	attr.c_cc[VMIN] = 1;
 	attr.c_cc[VTIME] = 0;
 	tcsetattr(0, TCSADRAIN, &attr);
-	if (!(term = getenv("TERM")))
+	if (!(term = getenv("TERM")) || tgetent(NULL, term) == -1)
 	{
 		ft_putendl_fd("lsh: environment not found", 2);
 		default_term();
 		exit(0);
 	}
-	else
-		tgetent(NULL, term);
 }
 
 void	default_term(void)
@@ -68,77 +71,9 @@ int	put_my_char(int c)
 	return (1);
 }
 
-char	*realloc_char(char **ptr, size_t size)
-{
-	char	*new_ptr;
-
-	new_ptr = (char*)ft_memalloc(sizeof(char) * size);
-	ft_memmove(new_ptr, *ptr, ft_strlen(*ptr));
-	//ft_strdel(ptr);
-	return (new_ptr);
-}
-
-void	add_char_to_line(char c)
-{
-	struct winsize	ws;
-
-	ioctl(1, TIOCGWINSZ, &ws);
-	if (g_linei->len == g_linei->len)
-	{
-		g_linei->content = realloc_char(&g_linei->content, g_linei->max_len + 20);
-		g_linei->max_len += 20;
-	}
-	if (g_linei->len == g_linei->curs)
-	{
-		g_linei->content[g_linei->curs] = c;
-		ft_putchar(c);
-	}
-	else
-	{
-		ft_memmove(&g_linei->content[g_linei->curs + 1], &g_linei->content[g_linei->curs], ft_strlen(&g_linei->content[g_linei->curs]));
-		g_linei->content[g_linei->curs] = c;
-		ft_putchar(c);
-		tputs(tgetstr("sc", NULL), 1, &put_my_char);
-		ft_putstr(&g_linei->content[g_linei->curs + 1]);
-		tputs(tgetstr("rc", NULL), 1, &put_my_char);
-	}
-	if (g_linei->curs != g_linei->len && g_linei->pos == ws.ws_col)
-	{
-		tputs(tgetstr("up", NULL), 1, &put_my_char);
-		g_linei->pos = 0;
-	}
-	if (g_linei->col + 1 == ws.ws_col)
-	{
-		tputs(tgetstr("do", NULL), 1, &put_my_char);
-		g_linei->col = 0;
-	}
-	g_linei->curs += 1;
-	g_linei->col += 1;
-	g_linei->len += 1;
-	g_linei->pos += 1;
-}
-
 int	key_is_arrow_right(const char *buff)
 {
 	static char		enter_key[] = {91, 67, 0, 0, 0};
-
-	if (!ft_strcmp(buff, enter_key))
-		return (1);
-	return (0);
-}
-
-int	key_is_arrow_top(const char *buff)
-{
-	static char	enter_key[] = {91, 65, 0, 0, 0};
-
-	if (!ft_strcmp(buff, enter_key))
-		return (1);
-	return (0);
-}
-
-int	key_is_arrow_down(const char *buff)
-{
-	static char	enter_key[] = {91, 66, 0, 0, 0};
 
 	if (!ft_strcmp(buff, enter_key))
 		return (1);
@@ -154,27 +89,116 @@ int	key_is_arrow_left(const char *buff)
 	return (0);
 }
 
-/*int	key_is_enter(const char *buff)
+int	key_is_home(const char *buff)
 {
-	static char	enter_key[] = {10, 0, 0, 0, 0, 0, 0, 0};
+	static char	enter_key[] = {91, 72, 0, 0, 0};
 
 	if (!ft_strcmp(buff, enter_key))
 		return (1);
 	return (0);
-}*/
+}
+
+int	key_is_end(const char *buff)
+{
+	static char	enter_key[] = {91, 70, 0, 0, 0};
+
+	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
+int	key_is_shift_left(const char *buff)
+{
+	static char	enter_key[] = {91, 49, 59, 50, 68, 0};
+
+	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
+int	key_is_shift_up(const char *buff)
+{
+	static char	enter_key[] = {91, 49, 59, 50, 65, 0};
+
+	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
+int	key_is_shift_down(const char *buff)
+{
+	static char	enter_key[] = {91, 49, 59, 50, 66, 0};
+
+	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
+int	key_is_shift_right(const char *buff)
+{
+	static char	enter_key[] = {91, 49, 59, 50, 67, 0};
+
+	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
+int	key_is_alt_right(const char *buff)
+{
+	static char	enter_key[] = {27, 91, 67, 0, 0, 0};
+
+	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
+int	key_is_alt_left(const char *buff)
+{
+	static char	enter_key[] = {27, 91, 68, 0, 0, 0};
+
+	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
+int	key_is_alt_v(const char *buff)
+{
+	static char	enter_key[] = {-120, -102, 0, 0, 0, 0};
+	char	buff2[6];
+
+	if (buff[0] == -30)
+	{
+		ft_bzero(buff2, 6);
+		read(0, buff2, 5);
+		if (!ft_strcmp(buff2, enter_key))
+			return (1);
+	}
+	return (0);
+}
 
 void	key_left_funct(void)
 {
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
-	tputs(tgetstr("le", NULL), 1, &put_my_char);
-	if (g_linei->curs)
+	if (g_linei->curs != 0)
 	{
-		if (g_linei->col == 0)
-			g_linei->col = ws.ws_col + 1;
+		if (g_linei->pos.x == 0 && g_linei->pos.y != 0) 
+		{
+			tputs(tgetstr("up", NULL), 1, &put_my_char);
+			g_linei->pos.y -= 1;
+			while (g_linei->pos.x != ws.ws_col)
+			{
+				tputs(tgetstr("nd", NULL), 1, &put_my_char);
+				g_linei->pos.x += 1;
+			}
+		}
+		else
+		{
+			tputs(tgetstr("le", NULL), 1, &put_my_char);
+		}
+		g_linei->pos.x -= 1;
 		g_linei->curs -= 1;
-		g_linei->col -= 1;
 	}
 }
 
@@ -183,33 +207,135 @@ void	key_right_funct(void)
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
-	if (g_linei->col + 1 == ws.ws_col)
+	if (g_linei->curs != g_linei->len)
 	{
-		tputs(tgetstr("do", NULL), 1, &put_my_char);
+		if (g_linei->pos.x + 1 == ws.ws_col)
+		{
+			tputs(tgetstr("do", NULL), 1, &put_my_char);
+			g_linei->pos.x = 0;
+			g_linei->pos.y += 1;
+		}
+		else
+		{
+			tputs(tgetstr("nd", NULL), 1, &put_my_char);
+			g_linei->pos.x += 1;
+		}
 		g_linei->curs += 1;
-		g_linei->col = 0;
-	}
-	else if (g_linei->curs < ft_strlen(g_linei->content))
-	{
-		tputs(tgetstr("nd", NULL), 1, &put_my_char);
-		g_linei->curs += 1;
-		g_linei->col += 1;
 	}
 }
 
-/*void	key_backspace_funct(void)
+void	key_home_funct(void)
 {
+	t_pos	tmp_pos;
+
+	tmp_pos.x = g_linei->p_len;
+	tmp_pos.y = 0;
+	save_reset_pos(tmp_pos, 1);
+	save_reset_pos(g_linei->pos, 2);
+}
+
+void	key_end_funct(void)
+{
+	t_pos			tmp_pos;
+	struct winsize	ws;
+
+	ioctl(1, TIOCGWINSZ, &ws);
+	tmp_pos.x = g_linei->len % ws.ws_col + g_linei->p_len;
+	tmp_pos.y = g_linei->len / ws.ws_col;
+	save_reset_pos(tmp_pos, 1);
+	save_reset_pos(g_linei->pos, 2);
+}
+
+void	key_shift_left_funct()
+{
+	int	sp;
+
+	sp = 0;
 	key_left_funct();
-	tputs(tgetstr("dc", NULL), 1, &put_my_char);
-	ft_memmove(&g_line_info->line[g_line_info->curs],
-			&g_line_info->line[g_line_info->curs + 1],
-			ft_strlen(&g_line_info->line[g_line_info->curs]));
+	while (g_linei->curs && g_linei->content[g_linei->curs] == ' ')
+	{
+		key_left_funct();
+		sp = 1;
+	}
+	while (g_linei->curs && ft_isalnum(g_linei->content[g_linei->curs]))
+		key_left_funct();
+	if (g_linei->curs)
+		key_right_funct();
 }
 
-void	is_key(char *buff)
+void	key_shift_right_funct()
 {
-	//TODO
-}*/
+	int	sp;
+
+	sp = 0;
+	key_right_funct();
+	while (g_linei->curs && ft_isalnum(g_linei->content[g_linei->curs]) && !sp)
+		key_right_funct();
+	while (g_linei->curs && g_linei->content[g_linei->curs] == ' ')
+	{
+		key_right_funct();
+		sp = 1;
+	}
+}
+
+void	key_shift_up_funct()
+{
+	t_pos	tmp_pos;
+
+	if (g_linei->pos.y - 1 >= 0)
+	{
+		if (g_linei->pos.x >= g_linei->p_len || g_linei->pos.y - 1 > 0)
+		{
+			tmp_pos.x = g_linei->pos.x;
+			tmp_pos.y = g_linei->pos.y - 1;
+			save_reset_pos(tmp_pos, 1);
+			save_reset_pos(g_linei->pos, 2);
+		}
+		else
+		{
+			tmp_pos.x = g_linei->p_len;
+			tmp_pos.y = g_linei->pos.y - 1;
+			save_reset_pos(tmp_pos, 1);
+			save_reset_pos(g_linei->pos, 2);
+		}
+	}
+}
+
+void	key_shift_down_funct()
+{
+	t_pos	tmp_pos;
+	struct winsize	ws;
+
+	ioctl(1, TIOCGWINSZ, &ws);
+	if (g_linei->pos.y + 1 <= g_linei->len / ws.ws_col)
+	{
+		if (ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col <= g_linei->len + g_linei->p_len)
+			tmp_pos.x = g_linei->pos.x;
+		else
+			tmp_pos.x = g_linei->len + g_linei->p_len - (g_linei->pos.y + 1) * ws.ws_col;
+		tmp_pos.y = g_linei->pos.y + 1;
+		save_reset_pos(tmp_pos, 1);
+		save_reset_pos(g_linei->pos, 2);
+	}
+}
+
+void	key_alt_left_funct()
+{
+	t_pos	tmp_pos;
+	struct winsize	ws;
+
+	ioctl(1, TIOCGWINSZ, &ws);
+	if (g_linei->pos.y + 1 <= g_linei->len / ws.ws_col)
+	{
+		if (ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col <= g_linei->len + g_linei->p_len)
+			tmp_pos.x = g_linei->pos.x;
+		else
+			tmp_pos.x = g_linei->len + g_linei->p_len - (g_linei->pos.y + 1) * ws.ws_col;
+		tmp_pos.y = g_linei->pos.y + 1;
+		save_reset_pos(tmp_pos, 1);
+		save_reset_pos(g_linei->pos, 2);
+	}
+}
 
 void	is_arrow(void)
 {
@@ -221,47 +347,267 @@ void	is_arrow(void)
 		key_left_funct();
 	if (key_is_arrow_right(buff))
 		key_right_funct();
+	if (key_is_home(buff))
+		key_home_funct();
+	if (key_is_end(buff))
+		key_end_funct();
+	if (key_is_shift_left(buff))
+		key_shift_left_funct();
+	if (key_is_shift_right(buff))
+		key_shift_right_funct();
+	if (key_is_shift_up(buff))
+		key_shift_up_funct();
+	if (key_is_shift_down(buff))
+		key_shift_down_funct();
 }
 
-int main(void)
+void	move_to(t_pos tmp_pos)
 {
-	char			buff[1];
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
+	while (g_linei->pos.y > tmp_pos.y)
+	{
+		g_linei->pos.y -= 1;
+		g_linei->curs -= ws.ws_col;
+		tputs(tgetstr("up", NULL), 1, &put_my_char);
+	}
+	while (g_linei->pos.y < tmp_pos.y)
+	{
+		g_linei->pos.y += 1;
+		g_linei->curs -= g_linei->pos.x;
+		g_linei->pos.x = 0;
+		g_linei->curs += ws.ws_col;
+		tputs(tgetstr("do", NULL), 1, &put_my_char);
+	}
+	while (g_linei->pos.x > tmp_pos.x)
+	{
+		g_linei->pos.x -= 1;
+		g_linei->curs -= 1;
+		tputs(tgetstr("le", NULL), 1, &put_my_char);
+	}
+	while (g_linei->pos.x < tmp_pos.x)
+	{
+		g_linei->pos.x += 1;
+		g_linei->curs += 1;
+		tputs(tgetstr("nd", NULL), 1, &put_my_char);
+	}
+}
+
+void	save_reset_pos(t_pos pos, int mode)
+{
+	static t_pos	tmp_pos = {0, 0};
+
+	if (mode == 1)
+		tmp_pos = pos;
+	else
+		move_to(tmp_pos);
+}
+
+void	put_my_str_edit(char *content)
+{
+	int	i;
+	struct winsize	ws;
+
+	ioctl(1, TIOCGWINSZ, &ws);
+	i = 0;
+	while (content[i])
+	{
+		ft_putchar(content[i]);
+		g_linei->pos.x += 1;
+		g_linei->curs += 1;
+		if (g_linei->pos.x == ws.ws_col)
+		{
+			g_linei->pos.x = 0;
+			tputs(tgetstr("do", NULL), 1, &put_my_char);
+			g_linei->pos.y += 1;
+		}
+		i += 1;
+	}
+}
+
+char	*line_editing_select(int mode)
+{
+	static char	*selected = NULL;
+	char		tmp[2];
+	char		buff[6];
+	int			i;
+
+	if (mode == 1)
+	{
+		i = 1;
+		g_linei->select_start = g_linei->pos;
+		selected = ft_strnew(1);
+		selected[0] = g_linei->content[g_linei->curs];
+		save_reset_pos(g_linei->pos, 1);
+		ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1
+		put_my_str_edit(selected);
+		save_reset_pos(g_linei->pos, 2);
+		ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
+		ft_bzero(buff, 6);
+		read(0, buff, 5);
+		while (buff[0] == 27 && key_is_arrow_right(buff + 1))
+		{
+			tmp[1] = '\0';
+			key_right_funct();
+			save_reset_pos(g_linei->pos, 1);
+			tmp[0] = g_linei->content[g_linei->curs];
+			selected = ft_stradd(selected, tmp);
+			ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1 (probleme du ls)
+			put_my_str_edit(&selected[i]);
+			save_reset_pos(g_linei->pos, 2);
+			ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
+			i += 1;
+			ft_bzero(buff, 6);
+			read(0, buff, 5);
+		}
+		save_reset_pos(g_linei->pos, 1);
+		move_to(g_linei->select_start);
+		put_my_str_edit(&selected[0]);
+		save_reset_pos(g_linei->pos, 2);
+	}
+	else if (mode == 2)
+		printf("TEST = [%s]\n", selected);
+	return (NULL);
+}
+
+char	*realloc_char(char **ptr, size_t size)
+{
+	char	*new_ptr;
+
+	new_ptr = NULL;
+	new_ptr = (char*)ft_memalloc(sizeof(char) * size);
+	if (*ptr && new_ptr)
+		ft_memmove(new_ptr, *ptr, ft_strlen(*ptr));
+	ft_strdel(ptr);
+	return (new_ptr);
+}
+
+void	add_char_enter_char(char c)
+{
+	struct winsize	ws;
+
+	ioctl(1, TIOCGWINSZ, &ws);
+	ft_memmove(&g_linei->content[g_linei->curs + 1],
+			&g_linei->content[g_linei->curs],
+			ft_strlen(&g_linei->content[g_linei->curs]));
+	g_linei->content[g_linei->curs] = c;
+	ft_putchar(c);
+	g_linei->curs += 1;
+	g_linei->pos.x += 1;
+	if (g_linei->pos.x == ws.ws_col)
+	{
+		g_linei->pos.x = 0;
+		tputs(tgetstr("do", NULL), 1, &put_my_char);
+		g_linei->pos.y += 1;
+	}
+	save_reset_pos(g_linei->pos, 1);
+	put_my_str_edit(&g_linei->content[g_linei->curs]);
+	save_reset_pos(g_linei->pos, 2);
+	g_linei->len += 1;
+}
+
+void	add_char_at_end(char c)
+{
+	struct winsize	ws;
+
+	ioctl(1, TIOCGWINSZ, &ws);
+	if (g_linei->len == g_linei->len_max)
+	{
+		g_linei->content =
+			realloc_char(&g_linei->content, g_linei->len_max + 21);
+		ft_bzero(&g_linei->content[g_linei->len_max], 21);
+		g_linei->len_max += 20;
+	}
+	g_linei->content[g_linei->curs] = c;
+	ft_putchar(c);
+	g_linei->curs += 1;
+	g_linei->pos.x += 1;
+	g_linei->len += 1;
+	if (g_linei->pos.x == ws.ws_col)
+	{
+		tputs(tgetstr("do", NULL), 1, &put_my_char);
+		g_linei->pos.y += 1;
+		g_linei->pos.x = 0;
+	}
+}
+
+void	add_char_to_line(char c)
+{
+	if (g_linei->len == g_linei->len_max)
+	{
+		g_linei->content =
+			realloc_char(&g_linei->content, g_linei->len_max + 21);
+		ft_bzero(&g_linei->content[g_linei->len_max], 21);
+		g_linei->len_max += 20;
+	}
+	if (g_linei->curs == g_linei->len)
+		add_char_at_end(c);
+	else
+		add_char_enter_char(c);
+}
+
+void	del_char(void)
+{
+	if (g_linei->len && g_linei->curs)
+	{
+		key_left_funct();
+		tputs(tgetstr("dc", NULL), 1, &put_my_char);
+		ft_memmove(&g_linei->content[g_linei->curs], &g_linei->content[g_linei->curs + 1],
+				ft_strlen(&g_linei->content[g_linei->curs + 1]));
+		g_linei->content[ft_strlen(g_linei->content) - 1] = '\0';
+		save_reset_pos(g_linei->pos, 1);
+		tputs(tgetstr("cd", NULL), 1, &put_my_char);
+		put_my_str_edit(&g_linei->content[g_linei->curs]);
+		save_reset_pos(g_linei->pos, 2);
+		g_linei->len -= 1;
+	}
+}
+
+int	main(void)
+{
+	char		buf[1];
+	struct winsize	ws;
+	char		*prompt;
+
+	prompt = "Hello > ";
+	ioctl(1, TIOCGWINSZ, &ws);
 	init_term();
-	g_linei = (struct s_linfo*)ft_memalloc(sizeof(struct s_linfo));
+	g_linei = ft_memalloc(sizeof(t_lineinfo));
 	g_linei->content = ft_strnew(20);
+	g_linei->p_len = ft_strlen(prompt);
 	g_linei->len = 0;
-	g_linei->pos = 0;
+	g_linei->len_max = 20;
+	g_linei->pos.x = g_linei->p_len;
+	g_linei->pos.y = 0;
 	g_linei->curs = 0;
-	g_linei->col = 0;
-	g_linei->max_len = 20;
+	ft_putstr(prompt);
 	while (1)
 	{
-		ft_bzero(buff, 1);
-		read(0, buff, 1);
-		// Faire un tableau de pointeur sur fonction
-		if (buff[0] == 27)
+		ft_bzero(buf, 1);
+		read(0, buf, 1);
+		if (buf[0] == 27)
 			is_arrow();
-		else if (ft_isprint(buff[0]))
-			add_char_to_line(buff[0]);
-		/*else if (key_is_arrow_left(buff))
-			key_left_funct();
-		else if (key_is_arrow_right(buff))
-			key_right_funct();
-		else if (buff[0] == 127)
-			key_backspace_funct();*/
-		else if (buff[0] == 10)
+		else if (buf[0] == 127) // Backspace
+			del_char();
+		else if (key_is_alt_v(buf))
+			line_editing_select(1);
+		else if (ft_isprint(buf[0]))
+			add_char_to_line(buf[0]);
+		else if (buf[0] == 10)
 		{
-			printf("\nLine = [%s]\n", g_linei->content);
-			printf("Cursor = [%d]\n", g_linei->curs);
-			printf("Len = [%d]\n", g_linei->len);
-			printf("Pos = [%d]\n", g_linei->pos);
-			printf("Winsize = [%d]\n", ws.ws_col);
-			//printf("col = %d et line = %d", getColumnPosition(0, 1), getLinePosition(0, 1));
+			line_editing_select(2);
+			printf("\nCURS = [%d]\n", g_linei->curs);
+			printf("LINE = [%s]\n", g_linei->content);
+			printf("LEN = [%d]\n", g_linei->len);
+			printf("COL = [%d]\n", g_linei->pos.x);
+			printf("SIZE = [%d]\n", ws.ws_col);
+			g_linei->curs = 0;
+			default_term();
 			exit(0);
 		}
 	}
+	ft_strdel(&g_linei->content);
+	free(g_linei);
 	default_term();
 }
