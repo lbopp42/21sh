@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/13 17:32:12 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/13 17:41:47 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -552,7 +552,7 @@ char	*line_editing_select(int mode)
 		save_reset_pos(g_linei->pos, 2);
 	}
 	else if (mode == 2)
-		printf("TEST = [%s]\n", copy);
+		return (copy);
 	return (NULL);
 }
 
