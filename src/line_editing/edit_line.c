@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/13 17:41:47 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/14 10:36:14 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,12 +188,12 @@ int		key_is_alt_c(char *buff)
 int		key_is_alt_p(char *buff)
 {
 	static char	alt_p_key[] = {-128, 0, 0, 0, 0};
-	char	buff2[6];
+	char	buff2[5];
 
-	ft_bzero(buff2, 5);
-	read(0, buff2, 5);
 	if (buff[0] == -49)
 	{
+		ft_bzero(buff2, 5);
+		read(0, buff2, 5);
 		if (!ft_strcmp(buff2, alt_p_key))
 			return (1);
 	}
@@ -514,7 +514,6 @@ char	*line_editing_select(int mode)
 			{
 				if (i - 1 > 0)
 				{
-					printf("i = %d\n", i);
 					tmp[0] = g_linei->content[g_linei->curs];
 					put_my_str_edit(tmp);
 					save_reset_pos(g_linei->pos, 2);
@@ -656,7 +655,16 @@ void	paste_select(void)
 	if (line_editing_select(2) == NULL)
 		return ;
 	result = ft_strsub(g_linei->content, 0, g_linei->curs);
-	printf("paste = %s\n", result);
+	result = ft_stradd(result, line_editing_select(2));
+	result = ft_stradd(result, ft_strsub(g_linei->content, g_linei->curs, g_linei->len));
+	free(g_linei->content);
+	g_linei->content = result;
+	g_linei->len = ft_strlen(result);
+	g_linei->len_max = g_linei->len;
+	put_my_str_edit(line_editing_select(2));
+	save_reset_pos(g_linei->pos, 1);
+	put_my_str_edit(&g_linei->content[g_linei->curs]);
+	save_reset_pos(g_linei->pos, 2);
 }
 
 int	main(void)
@@ -687,7 +695,7 @@ int	main(void)
 			del_char();
 		else if (key_is_alt_v(buf))
 			line_editing_select(1);
-		else if (ft_isprint(buf[0]))
+		if (ft_isprint(buf[0]))
 			add_char_to_line(buf[0]);
 		else if (key_is_alt_p(buf))
 			paste_select();
@@ -697,6 +705,7 @@ int	main(void)
 			printf("\nCURS = [%d]\n", g_linei->curs);
 			printf("LINE = [%s]\n", g_linei->content);
 			printf("LEN = [%d]\n", g_linei->len);
+			printf("LEN_MAX = [%d]\n", g_linei->len_max);
 			printf("COL = [%d]\n", g_linei->pos.x);
 			printf("SIZE = [%d]\n", ws.ws_col);
 			g_linei->curs = 0;
