@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/14 10:36:14 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/14 11:09:09 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -459,6 +459,16 @@ void	put_my_str_edit(char *content)
 	}
 }
 
+char	*cut_funct(char *selected)
+{
+	char	*copy;
+
+	copy = ft_strdup(selected);
+	move_to(g_linei->select_start);
+	tputs(tgetstr("cd", NULL), 1, &put_my_char);
+	return (NULL);
+}
+
 char	*line_editing_select(int mode)
 {
 	char		*selected;
@@ -545,6 +555,11 @@ char	*line_editing_select(int mode)
 		}
 		if (key_is_alt_c(buff))
 			copy = ft_strdup(selected);
+		else if (key_is_alt_x(buff))
+		{
+			copy = cut_funct(selected);
+			return (NULL);
+		}
 		save_reset_pos(g_linei->pos, 1);
 		move_to(g_linei->select_start);
 		put_my_str_edit(&selected[0]);
