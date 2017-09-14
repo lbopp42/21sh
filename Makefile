@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/05/24 10:36:34 by lbopp            ###   ########.fr        #
+#    Updated: 2017/09/14 14:11:14 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,17 +14,31 @@ NAME = 21sh
 CFLAGS = -Wall -Werror -Wextra -g
 LIBFT = libft/
 CLANG = clang
-LEXER_SRC = find_type.c\
-			isop.c\
-			isquote.c\
-			get_last_state.c\
-			get_last_token.c\
+LEXER_SRC = add_to_current_token.c\
+			create_new_token.c\
+			is_digit_token.c\
+			is_piece_of_bigop.c\
 			lexer.c\
-			print_debug.c\
+			management_of_op.c\
 			state_management.c\
-			token_management.c
-
+			treatment_newline.c\
+			treatment_of_quote.c\
+			treatment_of_word.c
+PARSER_SRC = list_to_array.c\
+			 parser.c
+EXPAND_SRC = main_expand.c
+EXECUTION_SRC = execution.c
+BUILTINS_SRC = array_to_list.c\
+			   ft_cd.c\
+			   ft_echo.c\
+			   ft_env.c\
+			   ft_exit.c\
+			   ft_setenv.c\
+			   ft_unsetenv.c\
+			   list_to_tab.c\
+			   tab_to_list.c
 SRC_NAME = main.c
+
 SRC_TEST = src/lexer/lexer.c\
 		   src/lexer/add_to_current_token.c\
 		   src/lexer/create_new_token.c\
@@ -71,10 +85,22 @@ SRC_TEST = src/lexer/lexer.c\
 		   lsh_test/test_parser16.c
 SRC_PATH = src
 LEXER_PATH = src/lexer
+PARSER_PATH = src/parser
+EXPAND_PATH = src/expand
+EXECUTION_PATH = src/execution
+BUILTINS_PATH = src/builtins
 SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
 LEXER = $(addprefix $(LEXER_PATH)/,$(LEXER_SRC))
+PARSER = $(addprefix $(PARSER_PATH)/,$(PARSER_SRC))
+EXPAND = $(addprefix $(EXPAND_PATH)/,$(EXPAND_SRC))
+EXECUTION = $(addprefix $(EXECUTION_PATH)/,$(EXECUTION_SRC))
+BUILTINS = $(addprefix $(BUILTINS_PATH)/,$(BUILTINS_SRC))
 OBJ = $(SRC:.c=.o)\
-	$(LEXER:.c=.o)
+	$(LEXER:.c=.o)\
+	$(PARSER:.c=.o)\
+	$(EXPAND:.c=.o)\
+	$(EXECUTION:.c=.o)\
+	$(BUILTINS:.c=.o)
 OBJ_TEST = $(SRC_TEST:.c=.o)
 RM = rm -f
 

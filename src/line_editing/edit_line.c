@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/14 13:18:10 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/14 13:57:26 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -352,6 +352,7 @@ void	key_shift_down_funct()
 	}
 }
 
+/* NE SERT A RIEN JE PENSE
 void	key_alt_left_funct()
 {
 	t_pos	tmp_pos;
@@ -368,7 +369,7 @@ void	key_alt_left_funct()
 		save_reset_pos(tmp_pos, 1);
 		save_reset_pos(g_linei->pos, 2);
 	}
-}
+}*/
 
 void	is_arrow(void)
 {
