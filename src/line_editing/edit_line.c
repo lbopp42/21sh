@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/14 11:09:09 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/14 13:18:10 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -461,12 +461,21 @@ void	put_my_str_edit(char *content)
 
 char	*cut_funct(char *selected)
 {
-	char	*copy;
+	char	*cutted;
+	char	*new_line;
 
-	copy = ft_strdup(selected);
+	cutted = ft_strdup(selected);
 	move_to(g_linei->select_start);
 	tputs(tgetstr("cd", NULL), 1, &put_my_char);
-	return (NULL);
+	save_reset_pos(g_linei->pos, 1);
+	put_my_str_edit(&g_linei->content[g_linei->curs + ft_strlen(cutted)]);
+	save_reset_pos(g_linei->pos, 2);
+	g_linei->len -= ft_strlen(cutted);
+	new_line = ft_strsub(g_linei->content, 0, g_linei->curs);
+	new_line = ft_stradd(new_line, &g_linei->content[g_linei->curs + ft_strlen(cutted)]); //memmove possible je pense
+	free(g_linei->content);
+	g_linei->content = new_line;
+	return (cutted);
 }
 
 char	*line_editing_select(int mode)
