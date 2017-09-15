@@ -11,9 +11,9 @@
 # **************************************************************************** #
 
 NAME = 21sh
-CFLAGS = -Wall -Werror -Wextra -g
+CFLAGS = -g
 LIBFT = libft/
-CLANG = clang
+CLANG = gcc
 LEXER_SRC = add_to_current_token.c\
 			create_new_token.c\
 			is_digit_token.c\

@@ -18,6 +18,7 @@ char	**g_env;
 int		g_last_status;
 
 #include "libft.h"
+#include <sys/wait.h>
 #include <stdio.h>
 #define READ_END 0
 #define WRITE_END 1

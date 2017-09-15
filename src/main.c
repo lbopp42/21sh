@@ -87,5 +87,5 @@ int		main(int ac, char **av, char **env)
 		free_ast_tree(&tuple_parse->ast_tree);
 		free(tuple_parse);
 	}
-	return (1);
+	return (0);
 }

@@ -13,6 +13,7 @@
 #include "lsh.h"
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 
 /*static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
 {
@@ -32,29 +33,6 @@
 
 int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min);
 //void	exec_cmd(char *content, int in, int out);
-
-void	run_pipe(t_ast_node *ast_tree)
-{
-	pid_t	child;
-	int		p[2];
-
-	pipe(p);
-	child = fork();
-	if (child == 0)
-	{
-		dup2(p[WRITE_END], STDOUT_FILENO);
-		close(p[READ_END]);
-		close(p[WRITE_END]);
-		main_exec(ast_tree->left, 1, 10);
-	}
-	else if (child > 0)
-	{
-		dup2(p[READ_END], STDIN_FILENO);
-		close(p[WRITE_END]);
-		close(p[READ_END]);
-		main_exec(ast_tree->right, 1, 10);
-	}
-}
 
 void	run_redir_great(t_ast_node *ast_tree, int in_fork)
 {
@@ -322,22 +300,66 @@ void	run_lessand(t_ast_node *ast_tree, int in_fork, int fd_min)
 	close(fd_new);
 }
 
+void	run_pipe(t_ast_node *ast_tree)
+{
+	pid_t	child;
+	int		p[2];
+
+	pipe(p);
+	child = fork();
+	if (child == 0)
+	{
+		dup2(p[WRITE_END], STDOUT_FILENO);
+		close(p[READ_END]);
+		close(p[WRITE_END]);
+		main_exec(ast_tree->left, 1, 10);
+	}
+	else if (child > 0)
+	{
+		dup2(p[READ_END], STDIN_FILENO);
+		close(p[WRITE_END]);
+		close(p[READ_END]);
+		main_exec(ast_tree->right, 1, 10);
+	}
+}
+
 void	launch_pipe(t_ast_node *ast_tree)
 {
 	pid_t		child;
+	pid_t		child2;
+	int			p[2];
 	static int	fork_nb = 0;
 
 	if (fork_nb == 0)
 	{
 		fork_nb = 1;
+		pipe(p);
 		child = fork();
 		if (child == 0)
-			run_pipe(ast_tree);
+		{
+			dup2(p[WRITE_END], STDOUT_FILENO);
+			close(p[READ_END]);
+			close(p[WRITE_END]);
+			main_exec(ast_tree->left, 1, 10);
+		}
 		if (child > 0)
 		{
-			while (wait(NULL) > 0);
-			ft_putendl_fd("PIPE FINI\n", 2);
-			fork_nb = 0;
+			child2 = fork();
+			if (child2 == 0)
+			{
+				dup2(p[READ_END], STDIN_FILENO);
+				close(p[WRITE_END]);
+				close(p[READ_END]);
+				main_exec(ast_tree->right, 1, 10);
+			}
+			if (child2 > 0)
+			{
+				close(p[WRITE_END]);
+				close(p[READ_END]);
+				wait(NULL);
+				wait(NULL);
+				fork_nb = 0;
+			}
 		}
 	}
 	else

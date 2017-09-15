@@ -43,7 +43,7 @@ static void	fill_lst(t_lst *lst, char ***array)
 
 static void	create_line(t_lst *lst, char ***array)
 {
-	int		size;
+	size_t	size;
 	int		i;
 	t_lst	*origin;
 
