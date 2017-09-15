@@ -64,6 +64,8 @@ int		main(int ac, char **av, char **env)
 		state_lst = NULL;
 		tok_lst = NULL;
 		get_next_line(0, &g_line);
+		if (!g_line || !g_line[0])
+			continue ;
 		nb_tok = lexer_posix(&tok_lst, &state_lst);
 		free(g_line);
 		if (state_lst)
@@ -75,7 +77,7 @@ int		main(int ac, char **av, char **env)
 		if (g_line && g_line[0])
 			tuple_parse = iscomplete_cmd(tok_lst, 0, 0);
 		else
-			exit(0);
+			continue ;
 		free_tok_lst(&tok_lst);
 		if (nb_tok != tuple_parse->mv)
 		{
