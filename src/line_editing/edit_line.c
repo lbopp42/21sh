@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/14 13:57:26 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/16 13:15:20 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -692,7 +692,7 @@ void	paste_select(void)
 	save_reset_pos(g_linei->pos, 2);
 }
 
-int	main(void)
+char	*editing_line(void)
 {
 	char		buf[1];
 	struct winsize	ws;
@@ -726,19 +726,14 @@ int	main(void)
 			paste_select();
 		else if (buf[0] == 10)
 		{
-			line_editing_select(2);
-			printf("\nCURS = [%d]\n", g_linei->curs);
-			printf("LINE = [%s]\n", g_linei->content);
-			printf("LEN = [%d]\n", g_linei->len);
-			printf("LEN_MAX = [%d]\n", g_linei->len_max);
-			printf("COL = [%d]\n", g_linei->pos.x);
-			printf("SIZE = [%d]\n", ws.ws_col);
 			g_linei->curs = 0;
+			ft_putchar('\n');
 			default_term();
-			exit(0);
+			return (g_linei->content);
 		}
 	}
 	ft_strdel(&g_linei->content);
 	free(g_linei);
 	default_term();
+	return (NULL);
 }

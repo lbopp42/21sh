@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/19 10:21:35 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/16 13:03:44 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,5 +137,11 @@ int		treatment_of_old_word(t_token **tok_lst, int *sp, int i);
 int		treatment_of_new_word(t_token **tok_lst, int *sp, int i);
 int		treatment_newline(t_token **tok_lst, int i, int type);
 int		treatment_new_op(t_token **tok_lst, int *sp, int i, int type);
+
+/* ************************ */
+/*		 LINE EDITING	  	*/
+/* ************************ */
+
+char	*editing_line(void);
 
 #endif

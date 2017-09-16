@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/14 13:55:27 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/16 12:56:40 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,11 @@ int		main(int ac, char **av, char **env)
 	(void)av;
 	while (1)
 	{
-		ft_putstr("$> ");
 		g_line = NULL;
 		tuple_parse = NULL;
 		state_lst = NULL;
 		tok_lst = NULL;
-		get_next_line(0, &g_line);
+		g_line = editing_line();
 		if (!g_line || !g_line[0])
 			continue ;
 		nb_tok = lexer_posix(&tok_lst, &state_lst);
