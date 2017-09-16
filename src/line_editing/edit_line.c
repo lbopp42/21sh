@@ -6,19 +6,12 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/16 13:15:20 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/16 15:18:28 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
-#include <stdio.h>
-#include <term.h>
-#include <termios.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
 
-struct termios		g_origin_term;
 typedef struct	s_pos
 {
 	int	x;
@@ -39,31 +32,6 @@ typedef struct	s_lineinfo
 t_lineinfo	*g_linei;
 void	default_term(void);
 void	save_reset_pos(t_pos pos, int mode);
-
-void	init_term()
-{
-	char			*term;
-	struct termios	attr;
-
-	tcgetattr(0, &g_origin_term);
-	tcgetattr(0, &attr);
-	attr.c_lflag &= ~(ECHO | ICANON);
-	attr.c_cc[VMIN] = 1;
-	attr.c_cc[VTIME] = 0;
-	tcsetattr(0, TCSADRAIN, &attr);
-	if (!(term = getenv("TERM")) || tgetent(NULL, term) == -1)
-	{
-		ft_putendl_fd("lsh: environment not found", 2);
-		default_term();
-		exit(0);
-	}
-}
-
-void	default_term(void)
-{
-	tcsetattr(0, TCSADRAIN, &g_origin_term);
-	tgetent(NULL, getenv("TERM"));
-}
 
 int	put_my_char(int c)
 {

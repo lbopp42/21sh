@@ -6,11 +6,36 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/16 12:56:40 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/16 15:20:05 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
+
+void	init_term(void)
+{
+	char			*term;
+	struct termios	attr;
+
+	tcgetattr(0, &g_origin_term);
+	tcgetattr(0, &attr);
+	attr.c_lflag &= ~(ECHO | ICANON);
+	attr.c_cc[VMIN] = 1;
+	attr.c_cc[VTIME] = 0;
+	tcsetattr(0, TCSADRAIN, &attr);
+	if (!(term = getenv("TERM")) || tgetent(NULL, term) == -1)
+	{
+		ft_putendl_fd("lsh: environment not found", 2);
+		default_term();
+		exit(0);
+	}
+}
+
+void	default_term(void)
+{
+	tcsetattr(0, TCSADRAIN, &g_origin_term);
+	tgetent(NULL, getenv("TERM"));
+}
 
 void	free_tok_lst(t_token **tok_lst)
 {

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/16 13:03:44 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/16 15:18:25 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,11 @@ int		g_last_status;
 #include "libft.h"
 #include <sys/wait.h>
 #include <stdio.h>
+#include <term.h>
+#include <termios.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
 #define READ_END 0
 #define WRITE_END 1
 
@@ -82,6 +87,7 @@ typedef struct	s_token
 	char			*content;
 	struct s_token	*next;
 }				t_token;
+struct termios		g_origin_term;
 
 int		execution(t_ast_node *ast_tree, char **env);
 t_list	*here_doc(char *delimiter, int option);
@@ -143,5 +149,7 @@ int		treatment_new_op(t_token **tok_lst, int *sp, int i, int type);
 /* ************************ */
 
 char	*editing_line(void);
+void	init_term(void);
+void	default_term(void);
 
 #endif
