@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/18 10:01:16 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/17 09:30:39 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-/*static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
+/*
+static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
 {
 	if (!ast_tree)
 		return ;
@@ -24,15 +25,14 @@
 	if (ast_tree->right)
 		print_my_ast(ast_tree->right, 2, layer + 1);
 	if (mode == 0)
-		printf("ROOT = [%s] layer = %d\n", ast_tree->content, layer);
+		printf("ROOT = [%s] layer = %d\n", ast_tree->content->content, layer);
 	if (mode == 1)
-		printf("LEFT = [%s] layer = %d\n", ast_tree->content, layer);
+		printf("LEFT = [%s] layer = %d\n", ast_tree->content->content, layer);
 	if (mode == 2)
-		printf("RIGHT = [%s] layer = %d\n", ast_tree->content, layer);
+		printf("RIGHT = [%s] layer = %d\n", ast_tree->content->content, layer);
 }*/
 
 int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min);
-//void	exec_cmd(char *content, int in, int out);
 
 void	run_redir_great(t_ast_node *ast_tree, int in_fork)
 {
@@ -377,7 +377,10 @@ void	launch_builtin(char	**cmd, int in_fork)
 	else if (ft_strequ(cmd[0], "echo"))
 		g_last_status = ft_echo(cmd);
 	else if (ft_strequ(cmd[0], "exit"))
+	{
+		default_term();
 		g_last_status = ft_exit(cmd);
+	}
 	else if (ft_strequ(cmd[0], "env"))
 		g_last_status = ft_env(cmd, in_fork);
 }
@@ -473,7 +476,7 @@ void	execution_cmd(t_list *content, int in_fork, char *path)
 	cmd = list_to_array(content);
 	if (ft_isinarray(cmd[0], builtins))
 		launch_builtin(cmd, in_fork);
-	else
+	else if (cmd[0] && cmd[0][0])
 	{
 		if (!find_abs_path(&cmd[0], path))
 			return ;
@@ -487,6 +490,12 @@ void	execution_cmd(t_list *content, int in_fork, char *path)
 			else
 				wait(NULL);
 		}
+	}
+	else
+	{
+		ft_putstr_fd("lsh: ", 2);
+		ft_putstr_fd(*cmd, 2);
+		ft_putendl_fd(": command not found", 2);
 	}
 }
 
@@ -517,7 +526,6 @@ int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
 int		execution(t_ast_node *ast_tree, char **env)
 {
 	(void)env;
-	//print_my_ast(ast_tree, 0, 0);
 	main_exec(ast_tree, 0, 10);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/14 10:07:15 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/14 11:04:23 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/16 16:33:22 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,9 @@ int		ft_exit(char **cmd)
 		exit(ft_atoi(cmd[1]));
 	}
 	else
+	{
+		default_term();
 		exit(g_last_status);
+	}
 	return (1);
 }

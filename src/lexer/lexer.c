@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/04/30 10:07:05 by lbopp             #+#    #+#             */
-/*   Updated: 2017/05/17 15:32:26 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/16 15:55:18 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,33 +24,19 @@ int	treatment_char(t_token **tok_lst, t_state **st_lst, int i)
 		return (0);
 	}
 	else if ((tmp = is_piece_of_bigop(tok_lst, st_lst, &sp, i)))
-	{
 		return (tmp);
-	}
 	else if (g_line[i] == '"' || g_line[i] == '\'')
-	{
 		return (treatment_of_quote(tok_lst, st_lst, &sp, i));
-	}
 	else if ((tmp = is_new_op(i)) != WORD && !*st_lst)
-	{
 		return (treatment_new_op(tok_lst, &sp, i, tmp));
-	}
 	else if (g_line[i] == '\n' && !*st_lst)
-	{
 		return (treatment_newline(tok_lst, i, tmp));
-	}
 	else if (!*st_lst && (g_line[i] == ' ' || g_line[i] == '\t'))
-	{
 		sp = 1;
-	}
 	else if (*tok_lst && (*tok_lst)->type == WORD && !sp)
-	{
 		return (treatment_of_old_word(tok_lst, &sp, i));
-	}
 	else
-	{
 		return (treatment_of_new_word(tok_lst, &sp, i));
-	}
 	return (1);
 }
 

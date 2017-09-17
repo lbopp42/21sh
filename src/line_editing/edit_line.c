@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/16 15:18:28 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/17 11:06:29 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -668,7 +668,6 @@ char	*editing_line(void)
 
 	prompt = "Hello > ";
 	ioctl(1, TIOCGWINSZ, &ws);
-	init_term();
 	g_linei = ft_memalloc(sizeof(t_lineinfo));
 	g_linei->content = ft_strnew(20);
 	g_linei->p_len = ft_strlen(prompt);
@@ -696,12 +695,10 @@ char	*editing_line(void)
 		{
 			g_linei->curs = 0;
 			ft_putchar('\n');
-			default_term();
 			return (g_linei->content);
 		}
 	}
 	ft_strdel(&g_linei->content);
 	free(g_linei);
-	default_term();
 	return (NULL);
 }
