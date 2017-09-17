@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/17 11:32:34 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/17 14:43:03 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,14 +110,15 @@ int	key_is_alt_left(const char *buff)
 
 int	key_is_alt_v(const char *buff)
 {
-	static char	enter_key[] = {-120, -102, 0, 0, 0, 0};
+	static char	alt_v[] = {-120, -102, 0, 0, 0, 0};
 	char		buff2[6];
 
 	if (buff[0] == -30)
 	{
 		ft_bzero(buff2, 6);
 		read(0, buff2, 5);
-		if (!ft_strcmp(buff2, enter_key))
+		if (buff2[0] == alt_v[0] && buff2[1] == alt_v[1] &&
+				!buff2[2])
 			return (1);
 	}
 	return (0);
@@ -149,9 +150,10 @@ int		key_is_alt_p(char *buff)
 
 int		key_is_alt_x(char *buff)
 {
-	static char	alt_x_key[] = {-30, -119, -120, 0, 0, 0};
+	static char	alt_x[] = {-30, -119, -120, 0, 0, 0};
 
-	if (!ft_strcmp(buff, alt_x_key))
+	if (buff[0] == alt_x[0] && buff[1] == alt_x[1] &&
+			buff[2] == alt_x[2] && !buff[3])
 		return (1);
 	return (0);
 }
@@ -325,37 +327,47 @@ void	is_arrow(void)
 		key_shift_down_funct();
 }
 
-void	move_to(t_pos tmp_pos)
+void	move_to_x(t_pos tmp_pos, struct winsize ws)
 {
-	struct winsize	ws;
-
-	ioctl(1, TIOCGWINSZ, &ws);
-	while (g_linei->pos.y > tmp_pos.y)
-	{
-		g_linei->pos.y -= 1;
-		g_linei->curs -= ws.ws_col;
-		tputs(tgetstr("up", NULL), 1, &put_my_char);
-	}
-	while (g_linei->pos.y < tmp_pos.y)
-	{
-		g_linei->pos.y += 1;
-		g_linei->curs -= g_linei->pos.x;
-		g_linei->pos.x = 0;
-		g_linei->curs += ws.ws_col;
-		tputs(tgetstr("do", NULL), 1, &put_my_char);
-	}
 	while (g_linei->pos.x > tmp_pos.x)
 	{
-		g_linei->pos.x -= 1;
+		g_linei->pos.x--;
 		g_linei->curs -= 1;
 		tputs(tgetstr("le", NULL), 1, &put_my_char);
 	}
 	while (g_linei->pos.x < tmp_pos.x)
 	{
-		g_linei->pos.x += 1;
+		g_linei->pos.x++;
 		g_linei->curs += 1;
 		tputs(tgetstr("nd", NULL), 1, &put_my_char);
 	}
+}
+
+void	move_to_y(t_pos tmp_pos, struct winsize ws)
+{
+	while (g_linei->pos.y > tmp_pos.y)
+	{
+		g_linei->pos.y--;
+		g_linei->curs -= ws.ws_col;
+		tputs(tgetstr("up", NULL), 1, &put_my_char);
+	}
+	while (g_linei->pos.y < tmp_pos.y)
+	{
+		g_linei->pos.y++;
+		g_linei->curs -= g_linei->pos.x;
+		g_linei->pos.x = 0;
+		g_linei->curs += ws.ws_col;
+		tputs(tgetstr("do", NULL), 1, &put_my_char);
+	}
+}
+
+void	move_to(t_pos tmp_pos)
+{
+	struct winsize	ws;
+
+	ioctl(1, TIOCGWINSZ, &ws);
+	move_to_x(tmp_pos, ws);
+	move_to_y(tmp_pos, ws);
 }
 
 void	save_reset_pos(t_pos pos, int mode)
@@ -404,18 +416,121 @@ char	*cut_funct(char *selected)
 	g_linei->len -= ft_strlen(cutted);
 	new_line = ft_strsub(g_linei->content, 0, g_linei->curs);
 	new_line = ft_stradd(new_line,
-			&g_linei->content[g_linei->curs + ft_strlen(cutted)]); //memmove possible je pense
+			&g_linei->content[g_linei->curs + ft_strlen(cutted)]);
 	free(g_linei->content);
 	g_linei->content = new_line;
 	return (cutted);
+}
+
+void	remove_select_to_right(int *i, char **selected)
+{
+	char		*tmp_select;
+	char		tmp[2];
+
+	tmp[1] = '\0';
+	tmp[0] = g_linei->content[g_linei->curs];
+	save_reset_pos(g_linei->pos, 1);
+	tmp_select = ft_strdup(*selected + 1);
+	free(*selected);
+	*selected = ft_strdup(tmp_select);
+	free(tmp_select);
+	put_my_str_edit(tmp);
+	save_reset_pos(g_linei->pos, 2);
+	key_right_funct();
+	g_linei->select_start = g_linei->pos;
+	(*i)++;
+}
+
+void	select_to_right(int *i, char **selected)
+{
+	char		tmp[2];
+
+	tmp[1] = '\0';
+	if (*i > 0 && g_linei->curs < g_linei->len)
+	{
+		key_right_funct();
+		save_reset_pos(g_linei->pos, 1);
+		tmp[0] = g_linei->content[g_linei->curs];
+		*selected = ft_stradd(*selected, tmp);
+		ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1 (probleme du ls)
+		put_my_str_edit(&(*selected)[(*i)++]);
+		save_reset_pos(g_linei->pos, 2);
+		ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
+	}
+	else if (g_linei->curs < g_linei->len)
+		remove_select_to_right(i, selected);
+}
+
+void	remove_select_to_left(int *i, char **selected)
+{
+	char		*tmp_select;
+	char		tmp[2];
+
+	tmp[1] = '\0';
+	tmp_select = ft_strdup(*selected);
+	ft_strdel(selected);
+	key_left_funct();
+	g_linei->select_start = g_linei->pos;
+	tmp[0] = g_linei->content[g_linei->curs];
+	*selected = ft_strdup(tmp);
+	*selected = ft_stradd(*selected, tmp_select);
+	free(tmp_select);
+	save_reset_pos(g_linei->pos, 1);
+	ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1
+	put_my_str_edit(*selected);
+	save_reset_pos(g_linei->pos, 2);
+	ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
+	(*i)--;
+}
+
+void	select_to_left(int *i, char **selected)
+{
+	char		tmp[2];
+
+	tmp[1] = '\0';
+	if (*i - 1 > 0)
+	{
+		tmp[0] = g_linei->content[g_linei->curs];
+		put_my_str_edit(tmp);
+		save_reset_pos(g_linei->pos, 2);
+		(*selected)[*i - 1] = '\0';
+		(*i)--;
+		key_left_funct();
+		save_reset_pos(g_linei->pos, 1);
+	}
+	else
+		remove_select_to_left(i, selected);
+}
+
+void	treat_key_select(int *i, char buff[], char **selected, char **copy)
+{
+	while (buff[0] == 27 && (key_is_arrow_right(buff + 1) ||
+				key_is_arrow_left(buff + 1)))
+	{
+		if (key_is_arrow_right(buff + 1))
+			select_to_right(i, selected);
+		else if (key_is_arrow_left(buff + 1) && g_linei->curs > 0)
+			select_to_left(i, selected);
+		ft_bzero(buff, 6);
+		read(0, buff, 5);
+	}
+	if (key_is_alt_c(buff))
+		*copy = ft_strdup(*selected);
+	else if (key_is_alt_x(buff))
+	{
+		*copy = cut_funct(*selected);
+		return ;
+	}
+	save_reset_pos(g_linei->pos, 1);
+	move_to(g_linei->select_start);
+	put_my_str_edit(&(*selected)[0]);
+	save_reset_pos(g_linei->pos, 2);
 }
 
 char	*line_editing_select(int mode)
 {
 	char		*selected;
 	static char	*copy = NULL;
-	char		*tmp_select;
-	char		tmp[2];
 	char		buff[6];
 	int			i;
 
@@ -432,82 +547,7 @@ char	*line_editing_select(int mode)
 		ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
 		ft_bzero(buff, 6);
 		read(0, buff, 5);
-		while (buff[0] == 27 && (key_is_arrow_right(buff + 1) ||
-					key_is_arrow_left(buff + 1)))
-		{
-			tmp[1] = '\0';
-			if (key_is_arrow_right(buff + 1) && i > 0 &&
-					g_linei->curs < g_linei->len)
-			{
-				key_right_funct();
-				save_reset_pos(g_linei->pos, 1);
-				tmp[0] = g_linei->content[g_linei->curs];
-				selected = ft_stradd(selected, tmp);
-				ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1 (probleme du ls)
-				put_my_str_edit(&selected[i]);
-				save_reset_pos(g_linei->pos, 2);
-				ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
-				i++;
-			}
-			else if (key_is_arrow_right(buff + 1) &&
-					g_linei->curs < g_linei->len)
-			{
-				tmp[0] = g_linei->content[g_linei->curs];
-				save_reset_pos(g_linei->pos, 1);
-				tmp_select = ft_strdup(selected + 1);
-				free(selected);
-				selected = ft_strdup(tmp_select);
-				free(tmp_select);
-				put_my_str_edit(tmp);
-				save_reset_pos(g_linei->pos, 2);
-				key_right_funct();
-				g_linei->select_start = g_linei->pos;
-				i++;
-			}
-			else if (key_is_arrow_left(buff + 1) && g_linei->curs > 0)
-			{
-				if (i - 1 > 0)
-				{
-					tmp[0] = g_linei->content[g_linei->curs];
-					put_my_str_edit(tmp);
-					save_reset_pos(g_linei->pos, 2);
-					selected[i - 1] = '\0';
-					i--;
-					key_left_funct();
-					save_reset_pos(g_linei->pos, 1);
-				}
-				else
-				{
-					tmp_select = ft_strdup(selected);
-					free(selected);
-					key_left_funct();
-					g_linei->select_start = g_linei->pos;
-					tmp[0] = g_linei->content[g_linei->curs];
-					selected = ft_strdup(tmp);
-					selected = ft_stradd(selected, tmp_select);
-					free(tmp_select);
-					save_reset_pos(g_linei->pos, 1);
-					ft_putstr("\033[7m"); // NE PAS ECRIRE SUR 1
-					put_my_str_edit(selected);
-					save_reset_pos(g_linei->pos, 2);
-					ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
-					i--;
-				}
-			}
-			ft_bzero(buff, 6);
-			read(0, buff, 5);
-		}
-		if (key_is_alt_c(buff))
-			copy = ft_strdup(selected);
-		else if (key_is_alt_x(buff))
-		{
-			copy = cut_funct(selected);
-			return (NULL);
-		}
-		save_reset_pos(g_linei->pos, 1);
-		move_to(g_linei->select_start);
-		put_my_str_edit(&selected[0]);
-		save_reset_pos(g_linei->pos, 2);
+		treat_key_select(&i, buff, &selected, &copy);
 	}
 	else if (mode == 2)
 		return (copy);
@@ -596,7 +636,8 @@ void	del_char(void)
 	{
 		key_left_funct();
 		tputs(tgetstr("dc", NULL), 1, &put_my_char);
-		ft_memmove(&g_linei->content[g_linei->curs], &g_linei->content[g_linei->curs + 1],
+		ft_memmove(&g_linei->content[g_linei->curs],
+				&g_linei->content[g_linei->curs + 1],
 				ft_strlen(&g_linei->content[g_linei->curs + 1]));
 		g_linei->content[ft_strlen(g_linei->content) - 1] = '\0';
 		save_reset_pos(g_linei->pos, 1);
@@ -627,14 +668,11 @@ void	paste_select(void)
 	save_reset_pos(g_linei->pos, 2);
 }
 
-char	*editing_line(void)
+void	init_line_info(void)
 {
-	char			buf[1];
-	struct winsize	ws;
 	char			*prompt;
 
 	prompt = "Hello > ";
-	ioctl(1, TIOCGWINSZ, &ws);
 	g_linei = ft_memalloc(sizeof(t_lineinfo));
 	g_linei->content = ft_strnew(20);
 	g_linei->p_len = ft_strlen(prompt);
@@ -644,26 +682,42 @@ char	*editing_line(void)
 	g_linei->pos.y = 0;
 	g_linei->curs = 0;
 	ft_putstr(prompt);
+}
+
+int		treat_key(char buf[])
+{
+	if (buf[0] == 27)
+		is_arrow();
+	else if (buf[0] == 127)// Backspace
+		del_char();
+	else if (key_is_alt_v(buf))
+		line_editing_select(1);
+	else if (ft_isprint(buf[0]))
+		add_char_to_line(buf[0]);
+	else if (key_is_alt_p(buf))
+		paste_select();
+	else if (buf[0] == 10)
+	{
+		g_linei->curs = 0;
+		ft_putchar('\n');
+		return (1);
+	}
+	return (0);
+}
+
+char	*editing_line(void)
+{
+	char			buf[1];
+	struct winsize	ws;
+
+	ioctl(1, TIOCGWINSZ, &ws);
+	init_line_info();
 	while (1)
 	{
 		ft_bzero(buf, 1);
 		read(0, buf, 1);
-		if (buf[0] == 27)
-			is_arrow();
-		else if (buf[0] == 127)// Backspace
-			del_char();
-		else if (key_is_alt_v(buf))
-			line_editing_select(1);
-		if (ft_isprint(buf[0]))
-			add_char_to_line(buf[0]);
-		else if (key_is_alt_p(buf))
-			paste_select();
-		else if (buf[0] == 10)
-		{
-			g_linei->curs = 0;
-			ft_putchar('\n');
+		if (treat_key(buf))
 			return (g_linei->content);
-		}
 	}
 	ft_strdel(&g_linei->content);
 	free(g_linei);
