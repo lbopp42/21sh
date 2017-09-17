@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/16 16:07:05 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/17 11:16:58 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,25 @@ typedef struct	s_token
 	char			*content;
 	struct s_token	*next;
 }				t_token;
+typedef struct	s_pos
+{
+	int	x;
+	int	y;
+}				t_pos;
+typedef struct	s_lineinfo
+{
+	int		curs;	//index du contenu
+	char	*content;
+	t_pos	pos;
+	int		p_len;	//taille du prompt
+	int		len;
+	int		len_max;
+	t_pos	select_start;
+	int		select_len;
+	char	*select;
+}				t_lineinfo;
+
+t_lineinfo			*g_linei;
 struct termios		g_origin_term;
 
 int		execution(t_ast_node *ast_tree, char **env);
@@ -151,5 +170,6 @@ int		treatment_new_op(t_token **tok_lst, int *sp, int i, int type);
 char	*editing_line(void);
 void	init_term(void);
 void	default_term(void);
+void	save_reset_pos(t_pos pos, int mode);
 
 #endif

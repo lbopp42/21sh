@@ -6,32 +6,11 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/17 11:06:29 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/17 11:32:34 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
-
-typedef struct	s_pos
-{
-	int	x;
-	int	y;
-}				t_pos;
-typedef struct	s_lineinfo
-{
-	int		curs;	//index du contenu
-	char	*content;
-	t_pos	pos;
-	int		p_len;	//taille du prompt
-	int		len;
-	int		len_max;
-	t_pos	select_start;
-	int		select_len;
-	char	*select;
-}				t_lineinfo;
-t_lineinfo	*g_linei;
-void	default_term(void);
-void	save_reset_pos(t_pos pos, int mode);
 
 int	put_my_char(int c)
 {
@@ -132,7 +111,7 @@ int	key_is_alt_left(const char *buff)
 int	key_is_alt_v(const char *buff)
 {
 	static char	enter_key[] = {-120, -102, 0, 0, 0, 0};
-	char	buff2[6];
+	char		buff2[6];
 
 	if (buff[0] == -30)
 	{
@@ -156,7 +135,7 @@ int		key_is_alt_c(char *buff)
 int		key_is_alt_p(char *buff)
 {
 	static char	alt_p_key[] = {-128, 0, 0, 0, 0};
-	char	buff2[5];
+	char		buff2[5];
 
 	if (buff[0] == -49)
 	{
@@ -184,7 +163,7 @@ void	key_left_funct(void)
 	ioctl(1, TIOCGWINSZ, &ws);
 	if (g_linei->curs != 0)
 	{
-		if (g_linei->pos.x == 0 && g_linei->pos.y != 0) 
+		if (g_linei->pos.x == 0 && g_linei->pos.y != 0)
 		{
 			tputs(tgetstr("up", NULL), 1, &put_my_char);
 			g_linei->pos.y -= 1;
@@ -247,7 +226,7 @@ void	key_end_funct(void)
 	save_reset_pos(g_linei->pos, 2);
 }
 
-void	key_shift_left_funct()
+void	key_shift_left_funct(void)
 {
 	int	sp;
 
@@ -264,7 +243,7 @@ void	key_shift_left_funct()
 		key_right_funct();
 }
 
-void	key_shift_right_funct()
+void	key_shift_right_funct(void)
 {
 	int	sp;
 
@@ -279,7 +258,7 @@ void	key_shift_right_funct()
 	}
 }
 
-void	key_shift_up_funct()
+void	key_shift_up_funct(void)
 {
 	t_pos	tmp_pos;
 
@@ -302,42 +281,25 @@ void	key_shift_up_funct()
 	}
 }
 
-void	key_shift_down_funct()
+void	key_shift_down_funct(void)
 {
-	t_pos	tmp_pos;
+	t_pos			tmp_pos;
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
 	if (g_linei->pos.y + 1 <= g_linei->len / ws.ws_col)
 	{
-		if (ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col <= g_linei->len + g_linei->p_len)
+		if (ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col <=
+				g_linei->len + g_linei->p_len)
 			tmp_pos.x = g_linei->pos.x;
 		else
-			tmp_pos.x = g_linei->len + g_linei->p_len - (g_linei->pos.y + 1) * ws.ws_col;
+			tmp_pos.x = g_linei->len + g_linei->p_len -
+				(g_linei->pos.y + 1) * ws.ws_col;
 		tmp_pos.y = g_linei->pos.y + 1;
 		save_reset_pos(tmp_pos, 1);
 		save_reset_pos(g_linei->pos, 2);
 	}
 }
-
-/* NE SERT A RIEN JE PENSE
-void	key_alt_left_funct()
-{
-	t_pos	tmp_pos;
-	struct winsize	ws;
-
-	ioctl(1, TIOCGWINSZ, &ws);
-	if (g_linei->pos.y + 1 <= g_linei->len / ws.ws_col)
-	{
-		if (ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col <= g_linei->len + g_linei->p_len)
-			tmp_pos.x = g_linei->pos.x;
-		else
-			tmp_pos.x = g_linei->len + g_linei->p_len - (g_linei->pos.y + 1) * ws.ws_col;
-		tmp_pos.y = g_linei->pos.y + 1;
-		save_reset_pos(tmp_pos, 1);
-		save_reset_pos(g_linei->pos, 2);
-	}
-}*/
 
 void	is_arrow(void)
 {
@@ -408,7 +370,7 @@ void	save_reset_pos(t_pos pos, int mode)
 
 void	put_my_str_edit(char *content)
 {
-	int	i;
+	int				i;
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
@@ -441,7 +403,8 @@ char	*cut_funct(char *selected)
 	save_reset_pos(g_linei->pos, 2);
 	g_linei->len -= ft_strlen(cutted);
 	new_line = ft_strsub(g_linei->content, 0, g_linei->curs);
-	new_line = ft_stradd(new_line, &g_linei->content[g_linei->curs + ft_strlen(cutted)]); //memmove possible je pense
+	new_line = ft_stradd(new_line,
+			&g_linei->content[g_linei->curs + ft_strlen(cutted)]); //memmove possible je pense
 	free(g_linei->content);
 	g_linei->content = new_line;
 	return (cutted);
@@ -469,10 +432,12 @@ char	*line_editing_select(int mode)
 		ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
 		ft_bzero(buff, 6);
 		read(0, buff, 5);
-		while (buff[0] == 27 && (key_is_arrow_right(buff + 1) || key_is_arrow_left(buff + 1)))
+		while (buff[0] == 27 && (key_is_arrow_right(buff + 1) ||
+					key_is_arrow_left(buff + 1)))
 		{
 			tmp[1] = '\0';
- 			if (key_is_arrow_right(buff + 1) && i > 0 && g_linei->curs < g_linei->len)
+			if (key_is_arrow_right(buff + 1) && i > 0 &&
+					g_linei->curs < g_linei->len)
 			{
 				key_right_funct();
 				save_reset_pos(g_linei->pos, 1);
@@ -484,7 +449,8 @@ char	*line_editing_select(int mode)
 				ft_putstr("\033[0m"); // NE PAS ECRIRE SUR 1
 				i++;
 			}
-			else if (key_is_arrow_right(buff + 1) && g_linei->curs < g_linei->len)
+			else if (key_is_arrow_right(buff + 1) &&
+					g_linei->curs < g_linei->len)
 			{
 				tmp[0] = g_linei->content[g_linei->curs];
 				save_reset_pos(g_linei->pos, 1);
@@ -649,7 +615,8 @@ void	paste_select(void)
 		return ;
 	result = ft_strsub(g_linei->content, 0, g_linei->curs);
 	result = ft_stradd(result, line_editing_select(2));
-	result = ft_stradd(result, ft_strsub(g_linei->content, g_linei->curs, g_linei->len));
+	result = ft_stradd(result,
+			ft_strsub(g_linei->content, g_linei->curs, g_linei->len));
 	free(g_linei->content);
 	g_linei->content = result;
 	g_linei->len = ft_strlen(result);
@@ -662,9 +629,9 @@ void	paste_select(void)
 
 char	*editing_line(void)
 {
-	char		buf[1];
+	char			buf[1];
 	struct winsize	ws;
-	char		*prompt;
+	char			*prompt;
 
 	prompt = "Hello > ";
 	ioctl(1, TIOCGWINSZ, &ws);
@@ -683,7 +650,7 @@ char	*editing_line(void)
 		read(0, buf, 1);
 		if (buf[0] == 27)
 			is_arrow();
-		else if (buf[0] == 127) // Backspace
+		else if (buf[0] == 127)// Backspace
 			del_char();
 		else if (key_is_alt_v(buf))
 			line_editing_select(1);
