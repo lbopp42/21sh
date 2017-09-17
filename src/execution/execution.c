@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/17 09:30:39 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/17 16:07:53 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,31 +15,24 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-/*
-static void print_my_ast(t_ast_node *ast_tree, int mode, int layer)
+int		print_error(char *content, char *error, int in_fork)
 {
-	if (!ast_tree)
-		return ;
-	if (ast_tree->left)
-		print_my_ast(ast_tree->left, 1, layer + 1);
-	if (ast_tree->right)
-		print_my_ast(ast_tree->right, 2, layer + 1);
-	if (mode == 0)
-		printf("ROOT = [%s] layer = %d\n", ast_tree->content->content, layer);
-	if (mode == 1)
-		printf("LEFT = [%s] layer = %d\n", ast_tree->content->content, layer);
-	if (mode == 2)
-		printf("RIGHT = [%s] layer = %d\n", ast_tree->content->content, layer);
-}*/
-
-int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min);
+	ft_putstr_fd("lsh: ", 2);
+	ft_putstr_fd(content, 2);
+	ft_putendl_fd(error, 2);
+	if (in_fork)
+		exit(1);
+	else
+		return (1);
+	return (0);
+}
 
 void	run_redir_great(t_ast_node *ast_tree, int in_fork)
 {
-	int		new_fd;
-	int		tmp_out;
+	int			new_fd;
+	int			tmp_out;
 	static	int	first = 0;
-	int		fd_default;
+	int			fd_default;
 
 	fd_default = 1;
 	new_fd = open(ast_tree->right->content->content,
@@ -53,7 +46,8 @@ void	run_redir_great(t_ast_node *ast_tree, int in_fork)
 		first = 1;
 	}
 	close(new_fd);
-	if (ast_tree->left && ast_tree->left->type == IO_NUMBER && ast_tree->left->left)
+	if (ast_tree->left && ast_tree->left->type == IO_NUMBER &&
+			ast_tree->left->left)
 		main_exec(ast_tree->left->left, in_fork, 10);
 	else if (ast_tree->left)
 		main_exec(ast_tree->left, in_fork, 10);
@@ -64,10 +58,10 @@ void	run_redir_great(t_ast_node *ast_tree, int in_fork)
 
 void	run_redir_dgreat(t_ast_node *ast_tree, int in_fork)
 {
-	int		new_fd;
+	int			new_fd;
 	static	int	first = 0;
-	int		tmp_out;
-	int		fd_default;
+	int			tmp_out;
+	int			fd_default;
 
 	fd_default = 1;
 	new_fd = open(ast_tree->right->content->content,
@@ -81,7 +75,8 @@ void	run_redir_dgreat(t_ast_node *ast_tree, int in_fork)
 		first = 1;
 	}
 	close(new_fd);
-	if (ast_tree->left && ast_tree->left->type == IO_NUMBER && ast_tree->left->left)
+	if (ast_tree->left && ast_tree->left->type == IO_NUMBER &&
+			ast_tree->left->left)
 		main_exec(ast_tree->left->left, in_fork, 10);
 	else if (ast_tree->left)
 		main_exec(ast_tree->left, in_fork, 10);
@@ -92,33 +87,29 @@ void	run_redir_dgreat(t_ast_node *ast_tree, int in_fork)
 
 void	run_redir_less(t_ast_node *ast_tree, int in_fork)
 {
-	int		new_fd;
+	int			new_fd;
 	static	int	first = 0;
-	int		tmp_in;
-	int		fd_default;
+	int			tmp_in;
+	int			fd_default;
 
 	fd_default = 0;
 	if (ast_tree->left && ast_tree->left->type == IO_NUMBER)
 		fd_default = ft_atoi(ast_tree->left->content->content);
-	new_fd = open(ast_tree->right->content->content, O_RDONLY, S_IRUSR | S_IWUSR);
+	new_fd = open(ast_tree->right->content->content,
+			O_RDONLY, S_IRUSR | S_IWUSR);
 	tmp_in = dup(fd_default);
 	if (new_fd == -1)
-	{
-		ft_putstr_fd("lsh: ", 2);
-		ft_putstr_fd(ast_tree->right->content->content, 2);
-		ft_putstr_fd(": No such file or directory\n", 2);
-		if (in_fork)
-			exit(1);
-		else
+		if (print_error(ast_tree->right->content->content,
+					": No such file or directory", in_fork))
 			return ;
-	}
 	if (first == 0)
 	{
 		dup2(new_fd, fd_default);
 		first = 1;
 	}
 	close(new_fd);
-	if (ast_tree->left && ast_tree->left->type == IO_NUMBER && ast_tree->left->left)
+	if (ast_tree->left && ast_tree->left->type == IO_NUMBER &&
+			ast_tree->left->left)
 		main_exec(ast_tree->left->left, in_fork, 10);
 	else if (ast_tree->left)
 		main_exec(ast_tree->left, in_fork, 10);
@@ -210,23 +201,16 @@ void	run_greatand(t_ast_node *ast_tree, int in_fork, int fd_min)
 		if (ft_isnumber(ast_tree->right->content->content) &&
 				ft_atoi(ast_tree->right->content->content) > 9)
 		{
-			ft_putstr_fd("lsh: ", 2);
-			ft_putstr_fd(ast_tree->right->content->content, 2);
-			ft_putendl_fd(": illegal file descriptor name", 2);
-			if (in_fork)
-				exit(1);
-			else
+			if (print_error(ast_tree->right->content->content,
+					": illegal file descriptor name", in_fork))
 				return ;
 		}
 		else if (ft_isnumber(ast_tree->right->content->content)
-				&& (fd_new = dup(ft_atoi(ast_tree->right->content->content))) == -1)
+				&& (fd_new =
+				dup(ft_atoi(ast_tree->right->content->content))) == -1)
 		{
-			ft_putstr_fd("lsh: ", 2);
-			ft_putstr_fd(ast_tree->right->content->content, 2);
-			ft_putendl_fd(": Bad file descriptor", 2);
-			if (in_fork)
-				exit(1);
-			else
+			if (print_error(ast_tree->right->content->content,
+					": Bad file descriptor", in_fork))
 				return ;
 		}
 		else if (!ft_isnumber(ast_tree->right->content->content))
@@ -235,7 +219,8 @@ void	run_greatand(t_ast_node *ast_tree, int in_fork, int fd_min)
 		dup2(fd_default, fd_new);
 		close(fd_default);
 	}
-	if (ast_tree->left && ast_tree->left->type == IO_NUMBER && ast_tree->left->left)
+	if (ast_tree->left && ast_tree->left->type == IO_NUMBER &&
+			ast_tree->left->left)
 		main_exec(ast_tree->left->left, in_fork, fd_min + 1);
 	else if (ast_tree->left)
 		main_exec(ast_tree->left, in_fork, fd_min + 1);
@@ -260,39 +245,27 @@ void	run_lessand(t_ast_node *ast_tree, int in_fork, int fd_min)
 		if (ft_isnumber(ast_tree->right->content->content)
 				&& ft_atoi(ast_tree->right->content->content) > 9)
 		{
-			ft_putstr_fd("lsh: ", 2);
-			ft_putstr_fd(ast_tree->right->content->content, 2);
-			ft_putendl_fd(": illegal file descriptor name", 2);
-			if (in_fork)
-				exit(1);
-			else
+			if (print_error(ast_tree->right->content->content,
+					": illegal file descriptor name", in_fork))
 				return ;
 		}
 		else if (ft_isnumber(ast_tree->right->content->content) &&
-				(fd_new = dup(ft_atoi(ast_tree->right->content->content))) == -1)
+				(fd_new = dup(ft_atoi(
+				ast_tree->right->content->content))) == -1)
 		{
-			ft_putstr_fd("lsh: ", 2);
-			ft_putstr_fd(ast_tree->right->content->content, 2);
-			ft_putendl_fd(": Bad file descriptor", 2);
-			if (in_fork)
-				exit(1);
-			else
+			if (print_error(ast_tree->right->content->content,
+					": Bad file descriptor", in_fork))
 				return ;
 		}
 		else if (!ft_isnumber(ast_tree->right->content->content))
-		{
-			ft_putstr_fd("lsh: ", 2);
-			ft_putstr_fd(ast_tree->right->content->content, 2);
-			ft_putendl_fd(": ambiguous redirect", 2);
-			if (in_fork)
-				exit(1);
-			else
+			if (print_error(ast_tree->right->content->content,
+					": ambiguous redirect", in_fork))
 				return ;
-		}
 		dup2(fd_default, fd_new);
 		close(fd_default);
 	}
-	if (ast_tree->left && ast_tree->left->type == IO_NUMBER && ast_tree->left->left)
+	if (ast_tree->left && ast_tree->left->type == IO_NUMBER &&
+			ast_tree->left->left)
 		main_exec(ast_tree->left->left, in_fork, fd_min + 1);
 	else if (ast_tree->left)
 		main_exec(ast_tree->left, in_fork, fd_min + 1);
@@ -366,7 +339,7 @@ void	launch_pipe(t_ast_node *ast_tree)
 		run_pipe(ast_tree);
 }
 
-void	launch_builtin(char	**cmd, int in_fork)
+void	launch_builtin(char **cmd, int in_fork)
 {
 	if (ft_strequ(cmd[0], "unsetenv"))
 		g_last_status = ft_unsetenv(cmd + 1);
@@ -468,10 +441,10 @@ int		find_abs_path(char **cmd, char *path)
 
 void	execution_cmd(t_list *content, int in_fork, char *path)
 {
-	char	**cmd;
-	pid_t	child;
-	char	*builtins[] =
-			{"cd", "echo", "exit", "env", "setenv", "unsetenv", NULL};
+	char		**cmd;
+	pid_t		child;
+	static char	*builtins[] =
+	{"cd", "echo", "exit", "env", "setenv", "unsetenv", NULL};
 
 	cmd = list_to_array(content);
 	if (ft_isinarray(cmd[0], builtins))
@@ -499,9 +472,12 @@ void	execution_cmd(t_list *content, int in_fork, char *path)
 	}
 }
 
+/*
+**	Array of funct is possible
+*/
+
 int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
 {
-	//Faire un tableau de pointeur sur fonction ou autre + leaks.
 	if (ast_tree->type == PIPE)
 		launch_pipe(ast_tree);
 	else if (ast_tree->type == GREAT)

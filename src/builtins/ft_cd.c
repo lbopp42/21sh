@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/09 10:50:30 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/14 13:17:45 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/17 15:43:55 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,6 @@ char	*edit_path(char *content, char *pwd)
 	}
 	return (pwd);
 }
-
-int		exec_cd(char *cmd, int option, t_lst **env);
 
 void	exec_cd_cdpath(char *cmd, t_lst **env, char *cdpath, int option)
 {

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/17 11:16:58 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/17 15:44:31 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ void	main_expand(t_ast_node **ast_tree);
 /*			BUILTINS		*/
 /* ************************ */
 
+int		exec_cd(char *cmd, int option, t_lst **env);
 void	del_array(char *array[]);
 void	del_lst(t_lst *lst);
 int		ft_cd(char **cmd);
@@ -145,6 +146,7 @@ char	**list_to_array(t_list *lst);
 /*		   EXECUTION	  	*/
 /* ************************ */
 
+int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min);
 void	execution_cmd(t_list *content, int in_fork, char *path);
 
 void	add_to_current_tok(t_token **tok_lst, int i, int type);
