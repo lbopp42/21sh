@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/17 14:43:03 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/18 14:48:59 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,15 @@ int	key_is_arrow_left(const char *buff)
 	static char	enter_key[] = {91, 68, 0, 0, 0};
 
 	if (!ft_strcmp(buff, enter_key))
+		return (1);
+	return (0);
+}
+
+int	key_is_arrow_up(const char *buff)
+{
+	static char	up_key[] = {91, 65, 0, 0, 0};
+
+	if (!ft_strcmp(buff, up_key))
 		return (1);
 	return (0);
 }
@@ -212,8 +221,20 @@ void	key_home_funct(void)
 
 	tmp_pos.x = g_linei->p_len;
 	tmp_pos.y = 0;
-	save_reset_pos(tmp_pos, 1);
-	save_reset_pos(g_linei->pos, 2);
+	move_to(tmp_pos);
+}
+
+void	key_up_funct(void)
+{
+	if (g_history)
+	{
+		key_home_funct();
+		tputs(tgetstr("cd", NULL), 1, &put_my_char);
+		g_line = g_history->content;
+		g_linei->len = ft_strlen(g_history->content);
+		g_history = g_history->prev;
+		put_my_str_edit(g_line);
+	}
 }
 
 void	key_end_funct(void)
@@ -224,8 +245,7 @@ void	key_end_funct(void)
 	ioctl(1, TIOCGWINSZ, &ws);
 	tmp_pos.x = g_linei->len % ws.ws_col + g_linei->p_len;
 	tmp_pos.y = g_linei->len / ws.ws_col;
-	save_reset_pos(tmp_pos, 1);
-	save_reset_pos(g_linei->pos, 2);
+	move_to(tmp_pos);
 }
 
 void	key_shift_left_funct(void)
@@ -313,6 +333,8 @@ void	is_arrow(void)
 		key_left_funct();
 	if (key_is_arrow_right(buff))
 		key_right_funct();
+	if (key_is_arrow_up(buff))
+		key_up_funct();
 	if (key_is_home(buff))
 		key_home_funct();
 	if (key_is_end(buff))

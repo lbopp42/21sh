@@ -6,16 +6,12 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/17 15:44:31 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/18 14:40:29 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LSH_H
 # define LSH_H
-
-char	*g_line;
-char	**g_env;
-int		g_last_status;
 
 #include "libft.h"
 #include <sys/wait.h>
@@ -25,6 +21,7 @@ int		g_last_status;
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <fcntl.h>
 #define READ_END 0
 #define WRITE_END 1
 
@@ -104,9 +101,20 @@ typedef struct	s_lineinfo
 	int		select_len;
 	char	*select;
 }				t_lineinfo;
+typedef struct	s_list_double
+{
+	char					*content;
+	struct s_list_double	*prev;
+	struct s_list_double	*next;
+}				t_list_double;
 
 t_lineinfo			*g_linei;
 struct termios		g_origin_term;
+char				*g_line;
+char				**g_env;
+int					g_last_status;
+t_list_double		*g_history;
+
 
 int		execution(t_ast_node *ast_tree, char **env);
 t_list	*here_doc(char *delimiter, int option);
@@ -169,9 +177,19 @@ int		treatment_new_op(t_token **tok_lst, int *sp, int i, int type);
 /*		 LINE EDITING	  	*/
 /* ************************ */
 
+void	default_term(void);
 char	*editing_line(void);
 void	init_term(void);
-void	default_term(void);
+void	move_to(t_pos tmp_pos);
 void	save_reset_pos(t_pos pos, int mode);
+
+/* ************************ */
+/*			 HISTORY	  	*/
+/* ************************ */
+
+void	add_to_history(char	*line);
+void	main_history(void);
+void	put_my_str_edit(char *content);
+void	save_history(void);
 
 #endif

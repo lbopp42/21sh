@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/18 10:04:59 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/18 13:37:27 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -358,6 +358,7 @@ void	launch_builtin(char **cmd, int in_fork)
 		g_last_status = ft_echo(cmd);
 	else if (ft_strequ(cmd[0], "exit"))
 	{
+		save_history();
 		default_term();
 		g_last_status = ft_exit(cmd);
 	}

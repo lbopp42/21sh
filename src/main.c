@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/17 11:06:59 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/18 13:48:31 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,15 +72,16 @@ void	free_ast_tree(t_ast_node **ast_tree)
 
 int		main(int ac, char **av, char **env)
 {
-	t_token	*tok_lst;
-	t_state	*state_lst;
-	t_tuple	*tuple_parse;
-	int		nb_tok;
+	t_token			*tok_lst;
+	t_state			*state_lst;
+	t_tuple			*tuple_parse;
+	int				nb_tok;
 
 	(void)ac;
 	g_last_status = 0;
 	g_env = env;
 	(void)av;
+	main_history();
 	while (1)
 	{
 		g_line = NULL;
@@ -96,6 +97,7 @@ int		main(int ac, char **av, char **env)
 		if (state_lst)
 		{
 			free_state_lst(&state_lst);
+			add_to_history(g_line);
 			ft_strdel(&g_line);
 			ft_putendl("Lexical problem !");
 			continue ;
@@ -104,22 +106,25 @@ int		main(int ac, char **av, char **env)
 			tuple_parse = iscomplete_cmd(tok_lst, 0, 0);
 		else
 		{
+			add_to_history(g_line);
 			ft_strdel(&g_line);
 			continue ;
 		}
-		ft_strdel(&g_line);
 		free_tok_lst(&tok_lst);
 		if (nb_tok != tuple_parse->mv)
 		{
 			ft_putendl("Syntax error !");
+			add_to_history(g_line);
+			ft_strdel(&g_line);
 			continue ;
 		}
+		add_to_history(g_line);
+		ft_strdel(&g_line);
 		main_expand(&tuple_parse->ast_tree);
 		execution(tuple_parse->ast_tree, env);
 		free_ast_tree(&tuple_parse->ast_tree);
 		free(tuple_parse);
 		system(g_line);
-		free(g_line);
 	}
 	return (0);
 }

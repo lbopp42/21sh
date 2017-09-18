@@ -1,20 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstdelone.c                                     :+:      :+:    :+:   */
+/*   ft_lstaddend.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/11/12 13:03:20 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/18 12:44:55 by lbopp            ###   ########.fr       */
+/*   Created: 2017/09/18 11:34:56 by lbopp             #+#    #+#             */
+/*   Updated: 2017/09/18 12:36:49 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_lstdelone(t_list **alst, void (*del)(void*, size_t))
+void	ft_lstaddend(t_list **alst, t_list *new)
 {
-	del((*alst)->content, (*alst)->content_size);
-	free(*alst);
-	*alst = NULL;
+	t_list	*tmp;
+
+	if (!(*alst))
+		ft_lstadd(alst, new);
+	else
+	{
+		tmp = *alst;
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = new;
+	}
 }

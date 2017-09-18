@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/09/16 12:54:00 by lbopp            ###   ########.fr        #
+#    Updated: 2017/09/18 10:50:13 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,6 +38,7 @@ BUILTINS_SRC = array_to_list.c\
 			   list_to_tab.c\
 			   tab_to_list.c
 LINE_EDITING_SRC = edit_line.c
+HISTORY_SRC = history.c
 SRC_NAME = main.c
 
 SRC_TEST = src/lexer/lexer.c\
@@ -91,6 +92,7 @@ EXPAND_PATH = src/expand
 EXECUTION_PATH = src/execution
 BUILTINS_PATH = src/builtins
 LINE_EDITING_PATH = src/line_editing
+HISTORY_PATH = src/line_editing/history
 SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
 LEXER = $(addprefix $(LEXER_PATH)/,$(LEXER_SRC))
 PARSER = $(addprefix $(PARSER_PATH)/,$(PARSER_SRC))
@@ -98,13 +100,15 @@ EXPAND = $(addprefix $(EXPAND_PATH)/,$(EXPAND_SRC))
 EXECUTION = $(addprefix $(EXECUTION_PATH)/,$(EXECUTION_SRC))
 BUILTINS = $(addprefix $(BUILTINS_PATH)/,$(BUILTINS_SRC))
 LINE_EDITING = $(addprefix $(LINE_EDITING_PATH)/,$(LINE_EDITING_SRC))
+HISTORY = $(addprefix $(HISTORY_PATH)/,$(HISTORY_SRC))
 OBJ = $(SRC:.c=.o)\
 	$(LEXER:.c=.o)\
 	$(PARSER:.c=.o)\
 	$(EXPAND:.c=.o)\
 	$(EXECUTION:.c=.o)\
 	$(BUILTINS:.c=.o)\
-	$(LINE_EDITING:.c=.o)
+	$(LINE_EDITING:.c=.o)\
+	$(HISTORY:.c=.o)
 OBJ_TEST = $(SRC_TEST:.c=.o)
 RM = rm -f
 
