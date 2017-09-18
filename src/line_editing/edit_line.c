@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/18 14:48:59 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/18 16:17:57 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,14 +226,18 @@ void	key_home_funct(void)
 
 void	key_up_funct(void)
 {
+	static int	last = 0;
+
 	if (g_history)
 	{
 		key_home_funct();
 		tputs(tgetstr("cd", NULL), 1, &put_my_char);
-		g_line = g_history->content;
+		ft_strdel(&g_linei->content);
+		g_linei->content = ft_strdup(g_history->content);
 		g_linei->len = ft_strlen(g_history->content);
-		g_history = g_history->prev;
-		put_my_str_edit(g_line);
+		if (g_history->prev)
+			g_history = g_history->prev;
+		put_my_str_edit(g_linei->content);
 	}
 }
 
@@ -333,8 +337,9 @@ void	is_arrow(void)
 		key_left_funct();
 	if (key_is_arrow_right(buff))
 		key_right_funct();
+	/*
 	if (key_is_arrow_up(buff))
-		key_up_funct();
+		key_up_funct();*/
 	if (key_is_home(buff))
 		key_home_funct();
 	if (key_is_end(buff))
@@ -720,6 +725,9 @@ int		treat_key(char buf[])
 		paste_select();
 	else if (buf[0] == 10)
 	{
+		/*
+		while (g_history && g_history->next)
+			g_history = g_history->next;*/	
 		g_linei->curs = 0;
 		ft_putchar('\n');
 		return (1);

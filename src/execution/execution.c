@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/18 13:37:27 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/18 16:25:22 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -408,7 +408,7 @@ int		find_abs_path(char **cmd, char *path)
 		if (!verif_path(paths[i], perm, cmd))
 			return (0);
 	}
-	else if ((*cmd)[0] == '.' || !path || !ft_strlen(path))
+	else if ((*cmd)[0] == '.' || (*cmd)[0] == '/' || !path || !ft_strlen(path))
 	{
 		if (!access(*cmd, F_OK))
 		{

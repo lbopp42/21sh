@@ -44,8 +44,9 @@ void	main_history(void)
 	char	*line;
 
 	fd = open(".lsh_history", O_CREAT | O_RDONLY);
+	line = NULL;
 	g_history = NULL;
-	while (get_next_line(fd, &line))
+	while (get_next_line(fd, &line) && line)
 		add_to_history(line);
 	close(fd);
 }
