@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/18 16:17:57 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/18 16:57:07 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,6 +235,7 @@ void	key_up_funct(void)
 		ft_strdel(&g_linei->content);
 		g_linei->content = ft_strdup(g_history->content);
 		g_linei->len = ft_strlen(g_history->content);
+		g_linei->len_max = g_linei->len;
 		if (g_history->prev)
 			g_history = g_history->prev;
 		put_my_str_edit(g_linei->content);
@@ -337,9 +338,8 @@ void	is_arrow(void)
 		key_left_funct();
 	if (key_is_arrow_right(buff))
 		key_right_funct();
-	/*
 	if (key_is_arrow_up(buff))
-		key_up_funct();*/
+		key_up_funct();
 	if (key_is_home(buff))
 		key_home_funct();
 	if (key_is_end(buff))
