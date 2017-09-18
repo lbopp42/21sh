@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/17 16:07:53 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/18 10:04:59 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
-int		print_error(char *content, char *error, int in_fork)
+int		print_error_fork(char *content, char *error, int in_fork)
 {
 	ft_putstr_fd("lsh: ", 2);
 	ft_putstr_fd(content, 2);
@@ -25,6 +25,13 @@ int		print_error(char *content, char *error, int in_fork)
 	else
 		return (1);
 	return (0);
+}
+
+void		print_error(char *content, char *error)
+{
+	ft_putstr_fd("lsh: ", 2);
+	ft_putstr_fd(content, 2);
+	ft_putendl_fd(error, 2);
 }
 
 void	run_redir_great(t_ast_node *ast_tree, int in_fork)
@@ -99,7 +106,7 @@ void	run_redir_less(t_ast_node *ast_tree, int in_fork)
 			O_RDONLY, S_IRUSR | S_IWUSR);
 	tmp_in = dup(fd_default);
 	if (new_fd == -1)
-		if (print_error(ast_tree->right->content->content,
+		if (print_error_fork(ast_tree->right->content->content,
 					": No such file or directory", in_fork))
 			return ;
 	if (first == 0)
@@ -201,7 +208,7 @@ void	run_greatand(t_ast_node *ast_tree, int in_fork, int fd_min)
 		if (ft_isnumber(ast_tree->right->content->content) &&
 				ft_atoi(ast_tree->right->content->content) > 9)
 		{
-			if (print_error(ast_tree->right->content->content,
+			if (print_error_fork(ast_tree->right->content->content,
 					": illegal file descriptor name", in_fork))
 				return ;
 		}
@@ -209,7 +216,7 @@ void	run_greatand(t_ast_node *ast_tree, int in_fork, int fd_min)
 				&& (fd_new =
 				dup(ft_atoi(ast_tree->right->content->content))) == -1)
 		{
-			if (print_error(ast_tree->right->content->content,
+			if (print_error_fork(ast_tree->right->content->content,
 					": Bad file descriptor", in_fork))
 				return ;
 		}
@@ -245,7 +252,7 @@ void	run_lessand(t_ast_node *ast_tree, int in_fork, int fd_min)
 		if (ft_isnumber(ast_tree->right->content->content)
 				&& ft_atoi(ast_tree->right->content->content) > 9)
 		{
-			if (print_error(ast_tree->right->content->content,
+			if (print_error_fork(ast_tree->right->content->content,
 					": illegal file descriptor name", in_fork))
 				return ;
 		}
@@ -253,12 +260,12 @@ void	run_lessand(t_ast_node *ast_tree, int in_fork, int fd_min)
 				(fd_new = dup(ft_atoi(
 				ast_tree->right->content->content))) == -1)
 		{
-			if (print_error(ast_tree->right->content->content,
+			if (print_error_fork(ast_tree->right->content->content,
 					": Bad file descriptor", in_fork))
 				return ;
 		}
 		else if (!ft_isnumber(ast_tree->right->content->content))
-			if (print_error(ast_tree->right->content->content,
+			if (print_error_fork(ast_tree->right->content->content,
 					": ambiguous redirect", in_fork))
 				return ;
 		dup2(fd_default, fd_new);
@@ -361,17 +368,9 @@ void	launch_builtin(char **cmd, int in_fork)
 int		verif_path(char *path, char *perm, char **cmd)
 {
 	if (!path && perm)
-	{
-		ft_putstr_fd("lsh: ", 2);
-		ft_putstr_fd(perm, 2);
-		ft_putendl_fd(": Permission denied", 2);
-	}
+		print_error(perm, ": Permission denied");
 	else if (!path && !perm)
-	{
-		ft_putstr_fd("lsh: ", 2);
-		ft_putstr_fd(*cmd, 2);
-		ft_putendl_fd(": command not found", 2);
-	}
+		print_error(*cmd, ": command not found");
 	else if (path)
 	{
 		ft_strdel(cmd);
@@ -415,24 +414,18 @@ int		find_abs_path(char **cmd, char *path)
 			lstat(cmd[0], &st);
 			if (S_ISDIR(st.st_mode))
 			{
-				ft_putstr_fd("lsh: ", 2);
-				ft_putstr_fd(*cmd, 2);
-				ft_putendl_fd(": is a directory", 2);
+				print_error(*cmd, ": is a directory");
 				return (0);
 			}
 			else if (access(*cmd, X_OK))
 			{
-				ft_putstr_fd("lsh: ", 2);
-				ft_putstr_fd(*cmd, 2);
-				ft_putendl_fd(": Permission denied", 2);
+				print_error(*cmd, ": Permission denied");
 				return (0);
 			}
 		}
 		else
 		{
-			ft_putstr_fd("lsh: ", 2);
-			ft_putstr_fd(*cmd, 2);
-			ft_putendl_fd(": No such file or directory", 2);
+			print_error(*cmd, ": No such file or directory");
 			return (0);
 		}
 	}
@@ -465,11 +458,7 @@ void	execution_cmd(t_list *content, int in_fork, char *path)
 		}
 	}
 	else
-	{
-		ft_putstr_fd("lsh: ", 2);
-		ft_putstr_fd(*cmd, 2);
-		ft_putendl_fd(": command not found", 2);
-	}
+		print_error(*cmd, ": command not found");
 }
 
 /*
