@@ -4,7 +4,7 @@ void	save_history(void)
 {
 	int	fd;
 
-	fd = open(".lsh_history", O_CREAT | O_WRONLY);
+	fd = open(".lsh_history", O_RDWR | O_CREAT, 0644);
 	while (g_history->prev)
 		g_history = g_history->prev;
 	while (g_history->next)
@@ -43,7 +43,7 @@ void	main_history(void)
 	int		fd;
 	char	*line;
 
-	fd = open(".lsh_history", O_CREAT | O_RDONLY);
+	fd = open(".lsh_history", O_RDWR | O_CREAT, 0644);
 	line = NULL;
 	g_history = NULL;
 	while (get_next_line(fd, &line) && line)

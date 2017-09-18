@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/18 16:57:07 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/18 17:03:31 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -725,9 +725,9 @@ int		treat_key(char buf[])
 		paste_select();
 	else if (buf[0] == 10)
 	{
-		/*
+		
 		while (g_history && g_history->next)
-			g_history = g_history->next;*/	
+			g_history = g_history->next;	
 		g_linei->curs = 0;
 		ft_putchar('\n');
 		return (1);
