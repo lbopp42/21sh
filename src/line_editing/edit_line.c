@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/19 14:14:38 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/19 14:38:42 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -291,7 +291,8 @@ void	key_end_funct(void)
 	ioctl(1, TIOCGWINSZ, &ws);
 	tmp_pos.x = g_linei->len % ws.ws_col + g_linei->p_len;
 	tmp_pos.y = g_linei->len / ws.ws_col;
-	move_to(tmp_pos);
+	save_reset_pos(tmp_pos, 1);
+	save_reset_pos(g_linei->pos, 2);
 }
 
 void	key_shift_left_funct(void)
