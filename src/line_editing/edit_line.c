@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/19 16:07:26 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/19 16:49:32 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,9 +200,7 @@ void	key_left_funct(void)
 			}
 		}
 		else
-		{
 			tputs(tgetstr("le", NULL), 1, &put_my_char);
-		}
 		g_linei->pos.x -= 1;
 		g_linei->curs -= 1;
 	}
@@ -215,7 +213,8 @@ void	key_right_funct(void)
 	ioctl(1, TIOCGWINSZ, &ws);
 	if (g_linei->curs != g_linei->len)
 	{
-		if (g_linei->pos.x + 1 == ws.ws_col)
+		if (g_linei->pos.x + 1 == ws.ws_col ||
+				g_linei->content[g_linei->curs] == '\n')
 		{
 			tputs(tgetstr("do", NULL), 1, &put_my_char);
 			g_linei->pos.x = 0;
@@ -237,6 +236,7 @@ void	key_home_funct(void)
 	tmp_pos.x = g_linei->p_len;
 	tmp_pos.y = 0;
 	move_to(tmp_pos);
+	g_linei->curs = 0;
 }
 
 void	key_up_funct(char **first_select)
