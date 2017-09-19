@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/18 17:03:31 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/19 09:41:03 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,8 +226,6 @@ void	key_home_funct(void)
 
 void	key_up_funct(void)
 {
-	static int	last = 0;
-
 	if (g_history)
 	{
 		key_home_funct();
@@ -354,7 +352,7 @@ void	is_arrow(void)
 		key_shift_down_funct();
 }
 
-void	move_to_x(t_pos tmp_pos, struct winsize ws)
+void	move_to_x(t_pos tmp_pos)
 {
 	while (g_linei->pos.x > tmp_pos.x)
 	{
@@ -393,7 +391,7 @@ void	move_to(t_pos tmp_pos)
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
-	move_to_x(tmp_pos, ws);
+	move_to_x(tmp_pos);
 	move_to_y(tmp_pos, ws);
 }
 

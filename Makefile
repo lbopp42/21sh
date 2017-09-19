@@ -6,12 +6,12 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/09/18 10:50:13 by lbopp            ###   ########.fr        #
+#    Updated: 2017/09/19 09:55:00 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = 21sh
-CFLAGS = -g
+CFLAGS = -Wall -Werror -Wextra -g
 LIBFT = libft/
 CLANG = gcc
 LEXER_SRC = add_to_current_token.c\

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/22 16:26:05 by lbopp             #+#    #+#             */
-/*   Updated: 2016/11/30 09:33:05 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/19 09:53:12 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@ char	*ft_strcdup(const char *s1, char n)
 	size = 0;
 	while (s1[size] != n && s1[size])
 		size++;
+	if (!size)
+		return (NULL);
 	dst = (char *)malloc(sizeof(char) * (size + 1));
 	if (dst == NULL)
 		return (0);

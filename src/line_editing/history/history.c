@@ -7,11 +7,12 @@ void	save_history(void)
 	fd = open(".lsh_history", O_RDWR | O_CREAT, 0644);
 	while (g_history->prev)
 		g_history = g_history->prev;
-	while (g_history->next)
+	while (g_history)
 	{
 		ft_putendl_fd(g_history->content, fd);
 		g_history = g_history->next;
 	}
+	//Need to free this list;
 	close(fd);
 }
 
@@ -47,6 +48,9 @@ void	main_history(void)
 	line = NULL;
 	g_history = NULL;
 	while (get_next_line(fd, &line) && line)
+	{
 		add_to_history(line);
+		ft_strdel(&line);
+	}
 	close(fd);
 }
