@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/19 09:41:03 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/19 11:17:49 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,22 @@ int	key_is_arrow_up(const char *buff)
 	static char	up_key[] = {91, 65, 0, 0, 0};
 
 	if (!ft_strcmp(buff, up_key))
+	{
+		//printf("UP\n");
 		return (1);
+	}
+	return (0);
+}
+
+int	key_is_arrow_down(const char *buff)
+{
+	static char	down_key[] = {91, 66, 0, 0, 0};
+
+	if (!ft_strcmp(buff, down_key))
+	{
+		//printf("DOWN\n");
+		return (1);
+	}
 	return (0);
 }
 
@@ -224,19 +239,47 @@ void	key_home_funct(void)
 	move_to(tmp_pos);
 }
 
-void	key_up_funct(void)
+void	key_up_funct(char **first_select)
 {
-	if (g_history)
+	if (g_history->prev)
 	{
+		if (!(*first_select))
+			*first_select = ft_strdup(g_linei->content);
+		else
+			g_history = g_history->prev;
 		key_home_funct();
 		tputs(tgetstr("cd", NULL), 1, &put_my_char);
 		ft_strdel(&g_linei->content);
 		g_linei->content = ft_strdup(g_history->content);
 		g_linei->len = ft_strlen(g_history->content);
 		g_linei->len_max = g_linei->len;
-		if (g_history->prev)
-			g_history = g_history->prev;
 		put_my_str_edit(g_linei->content);
+	}
+}
+
+void	key_down_funct(char **first_select)
+{
+	if (g_history->next)
+	{
+		g_history = g_history->next;
+		key_home_funct();
+		tputs(tgetstr("cd", NULL), 1, &put_my_char);
+		ft_strdel(&g_linei->content);
+		g_linei->content = ft_strdup(g_history->content);
+		g_linei->len = ft_strlen(g_history->content);
+		g_linei->len_max = g_linei->len;
+		put_my_str_edit(g_linei->content);
+	}
+	else if (*first_select)
+	{
+		key_home_funct();
+		tputs(tgetstr("cd", NULL), 1, &put_my_char);
+		ft_strdel(&g_linei->content);
+		g_linei->content = ft_strdup(*first_select);
+		g_linei->len = ft_strlen(*first_select);
+		g_linei->len_max = g_linei->len;
+		put_my_str_edit(g_linei->content);
+		ft_strdel(first_select);
 	}
 }
 
@@ -326,7 +369,7 @@ void	key_shift_down_funct(void)
 	}
 }
 
-void	is_arrow(void)
+void	is_arrow(char **first_select)
 {
 	char	buff[6];
 
@@ -337,7 +380,9 @@ void	is_arrow(void)
 	if (key_is_arrow_right(buff))
 		key_right_funct();
 	if (key_is_arrow_up(buff))
-		key_up_funct();
+		key_up_funct(first_select);
+	if (key_is_arrow_down(buff))
+		key_down_funct(first_select);
 	if (key_is_home(buff))
 		key_home_funct();
 	if (key_is_end(buff))
@@ -711,8 +756,9 @@ void	init_line_info(void)
 
 int		treat_key(char buf[])
 {
+	static char*	first_select = NULL;
 	if (buf[0] == 27)
-		is_arrow();
+		is_arrow(&first_select);
 	else if (buf[0] == 127)// Backspace
 		del_char();
 	else if (key_is_alt_v(buf))
@@ -723,7 +769,7 @@ int		treat_key(char buf[])
 		paste_select();
 	else if (buf[0] == 10)
 	{
-		
+		ft_strdel(&first_select);
 		while (g_history && g_history->next)
 			g_history = g_history->next;	
 		g_linei->curs = 0;
