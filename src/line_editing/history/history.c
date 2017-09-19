@@ -22,7 +22,6 @@ void	merge_history(t_list_double **prev, t_list_double **merge)
 	(*prev)->content = ft_stradd((*prev)->content, (*merge)->content);
 	ft_strdel(&(*merge)->content);
 	(*prev)->next = NULL;
-	//free(*merge);
 }
 
 void	add_to_history(char	*line)

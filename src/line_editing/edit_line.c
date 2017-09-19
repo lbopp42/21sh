@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/19 15:51:10 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/19 16:07:26 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -456,6 +456,11 @@ void	put_my_str_edit(char *content)
 	{
 		ft_putchar(content[i]);
 		g_linei->pos.x += 1;
+		if (content[i] == '\n')
+		{
+			g_linei->pos.x = 0;
+			g_linei->pos.y += 1;
+		}
 		g_linei->curs += 1;
 		if (g_linei->pos.x == ws.ws_col)
 		{

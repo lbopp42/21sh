@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/19 13:43:23 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/19 15:55:53 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ int		main(int ac, char **av, char **env)
 		nb_tok = lexer_posix(&tok_lst, &state_lst);
 		while (state_lst)
 		{
+			g_line = ft_stradd(g_line, "\n");
 			g_line = ft_stradd(g_line, editing_line("> "));
 			merge_history(&g_history->prev, &g_history);
 			g_history = g_history->prev;
