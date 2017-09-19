@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/19 11:17:49 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/19 14:14:38 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -436,8 +436,8 @@ void	move_to(t_pos tmp_pos)
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
-	move_to_x(tmp_pos);
 	move_to_y(tmp_pos, ws);
+	move_to_x(tmp_pos);
 }
 
 void	save_reset_pos(t_pos pos, int mode)
@@ -738,11 +738,8 @@ void	paste_select(void)
 	save_reset_pos(g_linei->pos, 2);
 }
 
-void	init_line_info(void)
+void	init_line_info(char	*prompt)
 {
-	char			*prompt;
-
-	prompt = "Hello > ";
 	g_linei = ft_memalloc(sizeof(t_lineinfo));
 	g_linei->content = ft_strnew(20);
 	g_linei->p_len = ft_strlen(prompt);
@@ -773,27 +770,30 @@ int		treat_key(char buf[])
 		while (g_history && g_history->next)
 			g_history = g_history->next;	
 		g_linei->curs = 0;
+		add_to_history(g_linei->content);
 		ft_putchar('\n');
 		return (1);
 	}
 	return (0);
 }
 
-char	*editing_line(void)
+char	*editing_line(char *prompt)
 {
 	char			buf[1];
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
-	init_line_info();
+	init_line_info(prompt);
+	init_term();
 	while (1)
 	{
 		ft_bzero(buf, 1);
 		read(0, buf, 1);
 		if (treat_key(buf))
+		{
+			default_term();
 			return (g_linei->content);
+		}
 	}
-	ft_strdel(&g_linei->content);
-	free(g_linei);
 	return (NULL);
 }

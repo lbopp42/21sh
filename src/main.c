@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/19 10:00:57 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/19 13:43:23 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,25 +88,24 @@ int		main(int ac, char **av, char **env)
 		tuple_parse = NULL;
 		state_lst = NULL;
 		tok_lst = NULL;
-		init_term();
-		g_line = editing_line();
-		default_term();
+		g_line = editing_line("Hello > ");
 		if (!g_line || !g_line[0])
 			continue ;
 		nb_tok = lexer_posix(&tok_lst, &state_lst);
-		if (state_lst)
+		while (state_lst)
 		{
-			free_state_lst(&state_lst);
-			add_to_history(g_line);
-			ft_strdel(&g_line);
-			ft_putendl("Lexical problem !");
+			g_line = ft_stradd(g_line, editing_line("> "));
+			merge_history(&g_history->prev, &g_history);
+			g_history = g_history->prev;
+			tok_lst = NULL; //Need to be remove properly
+			state_lst = NULL;
+			nb_tok = lexer_posix(&tok_lst, &state_lst);
 			continue ;
 		}
 		if (g_line && g_line[0])
 			tuple_parse = iscomplete_cmd(tok_lst, 0, 0);
 		else
 		{
-			add_to_history(g_line);
 			ft_strdel(&g_line);
 			continue ;
 		}
@@ -114,17 +113,14 @@ int		main(int ac, char **av, char **env)
 		if (nb_tok != tuple_parse->mv)
 		{
 			ft_putendl("Syntax error !");
-			add_to_history(g_line);
 			ft_strdel(&g_line);
 			continue ;
 		}
-		add_to_history(g_line);
 		ft_strdel(&g_line);
 		main_expand(&tuple_parse->ast_tree);
 		execution(tuple_parse->ast_tree, env);
 		free_ast_tree(&tuple_parse->ast_tree);
 		free(tuple_parse);
-		system(g_line);
 	}
 	return (0);
 }

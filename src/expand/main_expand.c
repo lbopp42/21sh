@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/05 09:37:02 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/09 12:34:04 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/19 13:05:40 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,9 @@ char	*expand_quote_remove(char **content)
 
 	i = 0;
 	before = NULL;
-	while ((*content)[i])
+	new = NULL;
+	after = NULL;
+	while ((size_t)i <= ft_strlen(*content) && (*content)[i])
 	{
 		if ((*content)[i] == '\'' || (*content)[i] == '"')
 		{
@@ -171,8 +173,11 @@ char	*expand_quote_remove(char **content)
 				i += 1;
 			new = ft_strsub(*content,
 					ft_strlen(before) + 1, i - 1 - ft_strlen(before));
-			after = ft_strsub(*content, i + 1, ft_strlen(*content) - i + 1);
-			after = expand_quote_remove(&after);
+			if (ft_strlen(*content) > (size_t)i + 1)
+			{
+				after = ft_strsub(*content, i + 1, ft_strlen(*content) - i + 1);
+				after = expand_quote_remove(&after);
+			}
 			replace_content(&before, &new, &after, content);
 		}
 		i += 1;

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/18 17:08:29 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/19 13:14:36 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,7 @@ int		treatment_new_op(t_token **tok_lst, int *sp, int i, int type);
 /* ************************ */
 
 void	default_term(void);
-char	*editing_line(void);
+char	*editing_line(char *prompt);
 void	init_term(void);
 void	move_to(t_pos tmp_pos);
 void	save_reset_pos(t_pos pos, int mode);
@@ -190,6 +190,7 @@ void	save_reset_pos(t_pos pos, int mode);
 
 void	add_to_history(char	*line);
 void	main_history(void);
+void	merge_history(t_list_double **prev, t_list_double **merge);
 void	put_my_str_edit(char *content);
 void	save_history(void);
 
