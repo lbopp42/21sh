@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/20 13:45:50 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/20 15:13:27 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,6 +187,7 @@ void	key_home_funct(void)
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
+	g_linei->pos.x = g_linei->curs + g_linei->p_len;
 	while (g_linei->curs)
 	{
 		if (g_linei->content[g_linei->curs] == '\n')
@@ -197,20 +198,17 @@ void	key_home_funct(void)
 		}
 		g_linei->curs--;
 	}
-	while (g_linei->pos.x > ws.ws_col)
+	while (g_linei->pos.x + 1 > ws.ws_col)
 	{
 		tputs(tgetstr("up", NULL), 1, &put_my_char);
 		g_linei->pos.x -= ws.ws_col;
 	}
-	while (g_linei->pos.x)
-	{
-		tputs(tgetstr("le", NULL), 1, &put_my_char);
-		g_linei->pos.x--;
-	}
+	g_linei->pos.x = 0;
+	tputs(tgetstr("cr", NULL), 1, &put_my_char);
 	while (g_linei->pos.x < g_linei->p_len)
 	{
-		tputs(tgetstr("nd", NULL), 1, &put_my_char);
 		g_linei->pos.x++;
+		tputs(tgetstr("nd", NULL), 1, &put_my_char);
 	}
 }
 
@@ -690,8 +688,6 @@ void	add_char_enter_char(char c)
 	}
 	save_reset_pos(g_linei->pos, 1);
 	put_my_str_edit(&g_linei->content[g_linei->curs]);
-	key_home_funct();
-	sleep(5);
 	save_reset_pos(g_linei->pos, 2);
 	g_linei->len += 1;
 }
