@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/19 16:49:32 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/20 10:19:28 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,28 +182,14 @@ int		key_is_alt_x(char *buff)
 	return (0);
 }
 
-void	key_left_funct(void)
+void	key_home_funct(void)
 {
-	struct winsize	ws;
+	t_pos	tmp_pos;
 
-	ioctl(1, TIOCGWINSZ, &ws);
-	if (g_linei->curs != 0)
-	{
-		if (g_linei->pos.x == 0 && g_linei->pos.y != 0)
-		{
-			tputs(tgetstr("up", NULL), 1, &put_my_char);
-			g_linei->pos.y -= 1;
-			while (g_linei->pos.x != ws.ws_col)
-			{
-				tputs(tgetstr("nd", NULL), 1, &put_my_char);
-				g_linei->pos.x += 1;
-			}
-		}
-		else
-			tputs(tgetstr("le", NULL), 1, &put_my_char);
-		g_linei->pos.x -= 1;
-		g_linei->curs -= 1;
-	}
+	tmp_pos.x = g_linei->p_len;
+	tmp_pos.y = 0;
+	move_to(tmp_pos);
+	g_linei->curs = 0;
 }
 
 void	key_right_funct(void)
@@ -229,14 +215,39 @@ void	key_right_funct(void)
 	}
 }
 
-void	key_home_funct(void)
+void	key_left_funct(void)
 {
-	t_pos	tmp_pos;
+	struct winsize	ws;
+	int				tmp_curs;
 
-	tmp_pos.x = g_linei->p_len;
-	tmp_pos.y = 0;
-	move_to(tmp_pos);
-	g_linei->curs = 0;
+	ioctl(1, TIOCGWINSZ, &ws);
+	if (g_linei->curs != 0)
+	{
+		if (g_linei->pos.x == 0 && g_linei->pos.y != 0 &&
+				g_linei->content[g_linei->curs - 1] == '\n')
+		{
+			tmp_curs = g_linei->curs;
+			key_home_funct();
+			while (g_linei->curs < tmp_curs - 1)
+				key_right_funct();
+			g_linei->curs++;
+			g_linei->pos.x++;
+		}
+		else if (g_linei->pos.x == 0 && g_linei->pos.y != 0)
+		{
+			tputs(tgetstr("up", NULL), 1, &put_my_char);
+			g_linei->pos.y -= 1;
+			while (g_linei->pos.x != ws.ws_col)
+			{
+				tputs(tgetstr("nd", NULL), 1, &put_my_char);
+				g_linei->pos.x += 1;
+			}
+		}
+		else
+			tputs(tgetstr("le", NULL), 1, &put_my_char);
+		g_linei->pos.x -= 1;
+		g_linei->curs -= 1;
+	}
 }
 
 void	key_up_funct(char **first_select)
@@ -401,11 +412,7 @@ void	move_to_x(t_pos tmp_pos)
 		tputs(tgetstr("le", NULL), 1, &put_my_char);
 	}
 	while (g_linei->pos.x < tmp_pos.x)
-	{
-		g_linei->pos.x++;
-		g_linei->curs += 1;
-		tputs(tgetstr("nd", NULL), 1, &put_my_char);
-	}
+		key_right_funct();
 }
 
 void	move_to_y(t_pos tmp_pos, struct winsize ws)
@@ -418,11 +425,12 @@ void	move_to_y(t_pos tmp_pos, struct winsize ws)
 	}
 	while (g_linei->pos.y < tmp_pos.y)
 	{
-		g_linei->pos.y++;
+		key_right_funct();
+		/*g_linei->pos.y++;
 		g_linei->curs -= g_linei->pos.x;
 		g_linei->pos.x = 0;
 		g_linei->curs += ws.ws_col;
-		tputs(tgetstr("do", NULL), 1, &put_my_char);
+		tputs(tgetstr("do", NULL), 1, &put_my_char);*/
 	}
 }
 
@@ -655,8 +663,11 @@ void	add_char_enter_char(char c)
 		g_linei->pos.y += 1;
 	}
 	save_reset_pos(g_linei->pos, 1);
+	//printf("x1 = %d et y1 = %d\n", g_linei->pos.x, g_linei->pos.y);
 	put_my_str_edit(&g_linei->content[g_linei->curs]);
+	key_home_funct();
 	save_reset_pos(g_linei->pos, 2);
+	//printf("x2 = %d et y2 = %d\n", g_linei->pos.x, g_linei->pos.y);
 	g_linei->len += 1;
 }
 
