@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/20 10:19:28 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/20 13:45:50 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,12 +184,34 @@ int		key_is_alt_x(char *buff)
 
 void	key_home_funct(void)
 {
-	t_pos	tmp_pos;
+	struct winsize	ws;
 
-	tmp_pos.x = g_linei->p_len;
-	tmp_pos.y = 0;
-	move_to(tmp_pos);
-	g_linei->curs = 0;
+	ioctl(1, TIOCGWINSZ, &ws);
+	while (g_linei->curs)
+	{
+		if (g_linei->content[g_linei->curs] == '\n')
+		{
+			g_linei->pos.y--;
+			tputs(tgetstr("up", NULL), 1, &put_my_char);
+			g_linei->pos.x = g_linei->curs - 1;
+		}
+		g_linei->curs--;
+	}
+	while (g_linei->pos.x > ws.ws_col)
+	{
+		tputs(tgetstr("up", NULL), 1, &put_my_char);
+		g_linei->pos.x -= ws.ws_col;
+	}
+	while (g_linei->pos.x)
+	{
+		tputs(tgetstr("le", NULL), 1, &put_my_char);
+		g_linei->pos.x--;
+	}
+	while (g_linei->pos.x < g_linei->p_len)
+	{
+		tputs(tgetstr("nd", NULL), 1, &put_my_char);
+		g_linei->pos.x++;
+	}
 }
 
 void	key_right_funct(void)
@@ -340,8 +362,11 @@ void	key_shift_up_funct(void)
 	{
 		if (g_linei->pos.x >= g_linei->p_len || g_linei->pos.y - 1 > 0)
 		{
+			printf("ON PREND LUI\n");
 			tmp_pos.x = g_linei->pos.x;
 			tmp_pos.y = g_linei->pos.y - 1;
+			printf("x = %d et y = %d\n", tmp_pos.x, tmp_pos.y);
+			printf("x2 = %d et y2 = %d\n", g_linei->pos.x, g_linei->pos.y);
 			save_reset_pos(tmp_pos, 1);
 			save_reset_pos(g_linei->pos, 2);
 		}
@@ -417,6 +442,7 @@ void	move_to_x(t_pos tmp_pos)
 
 void	move_to_y(t_pos tmp_pos, struct winsize ws)
 {
+	(void)ws;
 	while (g_linei->pos.y > tmp_pos.y)
 	{
 		g_linei->pos.y--;
@@ -663,11 +689,10 @@ void	add_char_enter_char(char c)
 		g_linei->pos.y += 1;
 	}
 	save_reset_pos(g_linei->pos, 1);
-	//printf("x1 = %d et y1 = %d\n", g_linei->pos.x, g_linei->pos.y);
 	put_my_str_edit(&g_linei->content[g_linei->curs]);
 	key_home_funct();
+	sleep(5);
 	save_reset_pos(g_linei->pos, 2);
-	//printf("x2 = %d et y2 = %d\n", g_linei->pos.x, g_linei->pos.y);
 	g_linei->len += 1;
 }
 
