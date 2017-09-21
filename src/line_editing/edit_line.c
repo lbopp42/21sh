@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/21 13:26:28 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/21 14:12:25 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -738,7 +738,7 @@ void	paste_select(void)
 	result = ft_strsub(g_linei->content, 0, g_linei->curs);
 	result = ft_stradd(result, line_editing_select(2));
 	result = ft_stradd(result,
-			ft_strsub(g_linei->content, g_linei->curs, g_linei->len));
+			ft_strsub(g_linei->content, g_linei->curs, g_linei->len - g_linei->curs));
 	free(g_linei->content);
 	g_linei->content = result;
 	g_linei->len = ft_strlen(result);
@@ -777,6 +777,7 @@ int		treat_key(char buf[])
 		paste_select();
 	else if (buf[0] == 10)
 	{
+		key_end_funct();
 		ft_strdel(&first_select);
 		while (g_history && g_history->next)
 			g_history = g_history->next;	
