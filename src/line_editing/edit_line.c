@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/21 10:34:07 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/21 13:26:28 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -423,11 +423,7 @@ void	is_arrow(char **first_select)
 void	move_to_x(t_pos tmp_pos)
 {
 	while (g_linei->pos.x > tmp_pos.x)
-	{
-		g_linei->pos.x--;
-		g_linei->curs -= 1;
-		tputs(tgetstr("le", NULL), 1, &put_my_char);
-	}
+		key_left_funct();
 	while (g_linei->pos.x < tmp_pos.x)
 		key_right_funct();
 }
@@ -436,23 +432,9 @@ void	move_to_y(t_pos tmp_pos, struct winsize ws)
 {
 	(void)ws;
 	while (g_linei->pos.y > tmp_pos.y)
-	{
-		if (g_linei->pos.y == 1)
-			g_linei->curs = g_linei->curs + g_linei->p_len - ws.ws_col;
-		else
-			g_linei->curs -= ws.ws_col;
-		g_linei->pos.y--;
-		tputs(tgetstr("up", NULL), 1, &put_my_char);
-	}
+		key_left_funct();
 	while (g_linei->pos.y < tmp_pos.y)
-	{
 		key_right_funct();
-		g_linei->pos.y++;
-		g_linei->curs -= g_linei->pos.x;
-		g_linei->pos.x = 0;
-		g_linei->curs += ws.ws_col;
-		tputs(tgetstr("do", NULL), 1, &put_my_char);
-	}
 }
 
 void	move_to(t_pos tmp_pos)
@@ -685,9 +667,6 @@ void	add_char_enter_char(char c)
 	}
 	save_reset_pos(g_linei->pos, 1);
 	put_my_str_edit(&g_linei->content[g_linei->curs]);
-	/*
-	**	Probleme dans save_reset_pos
-	*/
 	save_reset_pos(g_linei->pos, 2);
 	g_linei->len += 1;
 }
