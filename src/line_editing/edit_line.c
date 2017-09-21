@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/20 15:13:27 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/21 10:34:07 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,7 @@ int	key_is_arrow_up(const char *buff)
 	static char	up_key[] = {91, 65, 0, 0, 0};
 
 	if (!ft_strcmp(buff, up_key))
-	{
-		//printf("UP\n");
 		return (1);
-	}
 	return (0);
 }
 
@@ -53,10 +50,7 @@ int	key_is_arrow_down(const char *buff)
 	static char	down_key[] = {91, 66, 0, 0, 0};
 
 	if (!ft_strcmp(buff, down_key))
-	{
-		//printf("DOWN\n");
 		return (1);
-	}
 	return (0);
 }
 
@@ -202,6 +196,7 @@ void	key_home_funct(void)
 	{
 		tputs(tgetstr("up", NULL), 1, &put_my_char);
 		g_linei->pos.x -= ws.ws_col;
+		g_linei->pos.y--;
 	}
 	g_linei->pos.x = 0;
 	tputs(tgetstr("cr", NULL), 1, &put_my_char);
@@ -211,7 +206,9 @@ void	key_home_funct(void)
 		tputs(tgetstr("nd", NULL), 1, &put_my_char);
 	}
 }
-
+/*
+**	Peut etre une erreur ici pos.x = 0 serai = p_len pour y = 0
+*/
 void	key_right_funct(void)
 {
 	struct winsize	ws;
@@ -360,11 +357,8 @@ void	key_shift_up_funct(void)
 	{
 		if (g_linei->pos.x >= g_linei->p_len || g_linei->pos.y - 1 > 0)
 		{
-			printf("ON PREND LUI\n");
 			tmp_pos.x = g_linei->pos.x;
 			tmp_pos.y = g_linei->pos.y - 1;
-			printf("x = %d et y = %d\n", tmp_pos.x, tmp_pos.y);
-			printf("x2 = %d et y2 = %d\n", g_linei->pos.x, g_linei->pos.y);
 			save_reset_pos(tmp_pos, 1);
 			save_reset_pos(g_linei->pos, 2);
 		}
@@ -443,18 +437,21 @@ void	move_to_y(t_pos tmp_pos, struct winsize ws)
 	(void)ws;
 	while (g_linei->pos.y > tmp_pos.y)
 	{
+		if (g_linei->pos.y == 1)
+			g_linei->curs = g_linei->curs + g_linei->p_len - ws.ws_col;
+		else
+			g_linei->curs -= ws.ws_col;
 		g_linei->pos.y--;
-		g_linei->curs -= ws.ws_col;
 		tputs(tgetstr("up", NULL), 1, &put_my_char);
 	}
 	while (g_linei->pos.y < tmp_pos.y)
 	{
 		key_right_funct();
-		/*g_linei->pos.y++;
+		g_linei->pos.y++;
 		g_linei->curs -= g_linei->pos.x;
 		g_linei->pos.x = 0;
 		g_linei->curs += ws.ws_col;
-		tputs(tgetstr("do", NULL), 1, &put_my_char);*/
+		tputs(tgetstr("do", NULL), 1, &put_my_char);
 	}
 }
 
@@ -688,6 +685,9 @@ void	add_char_enter_char(char c)
 	}
 	save_reset_pos(g_linei->pos, 1);
 	put_my_str_edit(&g_linei->content[g_linei->curs]);
+	/*
+	**	Probleme dans save_reset_pos
+	*/
 	save_reset_pos(g_linei->pos, 2);
 	g_linei->len += 1;
 }
