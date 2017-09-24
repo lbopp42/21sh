@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/24 14:36:27 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/24 14:58:53 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -749,6 +749,7 @@ void	init_line_info(int p_len)
 int		treat_key(char buf[])
 {
 	static char*	first_select = NULL;
+
 	if (buf[0] == 27)
 		is_arrow(&first_select);
 	else if (buf[0] == 127)// Backspace
@@ -776,6 +777,7 @@ int		treat_key(char buf[])
 char	*editing_line(int p_len)
 {
 	char			buf[1];
+	static char		*exit[2] = {"exit", "0"};
 	struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
@@ -785,7 +787,9 @@ char	*editing_line(int p_len)
 	{
 		ft_bzero(buf, 1);
 		read(0, buf, 1);
-		if (treat_key(buf))
+		if (buf[0] == 4)
+			ft_exit(exit);
+		else if (treat_key(buf))
 		{
 			default_term();
 			return (g_linei->content);
