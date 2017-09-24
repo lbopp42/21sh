@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/24 14:45:01 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/24 15:00:46 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,12 +78,12 @@ int		print_my_prompt(char *p)
 		prompt = ft_strdup("Hello > ");
 	if (!p)
 	{
-		ft_putstr(prompt); //ne pas ecrire sur 1
+		ft_putstr_fd(prompt, 2);
 		return (ft_strlen(prompt));
 	}
 	else
 	{
-		ft_putstr(p); //ne pas ecrire sur 1
+		ft_putstr_fd(p, 2);
 		return (ft_strlen(p));
 	}
 }
@@ -93,7 +93,7 @@ void	signal_handle(int signal)
 	(void)signal;
 	if (signal == SIGINT && g_line == NULL)
 	{
-		ft_putchar('\n');
+		ft_putchar_fd('\n', 2);
 		print_my_prompt(NULL);
 	}
 }
