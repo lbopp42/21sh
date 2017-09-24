@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/24 10:36:56 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/24 11:09:04 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -315,12 +315,12 @@ void	key_shift_left_funct(void)
 
 	sp = 0;
 	key_left_funct();
-	while (g_linei->curs && g_linei->content[g_linei->curs] == ' ')
-	{
+	while (g_linei->curs && (g_linei->content[g_linei->curs] == ' ' ||
+			g_linei->content[g_linei->curs] == '\n'))
 		key_left_funct();
 		sp = 1;
-	}
-	while (g_linei->curs && ft_isalnum(g_linei->content[g_linei->curs]))
+	while (g_linei->curs && ft_isprint(g_linei->content[g_linei->curs])
+			&& !ft_isspace(g_linei->content[g_linei->curs]))
 		key_left_funct();
 	if (g_linei->curs)
 		key_right_funct();
@@ -333,7 +333,8 @@ void	key_shift_right_funct(void)
 	sp = 0;
 	key_right_funct();
 	while (g_linei->curs < g_linei->len &&
-			ft_isalnum(g_linei->content[g_linei->curs]) && !sp)
+			ft_isprint(g_linei->content[g_linei->curs]) && !sp
+			&& !ft_isspace(g_linei->content[g_linei->curs]))
 		key_right_funct();
 	while (g_linei->curs < g_linei->len &&
 			(g_linei->content[g_linei->curs] == ' ' ||
