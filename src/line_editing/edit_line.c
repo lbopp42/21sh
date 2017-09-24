@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/24 10:09:09 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/24 10:20:21 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -361,7 +361,17 @@ void	key_shift_up_funct(void)
 void	key_shift_down_funct(void)
 {
 	t_pos			tmp_pos;
-	struct winsize	ws;
+
+	tmp_pos.x = g_linei->pos.x;
+	tmp_pos.y = g_linei->pos.y + 1;
+	while (g_linei->pos.y < tmp_pos.y &&
+			g_linei->curs < g_linei->len)
+		key_right_funct();
+	while (g_linei->pos.x < tmp_pos.x &&
+			g_linei->content[g_linei->curs] != '\n')
+		key_right_funct();
+
+	/*struct winsize	ws;
 
 	ioctl(1, TIOCGWINSZ, &ws);
 	if (g_linei->pos.y + 1 <= g_linei->len / ws.ws_col)
@@ -375,7 +385,7 @@ void	key_shift_down_funct(void)
 		tmp_pos.y = g_linei->pos.y + 1;
 		save_reset_pos(tmp_pos, 1);
 		save_reset_pos(g_linei->pos, 2);
-	}
+	}*/
 }
 
 void	is_arrow(char **first_select)
