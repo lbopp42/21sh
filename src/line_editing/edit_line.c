@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/21 16:00:11 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/24 10:09:09 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -347,20 +347,14 @@ void	key_shift_up_funct(void)
 
 	if (g_linei->pos.y - 1 >= 0)
 	{
-		if (g_linei->pos.x >= g_linei->p_len || g_linei->pos.y - 1 > 0)
-		{
-			tmp_pos.x = g_linei->pos.x;
-			tmp_pos.y = g_linei->pos.y - 1;
-			save_reset_pos(tmp_pos, 1);
-			save_reset_pos(g_linei->pos, 2);
-		}
-		else
-		{
-			tmp_pos.x = g_linei->p_len;
-			tmp_pos.y = g_linei->pos.y - 1;
-			save_reset_pos(tmp_pos, 1);
-			save_reset_pos(g_linei->pos, 2);
-		}
+		tmp_pos.x = g_linei->pos.x;
+		tmp_pos.y = g_linei->pos.y - 1;
+		key_home_funct();
+		while (g_linei->pos.y < tmp_pos.y)
+			key_right_funct();
+		while (g_linei->pos.x < tmp_pos.x &&
+				g_linei->content[g_linei->curs] != '\n')
+			key_right_funct();
 	}
 }
 
