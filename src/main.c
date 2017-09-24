@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/19 15:55:53 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/24 14:39:41 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,39 @@ void	free_ast_tree(t_ast_node **ast_tree)
 	*ast_tree = NULL;
 }
 
+int		print_my_prompt(char *p)
+{
+	static char	*prompt = NULL;
+
+	if (!prompt)
+		prompt = ft_strdup("Hello > ");
+	if (!p)
+	{
+		ft_putstr(prompt); //ne pas ecrire sur 1
+		return (ft_strlen(prompt));
+	}
+	else
+	{
+		ft_putstr(p); //ne pas ecrire sur 1
+		return (ft_strlen(p));
+	}
+}
+
+void	signal_handle(int signal)
+{
+	(void)signal;
+	if (signal == SIGINT && g_line == NULL)
+	{
+		ft_putchar('\n');
+		print_my_prompt(NULL);
+	}
+}
+
+void	manage_signal(void)
+{
+	signal(SIGINT, &signal_handle);
+}
+
 int		main(int ac, char **av, char **env)
 {
 	t_token			*tok_lst;
@@ -81,21 +114,23 @@ int		main(int ac, char **av, char **env)
 	g_last_status = 0;
 	g_env = env;
 	(void)av;
+	g_line = NULL;
 	main_history();
+	manage_signal();
 	while (1)
 	{
 		g_line = NULL;
 		tuple_parse = NULL;
 		state_lst = NULL;
 		tok_lst = NULL;
-		g_line = editing_line("Hello > ");
+		g_line = editing_line(print_my_prompt(NULL));
 		if (!g_line || !g_line[0])
 			continue ;
 		nb_tok = lexer_posix(&tok_lst, &state_lst);
 		while (state_lst)
 		{
 			g_line = ft_stradd(g_line, "\n");
-			g_line = ft_stradd(g_line, editing_line("> "));
+			g_line = ft_stradd(g_line, editing_line(print_my_prompt("> ")));
 			merge_history(&g_history->prev, &g_history);
 			g_history = g_history->prev;
 			tok_lst = NULL; //Need to be remove properly
@@ -117,9 +152,9 @@ int		main(int ac, char **av, char **env)
 			ft_strdel(&g_line);
 			continue ;
 		}
-		ft_strdel(&g_line);
 		main_expand(&tuple_parse->ast_tree);
 		execution(tuple_parse->ast_tree, env);
+		ft_strdel(&g_line);
 		free_ast_tree(&tuple_parse->ast_tree);
 		free(tuple_parse);
 	}
