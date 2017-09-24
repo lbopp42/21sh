@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/24 10:20:21 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/24 10:36:56 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -332,9 +332,12 @@ void	key_shift_right_funct(void)
 
 	sp = 0;
 	key_right_funct();
-	while (g_linei->curs && ft_isalnum(g_linei->content[g_linei->curs]) && !sp)
+	while (g_linei->curs < g_linei->len &&
+			ft_isalnum(g_linei->content[g_linei->curs]) && !sp)
 		key_right_funct();
-	while (g_linei->curs && g_linei->content[g_linei->curs] == ' ')
+	while (g_linei->curs < g_linei->len &&
+			(g_linei->content[g_linei->curs] == ' ' ||
+			g_linei->content[g_linei->curs] == '\n'))
 	{
 		key_right_funct();
 		sp = 1;
@@ -370,22 +373,6 @@ void	key_shift_down_funct(void)
 	while (g_linei->pos.x < tmp_pos.x &&
 			g_linei->content[g_linei->curs] != '\n')
 		key_right_funct();
-
-	/*struct winsize	ws;
-
-	ioctl(1, TIOCGWINSZ, &ws);
-	if (g_linei->pos.y + 1 <= g_linei->len / ws.ws_col)
-	{
-		if (ws.ws_col * g_linei->pos.y + g_linei->pos.x + ws.ws_col <=
-				g_linei->len + g_linei->p_len)
-			tmp_pos.x = g_linei->pos.x;
-		else
-			tmp_pos.x = g_linei->len + g_linei->p_len -
-				(g_linei->pos.y + 1) * ws.ws_col;
-		tmp_pos.y = g_linei->pos.y + 1;
-		save_reset_pos(tmp_pos, 1);
-		save_reset_pos(g_linei->pos, 2);
-	}*/
 }
 
 void	is_arrow(char **first_select)
