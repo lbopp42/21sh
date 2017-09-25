@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/25 13:22:53 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/25 16:40:45 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -364,6 +364,8 @@ void	launch_builtin(char **cmd, int in_fork)
 	}
 	else if (ft_strequ(cmd[0], "env"))
 		g_last_status = ft_env(cmd, in_fork);
+	if (in_fork)
+		exit(0);
 }
 
 int		verif_path(char *path, char *perm, char **cmd)

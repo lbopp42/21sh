@@ -6,11 +6,30 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/25 12:49:56 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/25 14:42:12 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
+
+void		free_list(t_list **list)
+{
+	t_list	*tmp;
+
+	while (*list)
+	{
+		tmp = *list;
+		ft_strdel((char**)(&(*list)->content));
+		*list = (*list)->next;
+		free(tmp);
+	}
+}
+
+int			free_tuple(t_tuple **tuple)
+{
+	free_ast_tree(&(*tuple)->ast_tree);
+	return (1);
+}
 
 t_list		*create_new_list(char *content)
 {
@@ -690,8 +709,10 @@ t_tuple	*islist(t_token *tok_lst, int nb_tok, int mv)
 					max_tuple = tuple_parse;
 					continue ;
 				}
+				else
+					free_tuple(&tuple_parse);
 			}
-			break ;
+			break;
 		}
 	}
 	return (max_tuple);
@@ -700,7 +721,7 @@ t_tuple	*islist(t_token *tok_lst, int nb_tok, int mv)
 t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 {
 	int		tmp;
-	t_tuple	*tmp_tuple;
+	//t_tuple	*tmp_tuple;
 	t_tuple	*tuple_parse;
 
 	tmp = mv;
@@ -712,7 +733,7 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 			return (NULL);
 		tmp--;
 	}
-	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
+	/*if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
 	{
 		if ((tmp_tuple = isseparator_op(tok_lst, tuple_parse->mv)))
 		{
@@ -720,7 +741,7 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 			tmp_tuple->mv += mv;
 			return (tmp_tuple);
 		}
-	}
+	}*/
 	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
 	{
 		tuple_parse->mv += mv;

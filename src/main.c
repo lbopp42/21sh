@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/25 13:17:50 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/25 14:37:25 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,14 @@ void	default_term(void)
 
 void	free_state_lst(t_state **state_lst)
 {
-	if (!*state_lst)
-		return ;
-	if ((*state_lst)->next)
-		free_state_lst(&(*state_lst)->next);
-	free(*state_lst);
+	t_state	*last;
+
+	while (*state_lst)
+	{
+		last = *state_lst;
+		*state_lst = (*state_lst)->next;
+		free(last);
+	}
 }
 
 void	free_ast_tree(t_ast_node **ast_tree)
@@ -53,8 +56,7 @@ void	free_ast_tree(t_ast_node **ast_tree)
 		free_ast_tree(&(*ast_tree)->left);
 	else if ((*ast_tree)->right)
 		free_ast_tree(&(*ast_tree)->right);
-	free((*ast_tree)->content);
-	(*ast_tree)->content = NULL;
+	free_list(&(*ast_tree)->content);
 	free(*ast_tree);
 	*ast_tree = NULL;
 }
@@ -62,13 +64,16 @@ void	free_ast_tree(t_ast_node **ast_tree)
 int		print_my_prompt(char *p)
 {
 	static char	*prompt = NULL;
+	int			len;
 
 	if (!prompt)
 		prompt = ft_strdup("Hello > ");
 	if (!p)
 	{
 		ft_putstr_fd(prompt, 2);
-		return (ft_strlen(prompt));
+		len = ft_strlen(prompt);
+		ft_strdel(&prompt);
+		return (len);
 	}
 	else
 	{
@@ -129,9 +134,7 @@ int		main(int ac, char **av, char **env)
 			continue ;
 		}
 		if (g_line && g_line[0])
-		{
 			tuple_parse = iscomplete_cmd(tok_lst, 0, 0);
-		}
 		else
 		{
 			free_tok_lst(&tok_lst);
@@ -145,9 +148,9 @@ int		main(int ac, char **av, char **env)
 			ft_strdel(&g_line);
 			continue ;
 		}
+		ft_strdel(&g_line);
 		main_expand(&tuple_parse->ast_tree);
 		execution(tuple_parse->ast_tree, env);
-		ft_strdel(&g_line);
 		free_ast_tree(&tuple_parse->ast_tree);
 		free(tuple_parse);
 	}

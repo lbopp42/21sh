@@ -6,21 +6,32 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/28 08:47:47 by lbopp             #+#    #+#             */
-/*   Updated: 2017/01/21 21:14:26 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/25 15:58:03 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include "libft.h"
 
-int		get_next_line(const int fd, char **line)
+static int	error(const int fd, char **line, char **content)
+{
+	if (!line || fd < 0)
+	{
+		ft_strdel(content);
+		return (1);
+	}
+	else
+		return (0);
+}
+
+int			get_next_line(const int fd, char **line)
 {
 	static char	*content;
 	int			ret;
 	char		buf[BUFF_SIZE + 1];
 	char		*newline;
 
-	if (!line || fd < 0)
+	if (error(fd, line, &content))
 		return (-1);
 	!content ? (content = ft_strnew(0)) : 0;
 	while ((ret = read(fd, buf, BUFF_SIZE)) > 0)

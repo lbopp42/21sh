@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/25 10:53:03 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/25 14:25:24 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,8 @@ void	launch_expand(t_list **list);
 /*			PARSER			*/
 /* ************************ */
 
+void	free_ast_tree(t_ast_node **ast_tree);
+void	free_list(t_list **list);
 char	**list_to_array(t_list *lst);
 
 /* ************************ */
