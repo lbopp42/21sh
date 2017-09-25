@@ -6,27 +6,11 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/06/08 13:38:38 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/25 12:49:56 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
-
-/*void	print_AST(t_ast_node *ast_tree, int mode, int layer)
-{
-	if (!ast_tree)
-		return ;
-	if (ast_tree->left)
-		print_AST(ast_tree->left, 1, layer + 1);
-	if (ast_tree->right)
-		print_AST(ast_tree->right, 2, layer + 1);
-	if (mode == 1)
-		printf("LEFT = [%s], LAYER = %d\n", ast_tree->content, layer);
-	else if (mode == 2)
-		printf("RIGHT = [%s], LAYER = %d\n", ast_tree->content, layer);
-	else
-		printf("ROOT = [%s], LAYER = %d\n", ast_tree->content, layer);
-}*/
 
 t_list		*create_new_list(char *content)
 {
@@ -617,8 +601,6 @@ t_tuple	*ispipe_sequence(t_token *tok_lst, int nb_tok, int mv)
 						tmp_tuple->ast_tree->right = new_tuple->ast_tree;
 					tmp_tuple->mv = new_tuple->mv;
 					max_tuple = tmp_tuple;
-					/*printf("========= MAX_TUPLE ==============\n");
-					print_AST(max_tuple->ast_tree, 0, 0);*/
 					continue ;
 				}
 			}
@@ -718,7 +700,7 @@ t_tuple	*islist(t_token *tok_lst, int nb_tok, int mv)
 t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 {
 	int		tmp;
-	//t_tuple	*tmp_tuple;
+	t_tuple	*tmp_tuple;
 	t_tuple	*tuple_parse;
 
 	tmp = mv;
@@ -730,7 +712,7 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 			return (NULL);
 		tmp--;
 	}
-	/*if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
+	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
 	{
 		if ((tmp_tuple = isseparator_op(tok_lst, tuple_parse->mv)))
 		{
@@ -738,7 +720,7 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 			tmp_tuple->mv += mv;
 			return (tmp_tuple);
 		}
-	}*/
+	}
 	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
 	{
 		tuple_parse->mv += mv;
@@ -746,48 +728,3 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 	}
 	return (NULL);
 }
-
-//TODO GREATAND AND LESSAND WITH PIPE
-
-/*int	main(void)
-{
-	t_tuple	*tuple_end;
-	t_token	*tok_lst;
-
-	tok_lst = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->type = WORD;
-	tok_lst->content = ft_strdup("ls");
-	tok_lst->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->type = PIPE;
-	tok_lst->next->content = ft_strdup("|");
-	tok_lst->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->type = WORD;
-	tok_lst->next->next->content = ft_strdup("cat");
-	tok_lst->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->type = GREAT;
-	tok_lst->next->next->next->content = ft_strdup(">");
-	tok_lst->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->content = ft_strdup("file");
-	tok_lst->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->next->type = GREATAND;
-	tok_lst->next->next->next->next->next->content = ft_strdup(">&");
-	tok_lst->next->next->next->next->next->next = (t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->next->next->content = ft_strdup("-");
-	tok_lst->next->next->next->next->next->next->next = NULL;(t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->next->next->next->content = ft_strdup("fifi");
-	tok_lst->next->next->next->next->next->next->next->next = NULL;(t_token*)ft_memalloc(sizeof(t_token));
-	tok_lst->next->next->next->next->next->next->next->next->type = WORD;
-	tok_lst->next->next->next->next->next->next->next->next->content = ft_strdup("-");
-	tok_lst->next->next->next->next->next->next->next->next->next = NULL;
-	tuple_end = iscomplete_cmd(tok_lst, 4, 0);
-	printf("ON SORT DE LA!\n");
-	if (tuple_end)
-	{
-		printf("mv final = %d\n", tuple_end->mv);
-		printf("ICI\n");
-		print_AST(tuple_end->ast_tree, 0, 0);
-	}
-}*/

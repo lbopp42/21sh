@@ -6,7 +6,7 @@
 #    By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/02/02 11:07:10 by lbopp             #+#    #+#              #
-#    Updated: 2017/09/19 09:55:00 by lbopp            ###   ########.fr        #
+#    Updated: 2017/09/25 11:45:25 by lbopp            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,13 +23,13 @@ LEXER_SRC = add_to_current_token.c\
 			state_management.c\
 			treatment_newline.c\
 			treatment_of_quote.c\
-			treatment_of_word.c
+			treatment_of_word.c\
+			free_tok_lst.c
 PARSER_SRC = list_to_array.c\
 			 parser.c
 EXPAND_SRC = main_expand.c
 EXECUTION_SRC = execution.c
-BUILTINS_SRC = array_to_list.c\
-			   ft_cd.c\
+BUILTINS_SRC = ft_cd.c\
 			   ft_echo.c\
 			   ft_env.c\
 			   ft_exit.c\

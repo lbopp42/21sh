@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/24 14:45:03 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/25 10:53:03 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,12 @@ int		ft_unsetenv(char **cmd);
 char	**list_to_tab(t_lst *lst);
 void	put_in_env(t_lst **env, char *var, char *valeur);
 t_lst	*tab_to_list(char *array[]);
+
+/* ************************ */
+/*  		 LEXER			*/
+/* ************************ */
+
+void	free_tok_lst(t_token **tok_lst);
 
 /* ************************ */
 /*  		 EXPAND			*/

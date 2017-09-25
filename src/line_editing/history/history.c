@@ -2,7 +2,8 @@
 
 void	save_history(void)
 {
-	int	fd;
+	int				fd;
+	t_list_double	*prev;
 
 	fd = open(".lsh_history", O_RDWR | O_CREAT, 0644);
 	while (g_history->prev)
@@ -10,9 +11,11 @@ void	save_history(void)
 	while (g_history)
 	{
 		ft_putendl_fd(g_history->content, fd);
+		ft_strdel(&g_history->content);
+		prev = g_history;
 		g_history = g_history->next;
+		free(prev);
 	}
-	//Need to free this list;
 	close(fd);
 }
 

@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/24 15:00:46 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/25 13:17:50 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 void	init_term(void)
 {
-	char			*term;
 	struct termios	attr;
 
 	tcgetattr(0, &g_origin_term);
@@ -23,7 +22,7 @@ void	init_term(void)
 	attr.c_cc[VMIN] = 1;
 	attr.c_cc[VTIME] = 0;
 	tcsetattr(0, TCSADRAIN, &attr);
-	if (!(term = getenv("TERM")) || tgetent(NULL, term) == -1)
+	if (!(getenv("TERM")) || tgetent(NULL, getenv("TERM")) == -1)
 	{
 		ft_putendl_fd("lsh: environment not found", 2);
 		default_term();
@@ -35,16 +34,6 @@ void	default_term(void)
 {
 	tcsetattr(0, TCSADRAIN, &g_origin_term);
 	tgetent(NULL, getenv("TERM"));
-}
-
-void	free_tok_lst(t_token **tok_lst)
-{
-	if (!*tok_lst)
-		return ;
-	if ((*tok_lst)->next)
-		free_tok_lst(&(*tok_lst)->next);
-	free((*tok_lst)->content);
-	free(*tok_lst);
 }
 
 void	free_state_lst(t_state **state_lst)
@@ -123,7 +112,9 @@ int		main(int ac, char **av, char **env)
 		tuple_parse = NULL;
 		state_lst = NULL;
 		tok_lst = NULL;
-		g_line = editing_line(print_my_prompt(NULL));
+		g_line = ft_strdup(editing_line(print_my_prompt(NULL)));
+		ft_strdel(&g_linei->content);
+		free(g_linei);
 		if (!g_line || !g_line[0])
 			continue ;
 		nb_tok = lexer_posix(&tok_lst, &state_lst);
@@ -133,15 +124,17 @@ int		main(int ac, char **av, char **env)
 			g_line = ft_stradd(g_line, editing_line(print_my_prompt("> ")));
 			merge_history(&g_history->prev, &g_history);
 			g_history = g_history->prev;
-			tok_lst = NULL; //Need to be remove properly
 			state_lst = NULL;
 			nb_tok = lexer_posix(&tok_lst, &state_lst);
 			continue ;
 		}
 		if (g_line && g_line[0])
+		{
 			tuple_parse = iscomplete_cmd(tok_lst, 0, 0);
+		}
 		else
 		{
+			free_tok_lst(&tok_lst);
 			ft_strdel(&g_line);
 			continue ;
 		}

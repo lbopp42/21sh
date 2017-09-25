@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/19 10:00:58 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/25 13:22:53 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -406,7 +406,11 @@ int		find_abs_path(char **cmd, char *path)
 			i += 1;
 		}
 		if (!verif_path(paths[i], perm, cmd))
+		{
+			del_array(paths);
 			return (0);
+		}
+		del_array(paths);
 	}
 	else if ((*cmd)[0] == '.' || (*cmd)[0] == '/' || !path || !ft_strlen(path))
 	{
@@ -455,11 +459,17 @@ void	execution_cmd(t_list *content, int in_fork, char *path)
 			if (child == 0)
 				execve(cmd[0], cmd, g_env);
 			else
+			{
+				del_array(cmd);
 				wait(NULL);
+			}
 		}
 	}
 	else
+	{
 		print_error(*cmd, ": command not found");
+		del_array(cmd);
+	}
 }
 
 /*
@@ -468,6 +478,8 @@ void	execution_cmd(t_list *content, int in_fork, char *path)
 
 int		main_exec(t_ast_node *ast_tree, int in_fork, int fd_min)
 {
+	if (!ast_tree)
+		return (0);
 	if (ast_tree->type == PIPE)
 		launch_pipe(ast_tree);
 	else if (ast_tree->type == GREAT)
