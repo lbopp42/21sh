@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/25 14:42:12 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/25 17:38:55 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -721,7 +721,7 @@ t_tuple	*islist(t_token *tok_lst, int nb_tok, int mv)
 t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 {
 	int		tmp;
-	//t_tuple	*tmp_tuple;
+	t_tuple	*tmp_tuple;
 	t_tuple	*tuple_parse;
 
 	tmp = mv;
@@ -733,7 +733,7 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 			return (NULL);
 		tmp--;
 	}
-	/*if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
+	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
 	{
 		if ((tmp_tuple = isseparator_op(tok_lst, tuple_parse->mv)))
 		{
@@ -741,7 +741,9 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 			tmp_tuple->mv += mv;
 			return (tmp_tuple);
 		}
-	}*/
+		else
+			free_tuple(&tuple_parse);
+	}
 	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
 	{
 		tuple_parse->mv += mv;
