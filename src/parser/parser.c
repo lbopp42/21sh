@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/25 17:38:55 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/26 10:30:39 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -744,6 +744,8 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 		else
 			free_tuple(&tuple_parse);
 	}
+	if (tuple_parse)
+		free(tuple_parse);
 	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
 	{
 		tuple_parse->mv += mv;

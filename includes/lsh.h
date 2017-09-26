@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/21 15:15:33 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/25 14:25:24 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/26 10:21:12 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,7 @@ char				*g_line;
 char				**g_env;
 int					g_last_status;
 t_list_double		*g_history;
+t_tuple				*g_tuple;
 
 
 int		execution(t_ast_node *ast_tree, char **env);
@@ -155,6 +156,7 @@ void	launch_expand(t_list **list);
 /*			PARSER			*/
 /* ************************ */
 
+int		free_tuple(t_tuple **tuple);
 void	free_ast_tree(t_ast_node **ast_tree);
 void	free_list(t_list **list);
 char	**list_to_array(t_list *lst);

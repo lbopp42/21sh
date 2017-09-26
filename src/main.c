@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/25 17:14:04 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/26 10:15:17 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,6 @@ int		main(int ac, char **av, char **env)
 {
 	t_token			*tok_lst;
 	t_state			*state_lst;
-	t_tuple			*tuple_parse;
 	int				nb_tok;
 
 	(void)ac;
@@ -114,7 +113,7 @@ int		main(int ac, char **av, char **env)
 	while (1)
 	{
 		g_line = NULL;
-		tuple_parse = NULL;
+		g_tuple = NULL;
 		state_lst = NULL;
 		tok_lst = NULL;
 		g_line = ft_strdup(editing_line(print_my_prompt(NULL)));
@@ -134,7 +133,7 @@ int		main(int ac, char **av, char **env)
 			continue ;
 		}
 		if (g_line && g_line[0])
-			tuple_parse = iscomplete_cmd(tok_lst, 0, 0);
+			g_tuple = iscomplete_cmd(tok_lst, 0, 0);
 		else
 		{
 			free_tok_lst(&tok_lst);
@@ -142,17 +141,16 @@ int		main(int ac, char **av, char **env)
 			continue ;
 		}
 		free_tok_lst(&tok_lst);
-		if (nb_tok != tuple_parse->mv)
+		if (nb_tok != g_tuple->mv)
 		{
 			ft_putendl("Syntax error !");
 			ft_strdel(&g_line);
 			continue ;
 		}
 		ft_strdel(&g_line);
-		main_expand(&tuple_parse->ast_tree);
-		execution(tuple_parse->ast_tree, env);
-		free_ast_tree(&tuple_parse->ast_tree);
-		free(tuple_parse);
+		main_expand(&g_tuple->ast_tree);
+		execution(g_tuple->ast_tree, env);
+		free_tuple(&g_tuple);
 	}
 	return (0);
 }
