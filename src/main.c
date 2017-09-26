@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/26 10:15:17 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/26 12:15:28 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,13 @@ void	free_ast_tree(t_ast_node **ast_tree)
 {
 	if (!*ast_tree)
 		return ;
-	else if ((*ast_tree)->left)
+	if ((*ast_tree)->left)
 		free_ast_tree(&(*ast_tree)->left);
-	else if ((*ast_tree)->right)
+	if ((*ast_tree)->right)
 		free_ast_tree(&(*ast_tree)->right);
+	ft_putstr("DELETING: ");
+	ft_putendl((*ast_tree)->content->content);
+	sleep(2);
 	free_list(&(*ast_tree)->content);
 	free(*ast_tree);
 	*ast_tree = NULL;
@@ -87,6 +90,9 @@ void	signal_handle(int signal)
 	(void)signal;
 	if (signal == SIGINT && g_line == NULL)
 	{
+		ft_strdel(&g_linei->content);
+		free(g_linei);
+		g_linei = NULL;
 		ft_putchar_fd('\n', 2);
 		print_my_prompt(NULL);
 	}

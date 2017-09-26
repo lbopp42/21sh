@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/25 11:41:45 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/26 10:42:22 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -787,6 +787,8 @@ char	*editing_line(int p_len)
 	{
 		ft_bzero(buf, 1);
 		read(0, buf, 1);
+		if (!g_linei)
+			init_line_info(p_len);
 		if (buf[0] == 4)
 		{
 			save_history();

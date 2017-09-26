@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/26 10:30:39 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/26 12:48:04 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ void		free_list(t_list **list)
 int			free_tuple(t_tuple **tuple)
 {
 	free_ast_tree(&(*tuple)->ast_tree);
+	free(*tuple);
 	return (1);
 }
 
@@ -343,6 +344,9 @@ t_tuple	*is_word(t_token *tok_lst, t_tuple *last)
 			last = (t_tuple*)ft_memalloc(sizeof(t_tuple));
 			last->ast_tree = create_ast_node(tok_lst, NULL, NULL);
 			last->mv = 1;
+			ft_putstr("CREATING: ");
+			ft_putendl(tok_lst->content);
+			sleep(2);
 		}
 		else
 		{
@@ -600,6 +604,7 @@ t_tuple	*ispipe_sequence(t_token *tok_lst, int nb_tok, int mv)
 			if ((tmp_tuple = ispipe(tok_lst, max_tuple->mv)))
 			{
 				tmp_tuple->ast_tree->left = max_tuple->ast_tree;
+				free(max_tuple);
 				if (isnewline(tok_lst, &tmp_tuple) &&
 						(new_tuple = is_simplecmd(tok_lst, nb_tok, tmp_tuple->mv)))
 				{
@@ -619,6 +624,7 @@ t_tuple	*ispipe_sequence(t_token *tok_lst, int nb_tok, int mv)
 					else
 						tmp_tuple->ast_tree->right = new_tuple->ast_tree;
 					tmp_tuple->mv = new_tuple->mv;
+					free(new_tuple);
 					max_tuple = tmp_tuple;
 					continue ;
 				}
@@ -706,6 +712,7 @@ t_tuple	*islist(t_token *tok_lst, int nb_tok, int mv)
 				{
 					tuple_parse->ast_tree->right = tmp_tuple->ast_tree;
 					tuple_parse->mv = tmp_tuple->mv;
+					free(tmp_tuple);
 					max_tuple = tuple_parse;
 					continue ;
 				}
@@ -741,11 +748,9 @@ t_tuple	*iscomplete_cmd(t_token *tok_lst, int nb_tok, int mv)
 			tmp_tuple->mv += mv;
 			return (tmp_tuple);
 		}
-		else
-			free_tuple(&tuple_parse);
 	}
 	if (tuple_parse)
-		free(tuple_parse);
+		free_tuple(&tuple_parse);
 	if ((tuple_parse = islist(tok_lst, nb_tok, 0)))
 	{
 		tuple_parse->mv += mv;
