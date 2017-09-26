@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/09 10:50:30 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/17 15:43:55 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/26 15:45:33 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	edit_path_dotdot(char **pwd, int *i)
 		while ((*pwd)[j] != '/')
 			j -= 1;
 		*pwd = ft_strsub(*pwd, 0, j);
-		add_slash(pwd);
+		ft_putendl(*pwd);
 	}
 	*i += 2;
 }
@@ -185,7 +185,11 @@ int		exec_without_cdpath(char *cmd, t_lst **env)
 	else if (cmd && cmd[0] == '/')
 		exec_chdir(cmd, cmd, env);
 	else if (cmd && cmd[0] == '.')
+	{
+		ft_putendl("ON PASSE LA");
+		sleep(2);
 		exec_chdir(cmd, cmd, env);
+	}
 	else
 		return (0);
 	return (1);

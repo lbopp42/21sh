@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/26 13:40:50 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/26 15:28:12 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,10 @@ int		main(int ac, char **av, char **env)
 		ft_strdel(&g_linei->content);
 		free(g_linei);
 		if (!g_line || !g_line[0])
+		{
+			ft_strdel(&g_line);
 			continue ;
+		}
 		nb_tok = lexer_posix(&tok_lst, &state_lst);
 		while (state_lst)
 		{

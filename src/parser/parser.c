@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/10 13:32:50 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/26 13:41:03 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/26 15:28:11 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -721,6 +721,7 @@ t_tuple	*islist(t_token *tok_lst, int nb_tok, int mv)
 					tuple_parse->ast_tree->right = tmp_tuple->ast_tree;
 					tuple_parse->mv = tmp_tuple->mv;
 					free(tmp_tuple);
+					free(max_tuple);
 					max_tuple = tuple_parse;
 					continue ;
 				}
