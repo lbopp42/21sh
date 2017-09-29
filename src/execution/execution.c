@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/26 10:21:09 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/29 10:25:56 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -469,10 +469,8 @@ void	execution_cmd(t_list *content, int in_fork, char *path)
 		}
 	}
 	else
-	{
 		print_error(*cmd, ": command not found");
-		del_array(cmd);
-	}
+	del_array(cmd);
 }
 
 /*

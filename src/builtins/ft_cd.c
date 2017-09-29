@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/09 10:50:30 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/26 15:45:33 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/29 10:23:26 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ void	exec_cd_cdpath(char *cmd, t_lst **env, char *cdpath, int option)
 	ft_putendl_fd(": No such directory", 2);
 }
 
-int		exec_chdir(char *cmd, char *pwd, t_lst **env)
+int		exec_chdir(char *cmd, t_lst **env)
 {
 	char	pwd_tab[256];
 
@@ -110,29 +110,27 @@ int		exec_chdir(char *cmd, char *pwd, t_lst **env)
 	else
 	{
 		put_in_env(env, "OLDPWD", get_var_content("PWD"));
-		if (!pwd)
-		{
-			getcwd(pwd_tab, 256);
-			put_in_env(env, "PWD", pwd_tab);
-		}
-		else
-			put_in_env(env, "PWD", pwd);
+		getcwd(pwd_tab, 256);
+		put_in_env(env, "PWD", pwd_tab);
 	}
 	return (0);
 }
 
 int		exec_cd(char *cmd, int option, t_lst **env)
 {
-	char	pwd[256];
+	char	*pwd;
 	char	*new_pwd;
 
 	if (option == 80)
-		exec_chdir(cmd, NULL, env);
+		exec_chdir(cmd, env);
 	else
 	{
+		pwd = ft_strnew(256);
 		getcwd(pwd, 256);
+		add_slash(&pwd);
 		new_pwd = edit_path(cmd, pwd);
-		exec_chdir(new_pwd, new_pwd, env);
+		exec_chdir(new_pwd, env);
+		ft_strdel(&pwd);
 		free(new_pwd);
 	}
 	return (1);
@@ -174,22 +172,18 @@ int		exec_without_cdpath(char *cmd, t_lst **env)
 	if (!cmd && (!home_var || !ft_strlen(home_var)))
 		ft_putstr_fd("lsh: cd: HOME not set\n", 2);
 	else if (!cmd && home_var)
-		exec_chdir(home_var, NULL, env);
+		exec_chdir(home_var, env);
 	else if (ft_strequ(cmd, "-") && !get_var_content("OLDPWD"))
 		ft_putendl_fd("lsh: cd: OLDPWD not set", 2);
 	else if (ft_strequ(cmd, "-"))
 	{
 		ft_putendl(get_var_content("OLDPWD"));
-		exec_chdir(get_var_content("OLDPWD"), NULL, env);
+		exec_chdir(get_var_content("OLDPWD"), env);
 	}
 	else if (cmd && cmd[0] == '/')
-		exec_chdir(cmd, cmd, env);
+		exec_chdir(cmd, env);
 	else if (cmd && cmd[0] == '.')
-	{
-		ft_putendl("ON PASSE LA");
-		sleep(2);
-		exec_chdir(cmd, cmd, env);
-	}
+		exec_chdir(cmd, env);
 	else
 		return (0);
 	return (1);
