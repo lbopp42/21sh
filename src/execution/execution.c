@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/05/20 09:40:10 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/29 10:25:56 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/29 10:32:50 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -462,10 +462,7 @@ void	execution_cmd(t_list *content, int in_fork, char *path)
 			if (child == 0)
 				execve(cmd[0], cmd, g_env);
 			else
-			{
-				del_array(cmd);
 				wait(NULL);
-			}
 		}
 	}
 	else
