@@ -5,7 +5,7 @@ void	save_history(void)
 	int				fd;
 	t_list_double	*prev;
 
-	fd = open(".lsh_history", O_RDWR | O_CREAT, 0644);
+	fd = open("/Users/lbopp/Desktop/project/21sh/.lsh_history", O_RDWR | O_CREAT, 0644);
 	while (g_history->prev)
 		g_history = g_history->prev;
 	while (g_history)
