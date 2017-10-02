@@ -6,11 +6,15 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/02 14:08:53 by lbopp             #+#    #+#             */
-/*   Updated: 2017/10/02 16:10:05 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/10/02 16:38:52 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
+
+/*
+**	Ctrl C a gerer quand on mettra dans le shell
+*/
 
 int		put_my_char(int c)
 {
@@ -174,15 +178,13 @@ void	ft_read(char **cmd, char **env)
 	readding = NULL;
 	opt = get_read_opt(cmd);
 	if (opt != 0 && opt != 'r')
-	{
-		printf("ERROR\n");
 		return ;
-	}
 	if (opt == 'r')
 		readding = read_r_opt(cmd);
 	else
 		readding = read_without_opt(cmd);
 	read_put_in_var(cmd, readding);
+	ft_strdel(&readding);
 }
 
 int	main(int ac, char **av, char **env)
