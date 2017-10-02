@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/26 09:11:49 by lbopp             #+#    #+#             */
-/*   Updated: 2017/01/11 16:12:24 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/10/02 11:08:18 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,6 @@ char	*ft_stradd(char *s1, char const *s2)
 	char	*new;
 
 	new = ft_strjoin(s1, s2);
-	free(s1);
+	ft_strdel(&s1);
 	return (new);
 }

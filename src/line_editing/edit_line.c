@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/06/26 11:58:28 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/26 10:42:22 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/30 11:50:07 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,6 @@ void	key_home_funct(void)
 	}
 	while (g_linei->pos.x < g_linei->p_len)
 	{
-		tputs(tgetstr("nd", NULL), 1, &put_my_char);
 		g_linei->pos.x++;
 	}
 	g_linei->curs = 0;

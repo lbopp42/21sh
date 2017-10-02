@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/03/27 12:26:11 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/26 15:28:12 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/09/30 10:58:16 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	default_term(void)
 	tgetent(NULL, getenv("TERM"));
 }
 
-void	free_state_lst(t_state **state_lst)
+/*void	free_state_lst(t_state **state_lst)
 {
 	t_state	*last;
 
@@ -56,10 +56,12 @@ void	free_ast_tree(t_ast_node **ast_tree)
 		free_ast_tree(&(*ast_tree)->left);
 	if ((*ast_tree)->right)
 		free_ast_tree(&(*ast_tree)->right);
-	/*ft_putstr("DELETING: ");
+	ft_putstr("DELETING: ");
 	ft_putendl((*ast_tree)->content->content);
-	sleep(2);*/
+	sleep(2);
 	free_list(&(*ast_tree)->content);
+	ft_putstr("APRES");
+	sleep(2);
 	free(*ast_tree);
 	*ast_tree = NULL;
 }
@@ -163,4 +165,4 @@ int		main(int ac, char **av, char **env)
 		free_tuple(&g_tuple);
 	}
 	return (0);
-}
+}*/
