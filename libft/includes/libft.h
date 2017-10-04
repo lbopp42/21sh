@@ -6,7 +6,7 @@
 /*   By: lbopp <lbopp@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2016/11/05 10:58:35 by lbopp             #+#    #+#             */
-/*   Updated: 2017/09/18 12:23:06 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/10/04 12:09:52 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,5 +113,6 @@ char			*ft_addslash(char *s1, char *s2);
 int				ft_isinarray(char *var, char **array);
 size_t			ft_arraylen(char **array);
 void			ft_lstaddend(t_list **alst, t_list *new);
+char			*ft_itoa_base(int value, int base);
 
 #endif
