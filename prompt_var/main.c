@@ -6,24 +6,18 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/03 10:28:17 by lbopp             #+#    #+#             */
-/*   Updated: 2017/10/04 15:59:15 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/10/09 11:43:09 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
 #include <time.h>
 
-typedef struct	s_promp_funct
-{
-	char	c;
-	char	(*f)(char **line, int *i);
-}				t_prompt_funct;
-
 char	*before_curr_after(char **before, char **curr, char **after)
 {
 	char	*line;
 
-	line = ft_strnew(1);
+	line = ft_strnew(0);
 	if (*before)
 		line = ft_stradd(line, *before);
 	line = ft_stradd(line, *curr);
@@ -33,6 +27,15 @@ char	*before_curr_after(char **before, char **curr, char **after)
 	ft_strdel(curr);
 	ft_strdel(after);
 	return (line);
+}
+
+void	join_free_all(char **date, int do_itoa)
+{
+	char	*to_free;
+
+	to_free = ft_itoa(do_itoa);
+	*date = ft_stradd(*date, to_free);
+	ft_strdel(&to_free);
 }
 
 char	*return_date(void)
@@ -49,28 +52,23 @@ char	*return_date(void)
 	current = *localtime(&t);
 	date = ft_strdup(day_array[current.tm_wday]);
 	date = ft_stradd(date, month_array[current.tm_mon]);
-	date = ft_stradd(date, ft_itoa(current.tm_mday));
+	join_free_all(&date, current.tm_mday);
 	return (date);
 }
 
-void	get_date_prompt(char **line, int *i)
+char	*get_date_prompt(char **line, int *i)
 {
 	char		*date;
-	char		*tmp;
-	char		*before;
 	char		*after;
+	char		*before;
 
 	date = return_date();
-	tmp = *line;
-	before = NULL;
-	after = NULL;
-	if (*i)
-		before = ft_strsub(tmp, 0, *i - 1);
-	after = ft_strsub(tmp, *i + 2, ft_strlen(tmp) - *i - 1);
-	*line = before_curr_after(&before,
-			&date, &after);
-	ft_strdel(&tmp);
-	ft_putendl(*line);
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
+	*i += 2 + ft_strlen(date);
+	ft_strdel(line);
+	*line = before_curr_after(&before, &date, &after);
+	return (NULL);
 }
 
 char	*get_hostname_prompt(int mode)
@@ -190,6 +188,7 @@ char	*get_octal_value(char *code)
 	int		j;
 
 	int_octal = 0;
+	octal = NULL;
 	tmp[1] = '\0';
 	i = 0;
 	j = 2;
@@ -249,30 +248,26 @@ char	*prompt_management(char *line)
 {
 	int		i;
 	char	tmp[2];
-	char	*prompt;
-	char	*new_line;
 
-	new_line = ft_strdup(line);
 	i = 0;
 	tmp[1] = '\0';
-	prompt = NULL;
 	while (line[i])
 	{
 		if (line[i] == '\\' && line[i + 1])
-			get_prompt(&new_line, &i);
-		else
-		{
-			tmp[1] = line[i];
-			prompt = ft_stradd(prompt, tmp);
-		}
-		i++;
+			get_prompt(&line, &i);
+		if (line[i])
+			i++;
 	}
-	return (prompt);
+	return (line);
 }
 
 int		main(int ac, char **av)
 {
+	char	*line;
+
 	(void)ac;
-	prompt_management(av[1]);
+	line = prompt_management(av[1]);
+	ft_putendl(line);
+	ft_strdel(&line);
 	return (0);
 }
