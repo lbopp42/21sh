@@ -6,25 +6,24 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/03 10:28:17 by lbopp             #+#    #+#             */
-/*   Updated: 2017/10/09 11:43:09 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/10/09 16:46:20 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lsh.h"
 #include <time.h>
 
-char	*before_curr_after(char **before, char **curr, char **after)
+char	*before_curr_after(char **before, char *curr, char **after)
 {
 	char	*line;
 
 	line = ft_strnew(0);
 	if (*before)
 		line = ft_stradd(line, *before);
-	line = ft_stradd(line, *curr);
+	line = ft_stradd(line, curr);
 	if (*after)
 		line = ft_stradd(line, *after);
 	ft_strdel(before);
-	ft_strdel(curr);
 	ft_strdel(after);
 	return (line);
 }
@@ -56,7 +55,7 @@ char	*return_date(void)
 	return (date);
 }
 
-char	*get_date_prompt(char **line, int *i)
+void	get_date_prompt(char **line, int *i)
 {
 	char		*date;
 	char		*after;
@@ -65,20 +64,24 @@ char	*get_date_prompt(char **line, int *i)
 	date = return_date();
 	before = ft_strsub(*line, 0, *i);
 	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
-	*i += 2 + ft_strlen(date);
+	*i += ft_strlen(date);
 	ft_strdel(line);
-	*line = before_curr_after(&before, &date, &after);
-	return (NULL);
+	*line = before_curr_after(&before, date, &after);
+	ft_strdel(&date);
 }
 
-char	*get_hostname_prompt(int mode)
+void	get_hostname_prompt(char **line, int *i, int mode)
 {
 	char	*hostname;
 	char	**split;
+	char	*after;
+	char	*before;
 
 	if (!(hostname = ft_memalloc(sizeof(char) * 256)))
 		exit (EXIT_FAILURE);
 	gethostname(hostname, 256);
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
 	if (mode == 1)
 	{
 		split = ft_strsplit(hostname, '.');
@@ -86,179 +89,261 @@ char	*get_hostname_prompt(int mode)
 		hostname = ft_strdup(split[0]);
 		// FREE split
 	}
-	return (hostname);
+	*i += ft_strlen(hostname);
+	ft_strdel(line);
+	*line = before_curr_after(&before, hostname, &after);
+	ft_strdel(&hostname);
 }
 
-char	*get_ttyname(void)
+void	get_ttyname(char **line, int *i)
 {
 	char	*name;
+	char	*before;
+	char	*after;
 
 	name = ttyname(0);
 	name = ft_strrchr(name, '/');
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
 	if (name[0] && name[0] == '/')
 		name++;
-	return (name);
+	*i += ft_strlen(name);
+	ft_strdel(line);
+	*line = before_curr_after(&before, name, &after);
 }
 
-char	*get_time_prompt(int mode)
+void	get_time_prompt(char **line, int *i, int mode)
 {
-	char	*curr_time;
+	char		*curr_time;
 	time_t		t;
 	struct tm	current;
-	int			hour;
+	char		*before;
+	char		*after;
 
 	time(&t);
 	current = *localtime(&t);
-	hour = current.tm_hour;
-	if (mode != 1 && hour > 12)
-		hour -= 12;
-	curr_time = ft_strdup(ft_itoa(hour));
+	current.tm_hour -= (mode != 1 && current.tm_hour > 12) ? 12 : 0;
+	before = ft_itoa(current.tm_hour);
+	curr_time = ft_strdup(before);
 	curr_time = ft_stradd(curr_time, ":");
-	curr_time = ft_stradd(curr_time, ft_itoa(current.tm_min));
+	ft_strdel(&before);
+	before = ft_itoa(current.tm_min);
+	curr_time = ft_stradd(curr_time, before);
 	curr_time = ft_stradd(curr_time, ":");
-	curr_time = ft_stradd(curr_time, ft_itoa(current.tm_sec));
-	return (curr_time);
+	ft_strdel(&before);
+	before = ft_itoa(current.tm_sec);
+	curr_time = ft_stradd(curr_time, before);
+	ft_strdel(&before);
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
+	ft_strdel(line);
+	*line = before_curr_after(&before, curr_time, &after);
+	ft_strdel(&curr_time);
 }
 
-char	*get_time_prompt2(void)
+void	get_time_prompt2(char **line, int *i)
 {
-	char	*curr_time;
+	char		*curr_time;
 	time_t		t;
 	struct tm	current;
-	int			hour;
+	char		*before;
+	char		*after;
 
 	time(&t);
 	current = *localtime(&t);
-	hour = current.tm_hour;
-	if (hour > 12)
-		hour -= 12;
-	curr_time = ft_strdup(ft_itoa(hour));
+	current.tm_hour -= (current.tm_hour > 12) ? 12 : 0;
+	before = ft_itoa(current.tm_hour);
+	curr_time = ft_strdup(before);
+	ft_strdel(&before);
 	curr_time = ft_stradd(curr_time, ":");
-	curr_time = ft_stradd(curr_time, ft_itoa(current.tm_min));
+	before = ft_itoa(current.tm_min);
+	curr_time = ft_stradd(curr_time, before);
+	ft_strdel(&before);
 	if (current.tm_hour < 12)
 		curr_time = ft_stradd(curr_time, " AM");
 	else
 		curr_time = ft_stradd(curr_time, " PM");
-	return (curr_time);
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
+	ft_strdel(line);
+	*line = before_curr_after(&before, curr_time, &after);
+	ft_strdel(&curr_time);
 }
 
-char	*get_username(void)
+void	get_username(char **line, int *i)
 {
 	char	*username;
+	char	*before;
+	char	*after;
 
 	if (!(username = ft_memalloc(sizeof(char) * 257)))
 		exit(EXIT_FAILURE);
 	getlogin_r(username, 256);
-	return (username);
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
+	ft_strdel(line);
+	*line = before_curr_after(&before, username, &after);
+	ft_strdel(&username);
 }
 
-char	*get_path(int mode)
+void	get_path(char **line, int *i, int mode)
 {
 	char	path[256];
 	char	*final_path;
+	char	*before;
+	char	*after;
 
 	getcwd(path, 256);
-	final_path = ft_strdup(path);
 	if (mode == 2)
-		final_path = ft_strrchr(final_path, '/');
+		final_path = ft_strrchr(path, '/');
+	else
+		final_path = ft_strdup(path);
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
+	ft_strdel(line);
 	if (final_path[0] && final_path[0] == '/')
-		final_path++;
-	return (final_path);
+		*line = before_curr_after(&before, final_path + 1, &after);
+	else
+		*line = before_curr_after(&before, final_path, &after);
+	if (mode != 2)
+		ft_strdel(&final_path);
 }
 
-char	*get_uid_prompt(void)
+void	get_uid_prompt(char **line, int *i)
 {
 	uid_t	uid;
-	char	*uid_string;
+	char	*before;
+	char	*after;
 
 	uid = getuid();
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
+	*i += 1;
+	ft_strdel(line);
 	if (uid == 0)
-		uid_string = ft_strdup("#");
+		*line = before_curr_after(&before, "#", &after);
 	else
-		uid_string = ft_strdup("$");
-	return (uid_string);
+		*line = before_curr_after(&before, "$", &after);
 }
 
-char	*get_octal_value(char *code)
+void	get_octal_value2(char **line, int *i, char **octal)
+{
+	char	*before;
+	char	*after;
+
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
+	ft_strdel(line);
+	*i += ft_strlen(*octal);
+	*line = before_curr_after(&before, *octal, &after);
+	ft_strdel(octal);
+}
+
+void	get_octal_value(char **line, int *i, char *code)
 {
 	char	*octal;
 	char	tmp[2];
 	int		int_octal;
-	int		i;
+	int		curs;
 	int		j;
 
 	int_octal = 0;
 	octal = NULL;
 	tmp[1] = '\0';
-	i = 0;
+	curs = 0;
 	j = 2;
 	if (code[0] && code[1] && code[2] && ft_isdigit(code[0]) &&
 			ft_isdigit(code[1]) && ft_isdigit(code[2]))
 	{
-		while (i < 3)
+		while (curs < 3)
 		{
-			tmp[0] = code[i];
+			tmp[0] = code[curs];
 			int_octal += ft_atoi(tmp) * ft_power(8, j);
 			j--;
-			i++;
+			curs++;
 		}
 		octal = ft_itoa(int_octal);
 	}
-	return (octal);
+	get_octal_value2(line, i, &octal);
+}
+
+void	get_shell_name(char **line, int *i)
+{
+	char *before;
+	char *after;
+
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
+	ft_strdel(line);
+	*line = before_curr_after(&before, "42sh", &after);
+}
+
+void	get_version(char **line, int *i, int mode)
+{
+	char	*before;
+	char	*after;
+
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
+	ft_strdel(line);
+	if (mode == 1)
+		*line = before_curr_after(&before, "1.0", &after);
+	else
+		*line = before_curr_after(&before, "1.0.0", &after);
 }
 
 char	*get_prompt(char **line, int *i)
 {
 	if ((*line)[*i + 1] == 'd')
 		get_date_prompt(line, i);
-	/*if (code[i] == '\\' && code[i + 1] && code[i + 1] == 'h')
-		printf("%s\n", get_hostname_prompt(1));
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == 'H')
-		printf("%s\n", get_hostname_prompt(2));
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == 'l')
-		printf("%s\n", get_ttyname());
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == 's')
-		printf("%s\n", "42sh");
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == 't')
-		printf("%s\n", get_time_prompt(1));
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == 'T')
-		printf("%s\n", get_time_prompt(2));
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == '@')
-		printf("%s\n", get_time_prompt2());
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == 'u')
-		printf("%s\n", get_username());
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == 'v')
-		printf("%s\n", "1.0");
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == 'V')
-		printf("%s\n", "1.0.0");
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == 'w')
-		printf("%s\n", get_path(1));
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == 'W')
-		printf("%s\n", get_path(2));
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == '$')
-		printf("%s\n", get_uid_prompt());
-	if (code[i] == '\\' && code[i + 1] && ft_isdigit(code[i + 1]))
-		printf("octal = [%s]\n", get_octal_value(&code[i + 1]));
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == 'h')
+		get_hostname_prompt(line, i, 1);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == 'H')
+		get_hostname_prompt(line, i, 2);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == 'l')
+		get_ttyname(line, i);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == 's')
+		get_shell_name(line, i);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == 't')
+		get_time_prompt(line, i, 1);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == 'T')
+		get_time_prompt(line, i, 2);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == '@')
+		get_time_prompt2(line, i);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == 'u')
+		get_username(line, i);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == 'v')
+		get_version(line, i, 1);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == 'V')
+		get_version(line, i, 2);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == 'w')
+		get_path(line, i, 1);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == 'W')
+		get_path(line, i, 2);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == '$')
+		get_uid_prompt(line, i);
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && ft_isdigit((*line)[*i + 1]))
+		get_octal_value(line, i, &(*line)[*i + 1]);
+	/*
 	if (code[i] == '\\' && code[i + 1] && code[i + 1] == '\\')
 		printf("\\");*/
 	return (NULL);
 }
 
-char	*prompt_management(char *line)
+void	prompt_management(char **line)
 {
 	int		i;
 	char	tmp[2];
 
 	i = 0;
 	tmp[1] = '\0';
-	while (line[i])
+	while ((*line)[i])
 	{
-		if (line[i] == '\\' && line[i + 1])
-			get_prompt(&line, &i);
-		if (line[i])
+		if ((*line)[i] == '\\' && (*line)[i + 1])
+			get_prompt(line, &i);
+		if ((*line)[i])
 			i++;
 	}
-	return (line);
 }
 
 int		main(int ac, char **av)
@@ -266,7 +351,8 @@ int		main(int ac, char **av)
 	char	*line;
 
 	(void)ac;
-	line = prompt_management(av[1]);
+	line = ft_strdup(av[1]);
+	prompt_management(&line);
 	ft_putendl(line);
 	ft_strdel(&line);
 	return (0);
