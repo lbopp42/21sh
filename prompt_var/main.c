@@ -6,7 +6,7 @@
 /*   By: lbopp <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/10/03 10:28:17 by lbopp             #+#    #+#             */
-/*   Updated: 2017/10/09 16:46:20 by lbopp            ###   ########.fr       */
+/*   Updated: 2017/10/09 17:44:58 by lbopp            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,7 +232,7 @@ void	get_octal_value2(char **line, int *i, char **octal)
 	char	*after;
 
 	before = ft_strsub(*line, 0, *i);
-	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
+	after = ft_strsub(*line, *i + 4, ft_strlen(*line) - *i - 4);
 	ft_strdel(line);
 	*i += ft_strlen(*octal);
 	*line = before_curr_after(&before, *octal, &after);
@@ -292,6 +292,17 @@ void	get_version(char **line, int *i, int mode)
 		*line = before_curr_after(&before, "1.0.0", &after);
 }
 
+void	add_backslash(char **line, int *i)
+{
+	char	*before;
+	char	*after;
+
+	before = ft_strsub(*line, 0, *i);
+	after = ft_strsub(*line, *i + 2, ft_strlen(*line) - *i - 2);
+	ft_strdel(line);
+	*line = before_curr_after(&before, "\\", &after);
+}
+
 char	*get_prompt(char **line, int *i)
 {
 	if ((*line)[*i + 1] == 'd')
@@ -324,9 +335,8 @@ char	*get_prompt(char **line, int *i)
 		get_uid_prompt(line, i);
 	if ((*line)[*i] == '\\' && (*line)[*i + 1] && ft_isdigit((*line)[*i + 1]))
 		get_octal_value(line, i, &(*line)[*i + 1]);
-	/*
-	if (code[i] == '\\' && code[i + 1] && code[i + 1] == '\\')
-		printf("\\");*/
+	if ((*line)[*i] == '\\' && (*line)[*i + 1] && (*line)[*i + 1] == '\\')
+		add_backslash(line, i);
 	return (NULL);
 }
 
@@ -352,6 +362,7 @@ int		main(int ac, char **av)
 
 	(void)ac;
 	line = ft_strdup(av[1]);
+	printf("ON RECOIS [%s]\n", line);
 	prompt_management(&line);
 	ft_putendl(line);
 	ft_strdel(&line);
